@@ -1,4 +1,4 @@
-//var meteoRequest = new XMLHttpRequest();
+var meteoRequest = new XMLHttpRequest();
 // var longitude = 5.4510;
 // var latitude = 43.5156;
 var startUrl = "https://api.openweathermap.org/data/2.5/weather?lat=";
@@ -24,7 +24,7 @@ function error(err) {
 /**
  * Display the weather
  */
-function refreshWeather(latitude, longitude) {
+function refreshWeather() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(success, error);
     }
