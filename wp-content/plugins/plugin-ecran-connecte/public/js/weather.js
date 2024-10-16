@@ -1,15 +1,33 @@
-var meteoRequest = new XMLHttpRequest();
-var longitude = 5.4510;
-var latitude = 43.5156;
-var url = "https://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&lang=fr&APPID=ae546c64c1c36e47123b3d512efa723e";
+//var meteoRequest = new XMLHttpRequest();
+// var longitude = 5.4510;
+// var latitude = 43.5156;
+var startUrl = "https://api.openweathermap.org/data/2.5/weather?lat=";
+var endUrl = "&lang=fr&APPID=ae546c64c1c36e47123b3d512efa723e";
+
+function success(pos){
+    const crd = pos.coords;
+
+    var latitude = crd.latitude;
+    var longitude = crd.longitude;
+
+    var url = startUrl + latitude + "&lon=" + longitude + endUrl;
+
+    meteoRequest.open('GET', url, true);
+    meteoRequest.setRequestHeader('Accept', 'application/json');
+    meteoRequest.send();
+}
+
+function error(err) {
+    console.warn(`ERROR(${err.code}): ${err.message}`);
+}
 
 /**
  * Display the weather
  */
-function refreshWeather() {
-    meteoRequest.open('GET', url, true);
-    meteoRequest.setRequestHeader('Accept', 'application/json');
-    meteoRequest.send();
+function refreshWeather(latitude, longitude) {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(success, error);
+    }
 }
 
 meteoRequest.onload = function () {
