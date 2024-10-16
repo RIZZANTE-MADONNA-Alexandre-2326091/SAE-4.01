@@ -20,8 +20,8 @@ if((in_array('etudiant', $current_user->roles) || in_array('television', $curren
         $class_footer= "footer_alert_etudiant";
     }?>
 
+    <?php  if (get_theme_mod('ecran_connecte_footer_alert', 'show') == 'show') { ?>
     <footer class="row <?=$class_footer?>">
-        <?php  if (get_theme_mod('ecran_connecte_footer_alert', 'show') == 'show') { ?>
             <div class = "<?php echo $class; ?>">
             <?php the_widget('WidgetAlert'); ?>
             </div>
@@ -33,13 +33,15 @@ if((in_array('etudiant', $current_user->roles) || in_array('television', $curren
             <div class = "<?php echo $class; ?>">
             <?php the_widget('WidgetWeather'); ?>
             </div>
-        <?php }} ?>
+        <?php }?>
+            </footer>
+        <?php } ?>
 
-<?php else: ?>
+    <?php else: ?>
     <footer class="footer_ecran">
         <p class="text-center">© 2021 - Aix-Marseille Université</p>
-<?php endif; ?>
-</footer>
+    </footer>
+    <?php endif; ?>
 <?php wp_footer(); ?>
 </body>
 </html>

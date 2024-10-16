@@ -10,17 +10,6 @@ add_filter('auto_update_theme', '__return_true');
 
 
 error_reporting(0);
-/*
-function wp_maintenance_mode()
-{
-	if(!current_user_can('edit_themes') || !is_user_logged_in()) {
-		wp_die('<h1 style="color:red">Site en maintenance</h1>
-<br />Le site est en cours de maintenance, merci de bien patienter
-<script src="/wp-content/themes/theme-ecran-connecte/assets/js/refresh.js"></script>');
-	}
-}
-add_action('get_header', 'wp_maintenance_mode');
-*/
 
 function add_scripts()
 {
@@ -49,7 +38,6 @@ function add_theme_scripts()
     wp_enqueue_script( 'theme-jquery', get_template_directory_uri() . '/assets/js/vendor/jquery-3.3.1.min.js', array (), '', false);
     wp_enqueue_script( 'theme-jqueryUI', get_template_directory_uri() . '/assets/js/vendor/jquery-ui.min.js', array ( 'jquery' ), '', false);
 }
-//add_action('wp_enqueue_scripts', 'add_theme_scripts');
 
 /**
  * CSS for login page

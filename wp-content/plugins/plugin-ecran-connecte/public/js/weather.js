@@ -4,40 +4,25 @@ var meteoRequest = new XMLHttpRequest();
 var startUrl = "https://api.openweathermap.org/data/2.5/weather?lat=";
 var endUrl = "&lang=fr&APPID=ae546c64c1c36e47123b3d512efa723e";
 
-
-/**
-* @param La position d'un appareil.
-*
-* Utilise la position d'un appareil pour avoir la lattitude et la longitude de ce dernier et les insérer dans un lien.
-* Ce lien est ensuite utilisé dans XMLHttpRequest meteoRequest afin de l'adapter à la page WordPress.
-* */
 function success(pos){
-    // On récupère les coordonnées de la postition.
     const crd = pos.coords;
 
-    // On déclare nos variables latitude et longitude.
     var latitude = crd.latitude;
     var longitude = crd.longitude;
 
-    // On crée l'URL permettant de connaitre la météo à la latitude et longitude demandée.
     var url = startUrl + latitude + "&lon=" + longitude + endUrl;
 
-    // On fait appel à meteoRequest.
     meteoRequest.open('GET', url, true);
     meteoRequest.setRequestHeader('Accept', 'application/json');
     meteoRequest.send();
 }
 
-/**
-* Permet d'afficher une erreur si la position de l'appareil n'est pas trouvé.
-* */
 function error(err) {
     console.warn(`ERROR(${err.code}): ${err.message}`);
 }
 
 /**
- * Permet de rafraichir la météo. Si le navigateur supporte l'API, il localise l'appareil utilisé et lance soit
- * la fonction success(), soit la fonction error().
+ * Display the weather
  */
 function refreshWeather() {
     if (navigator.geolocation) {

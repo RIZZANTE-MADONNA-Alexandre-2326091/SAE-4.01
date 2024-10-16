@@ -57,7 +57,7 @@ $oddcomment = 'alt';
             <?php else : // comments are closed ?>
 
                 <!-- If comments are closed. -->
-                <p class="nocomments">Les commentaires sont fermŽs !</p>
+                <p class="nocomments">Les commentaires sont fermés !</p>
 
             <?php endif; ?>
         <?php endif; ?>
@@ -68,7 +68,7 @@ $oddcomment = 'alt';
     <h3 id="respond">Laissez un commentaire</h3>
 
     <?php if (get_option('comment_registration') && !$user_ID) : ?>
-        <p>You must be <a
+        <p>Vous devez être <a
                     href="<?php echo get_option('siteurl'); ?>/wp-login.php?redirect_to=<?php the_permalink(); ?>">connect&eacute;</a>
             pour laisser un commentaire.</p>
 
@@ -99,7 +99,7 @@ $oddcomment = 'alt';
 
             <?php endif; ?>
 
-            <!--<p><small><strong>XHTML:</strong> <?php _e('Vous pouvez utiliser ces tags&#58;'); ?> <?php echo allowed_tags(); ?></small></p>-->
+            <?php _e('Vous pouvez utiliser ces tags&#58;'); ?> <?php echo allowed_tags(); ?></small></p>-->
 
             <p><textarea name="comment" id="comment" cols="60" rows="10" tabindex="4"></textarea></p>
 
