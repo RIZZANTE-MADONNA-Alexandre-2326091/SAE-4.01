@@ -69,7 +69,7 @@ function getIcon(json) {
 }
 
 function cutIcon(str) {
-    return str.substr(0, str.length - 1);
+    return str.slice(0, -1);
 }
 
 function getTemp(json) {
