@@ -1,20 +1,21 @@
 var meteoRequest = new XMLHttpRequest();
-// var longitude = 5.4510;
-// var latitude = 43.5156;
 var startUrl = "https://api.openweathermap.org/data/2.5/weather?lat=";
+var url;
 var endUrl = "&lang=fr&APPID=ae546c64c1c36e47123b3d512efa723e";
 
 function success(pos){
-    const crd = pos.coords;
+    var crd = pos.coords;
 
-    var latitude = crd.latitude;
     var longitude = crd.longitude;
+    var latitude = crd.latitude;
 
-    var url = startUrl + latitude + "&lon=" + longitude + endUrl;
+    url = startUrl + latitude + "&lon=" + longitude + endUrl;
 
     meteoRequest.open('GET', url, true);
     meteoRequest.setRequestHeader('Accept', 'application/json');
     meteoRequest.send();
+
+
 }
 
 function error(err) {
@@ -68,7 +69,7 @@ function getIcon(json) {
 }
 
 function cutIcon(str) {
-    return str.substr(0, str.length - 1);
+    return str.substr(0, str.length()-1);
 }
 
 function getTemp(json) {
