@@ -229,7 +229,6 @@ class InformationView extends View
 	 * */
 	public function displayFormVideo(string $title = null, string $link = null, string $endDate = null, string $type = 'createVideo'): string
 	{
-		//TODO
 		$dateMin = date('Y-m-d', strtotime("+1 day"));
 		$form = '
 		<form method="post" enctype="multipart/form-data">

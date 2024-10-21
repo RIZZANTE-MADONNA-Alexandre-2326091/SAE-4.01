@@ -139,7 +139,6 @@ class InformationController extends Controller
         }
         if(isset($actionVideo)) // If the information is a video
         {
-            //TODO
             $type = 'video';
             $information->setType($type);
            // $information->setContent($content);
