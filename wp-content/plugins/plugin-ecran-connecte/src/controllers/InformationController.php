@@ -372,13 +372,17 @@ class InformationController extends Controller
             $type = $information->getType();
             if ($information->getType() === 'img') {
                 $type = 'Image';
-            } else if ($information->getType() === 'pdf') {
+            }
+			else if ($information->getType() === 'pdf') {
                 $type = 'PDF';
-            } else if ($information->getType() === 'event') {
+            }
+			else if ($information->getType() === 'event') {
                 $type = 'Évènement';
-            } else if ($information->getType() === 'text') {
+            }
+			else if ($information->getType() === 'text') {
                 $type = 'Texte';
-            } else if ($information->getType() === 'tab') {
+            }
+			else if ($information->getType() === 'tab') {
                 $type = 'Table Excel';
             }
             else if ($information->getType() === 'video') {

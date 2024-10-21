@@ -245,6 +245,16 @@ class InformationView extends View
                 src="' . $link . '">
             </div>
             <div class="form-group">
+            	<div class="form-check form-check-inline">
+            		<input class="form-check-input" type="radio" name="format" id="classicVideo" value="video">
+            		<label class="form-check-label" for="video">Vidéo classique</label>
+            	</div>
+            	<div class="form-check form-check-inline">
+            		<input class="form-check-input" type="radio" name="format" id="shortVideo" value="short">
+            		<label class="form-check-label" for="shortVideo">Short</label>
+            	</div>
+			</div>
+            <div class="form-group">
                 <label for="expirationDate">Date d\'expiration</label>
                 <input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' .
 		        $dateMin . '" value="' . $endDate . '" required="required">
