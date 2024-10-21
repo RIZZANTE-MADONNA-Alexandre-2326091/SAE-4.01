@@ -41,7 +41,8 @@ class InformationController extends Controller
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      */
-    public function create() {
+    public function create(): string
+    {
         $current_user = wp_get_current_user();
 
         // All forms
@@ -50,6 +51,7 @@ class InformationController extends Controller
         $actionTab = filter_input(INPUT_POST, 'createTab');
         $actionPDF = filter_input(INPUT_POST, 'createPDF');
         $actionEvent = filter_input(INPUT_POST, 'createEvent');
+        $actionVideo = filter_input(INPUT_POST, 'createVideo');
 
         // Variables
         $title = filter_input(INPUT_POST, 'title');
@@ -108,7 +110,7 @@ class InformationController extends Controller
                 $this->view->buildModal('Tableau non valide', '<p>Ce fichier est un tableau non valide, veuillez choisir un autre tableau</p>');
             }
         }
-        if (isset($actionPDF)) {
+        if (isset($actionPDF)) { // If the information is a PDF file
             $type = "pdf";
             $information->setType($type);
             $filename = $_FILES['contentFile']['name'];
@@ -120,7 +122,7 @@ class InformationController extends Controller
                 $this->view->buildModal('PDF non valide', '<p>Ce fichier est un tableau non PDF, veuillez choisir un autre PDF</p>');
             }
         }
-        if (isset($actionEvent)) {
+        if (isset($actionEvent)) { // If the information is an event
             $type = 'event';
             $information->setType($type);
             $countFiles = count($_FILES['contentFile']['name']);
@@ -135,6 +137,20 @@ class InformationController extends Controller
                 }
             }
         }
+        if(isset($actionVideo)) // If the information is a video
+        {
+            //TODO
+            $type = 'video';
+            $information->setType($type);
+           // $information->setContent($content);
+
+            // Try to insert the information
+            if ($information->insert()) {
+                $this->view->displayCreateValidate();
+            } else {
+                $this->view->displayErrorInsertionInfo();
+            }
+        }
         // Return a selector with all forms
         return
             $this->view->displayStartMultiSelect() .
@@ -143,12 +159,14 @@ class InformationController extends Controller
             $this->view->displayTitleSelect('table', 'Tableau') .
             $this->view->displayTitleSelect('pdf', 'PDF') .
             $this->view->displayTitleSelect('event', 'Événement') .
+            $this->view->displayTitleSelect('video','Vidéo') .
             $this->view->displayEndOfTitle() .
             $this->view->displayContentSelect('text', $this->view->displayFormText(), true) .
             $this->view->displayContentSelect('image', $this->view->displayFormImg()) .
             $this->view->displayContentSelect('table', $this->view->displayFormTab()) .
             $this->view->displayContentSelect('pdf', $this->view->displayFormPDF()) .
             $this->view->displayContentSelect('event', $this->view->displayFormEvent()) .
+            $this->view->displayContentSelect('video', $this->view->displayFormVideo()) .
             $this->view->displayEndDiv() .
             $this->view->contextCreateInformation();
     }
@@ -170,7 +188,8 @@ class InformationController extends Controller
         $current_user = wp_get_current_user();
         $information = $this->model->get($id);
 
-        if (!(in_array('administrator', $current_user->roles) || in_array('secretaire', $current_user->roles) || $information->getAuthor()->getId() == $current_user->ID)) {
+        if (!(in_array('administrator', $current_user->roles) || in_array('secretaire', $current_user->roles)
+              || $information->getAuthor()->getId() == $current_user->ID)) {
             return $this->view->noInformation();
         }
 
@@ -187,10 +206,17 @@ class InformationController extends Controller
             $information->setTitle($title);
             $information->setExpirationDate($endDate);
 
-            if ($information->getType() == 'text') {
+            if ($information->getType() == 'text')
+            {
                 // Set new information
                 $information->setContent($content);
-            } else {
+            }
+            else if ($information->getType() == 'video')
+            {
+				$information->setContent($content);
+            }
+            else
+            {
                 // Change the content
                 if ($_FILES["contentFile"]['size'] != 0) {
                     echo $_FILES["contentFile"]['size'];
@@ -349,11 +375,14 @@ class InformationController extends Controller
             } else if ($information->getType() === 'pdf') {
                 $type = 'PDF';
             } else if ($information->getType() === 'event') {
-                $type = 'Événement';
+                $type = 'Évènement';
             } else if ($information->getType() === 'text') {
                 $type = 'Texte';
             } else if ($information->getType() === 'tab') {
                 $type = 'Table Excel';
+            }
+            else if ($information->getType() === 'video') {
+                $type = "Vidéo";
             }
             $dataList[] = [$row, $this->view->buildCheckbox($name, $information->getId()), $information->getTitle(), $content, $information->getCreationDate(), $information->getExpirationDate(), $information->getAuthor()->getLogin(), $type, $this->view->buildLinkForModify(esc_url(get_permalink(get_page_by_title('Modifier une information'))) . '?id=' . $information->getId())];
         }
