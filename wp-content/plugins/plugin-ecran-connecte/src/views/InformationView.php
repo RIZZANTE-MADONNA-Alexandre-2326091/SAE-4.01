@@ -26,22 +26,26 @@ class InformationView extends View
      *
      * @return string
      */
-    public function displayFormText($title = null, $content = null, $endDate = null, $type = "createText"): string {
+    public function displayFormText($title = null, $content = null, $endDate = null, $type = "createText"): string
+    {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
 
         $form = '
         <form method="post">
             <div class="form-group">
                 <label for="title">Titre <span class="text-muted">(Optionnel)</span></label>
-                <input id="info" class="form-control" type="text" name="title" minlength="4" maxlength="40" placeholder="Titre..." value="' . $title . '">
+                <input id="info" class="form-control" type="text" name="title" minlength="4" maxlength="40"
+                placeholder="Titre..." value="' . $title . '">
             </div>
             <div class="form-group">
                 <label for="content">Contenu</label>
-                <textarea class="form-control" id="content" name="content" rows="3" placeholder="280 caractères au maximum" maxlength="280" minlength="4" required>' . $content . '</textarea>
+                <textarea class="form-control" id="content" name="content" rows="3" maxlength="280" minlength="4"
+                placeholder="280 caractères au maximum" required="required">' . $content . '</textarea>
             </div>
             <div class="form-group">
                 <label for="expirationDate">Date d\'expiration</label>
-                <input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' . $dateMin . '" value="' . $endDate . '" required >
+                <input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' . $dateMin . '"
+                value="' . $endDate . '" required="required">
             </div>
             <button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
 
@@ -62,7 +66,8 @@ class InformationView extends View
      *
      * @return string
      */
-    public function displayFormImg($title = null, $content = null, $endDate = null, $type = "createImg"): string {
+    public function displayFormImg($title = null, $content = null, $endDate = null, $type = "createImg"): string
+    {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
 
         $form = '<form method="post" enctype="multipart/form-data">
@@ -108,7 +113,8 @@ class InformationView extends View
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      */
-    public function displayFormTab($title = null, $content = null, $endDate = null, $type = "createTab"): string {
+    public function displayFormTab($title = null, $content = null, $endDate = null, $type = "createTab"): string
+    {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
 
         $form = '<form method="post" enctype="multipart/form-data">
@@ -156,7 +162,8 @@ class InformationView extends View
      *
      * @return string
      */
-    public function displayFormPDF($title = null, $content = null, $endDate = null, $type = "createPDF"): string {
+    public function displayFormPDF($title = null, $content = null, $endDate = null, $type = "createPDF"): string
+    {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
 
         $form = '<form method="post" enctype="multipart/form-data">
@@ -199,7 +206,8 @@ class InformationView extends View
      *
      * @return string
      */
-    public function displayFormEvent($endDate = null, $type = "createEvent"): string {
+    public function displayFormEvent($endDate = null, $type = "createEvent"): string
+    {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
         $form = '
 		<form method="post" enctype="multipart/form-data">
@@ -227,7 +235,8 @@ class InformationView extends View
 	 * Display a form to create a video information
 	 * @return string form
 	 * */
-	public function displayFormVideo(string $title = null, string $link = null, string $endDate = null, string $type = 'createVideo'): string
+	public function displayFormVideo(string $title = null, string $content = null,
+		string $endDate = null, string $type = 'createVideo'): string
 	{
 		$dateMin = date('Y-m-d', strtotime("+1 day"));
 		$form = '
@@ -239,25 +248,16 @@ class InformationView extends View
             </div>
             <div class="form-group">
                 <label for="contentVideo">Lien Youtube</label>
-                <input id="linkVideo" class="form-control" type="url" name="linkVideo" minlength="4" maxlength="40"
-                placeholder="Ajouter votre lien Youtube..." required="required" pattern="^https:\/\/www\.youtube\.com\/.*$"
-                src="' . $link . '">
+                <input id="linkVideo" class="form-control" type="url" name="content" minlength="4" maxlength="40"
+                placeholder="Ajouter votre lien Youtube..." required="required"
+                value="' . $content . '" pattern="^https:\/\/www\.youtube\.com\/((watch\?v=)|(shorts\/)).+$">
             </div>
-            <div class="form-group">
-            	<div class="form-check form-check-inline">
-            		<input class="form-check-input" type="radio" name="format" id="classicVideo" value="video">
-            		<label class="form-check-label" for="video">Vidéo classique</label>
-            	</div>
-            	<div class="form-check form-check-inline">
-            		<input class="form-check-input" type="radio" name="format" id="shortVideo" value="short">
-            		<label class="form-check-label" for="shortVideo">Short</label>
-            	</div>
-			</div>
             <div class="form-group">
                 <label for="expirationDate">Date d\'expiration</label>
                 <input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' .
 		        $dateMin . '" value="' . $endDate . '" required="required">
             </div>
+            
             <button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
 
         if ($type == 'submit') {
@@ -274,7 +274,8 @@ class InformationView extends View
      *
      * @return string
      */
-    public function contextCreateInformation(): string {
+    public function contextCreateInformation(): string
+    {
         return '
 		<hr class="half-rule">
 		<div>
@@ -303,24 +304,43 @@ class InformationView extends View
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      */
-    public function displayModifyInformationForm($title, $content, $endDate, $type): string {
-        if ($type == "text") {
-            return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormText($title, $content, $endDate, 'submit');
-        } elseif ($type == "img") {
+    public function displayModifyInformationForm($title, $content, $endDate, $type): string
+    {
+        if ($type == "text")
+		{
+	        return '<a href="' . esc_url( get_permalink(get_page_by_title('Gestion des informations' ))) . '">< Retour</a>' . $this->displayFormText( $title, $content, $endDate, 'submit' );
+        }
+		else if ($type == "videosh" || $type == "videow")
+		{
+			return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormVideo($title, $content, $endDate, 'submit');
+		}
+		elseif ($type == "img")
+		{
             return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormImg($title, $content, $endDate, 'submit');
-        } elseif ($type == "tab") {
+        }
+		elseif ($type == "tab")
+		{
             return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormTab($title, $content, $endDate, 'submit');
-        } elseif ($type == "pdf") {
+        }
+		elseif ($type == "pdf")
+		{
             return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormPDF($title, $content, $endDate, 'submit');
-        } elseif ($type == "event") {
+        }
+		elseif ($type == "event")
+		{
             $extension = explode('.', $content);
             $extension = $extension[1];
-            if ($extension == "pdf") {
+            if ($extension == "pdf")
+			{
                 return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormPDF($title, $content, $endDate, 'submit');
-            } else {
+            }
+			else
+			{
                 return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormImg($title, $content, $endDate, 'submit');
             }
-        } else {
+        }
+		else
+		{
             return $this->noInformation();
         }
     }
@@ -328,7 +348,8 @@ class InformationView extends View
     /**
      * Display the begin of the slideshow
      */
-    public function displayStartSlideshow(): void {
+    public function displayStartSlideshow(): void
+    {
         echo '<div class="slideshow-container">';
     }
 
@@ -340,7 +361,8 @@ class InformationView extends View
      * @param $type
      * @param bool $adminSite
      */
-    public function displaySlide($title, $content, $type, $adminSite = false): void {
+    public function displaySlide($title, $content, $type, $adminSite = false): void
+    {
         echo '<div class="myInfoSlides text-center">';
 
         // If the title is empty
@@ -380,7 +402,8 @@ class InformationView extends View
         echo '</div>';
     }
 
-    public function contextDisplayAll(): string {
+    public function contextDisplayAll(): string
+    {
         return '
 		<div class="row">
 			<div class="col-6 mx-auto col-md-6 order-md-2">
@@ -397,7 +420,8 @@ class InformationView extends View
 		<hr class="half-rule">';
     }
 
-    public function noInformation(): string {
+    public function noInformation(): string
+    {
         return '
 		<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>
 		<div>
@@ -410,7 +434,8 @@ class InformationView extends View
     /**
      * Start the slideshow
      */
-    public function displayStartSlideEvent(): void {
+    public function displayStartSlideEvent(): void
+    {
         echo '
             <div id="slideshow-container" class="slideshow-container">';
     }
@@ -418,7 +443,8 @@ class InformationView extends View
     /**
      * Start a slide
      */
-    public function displaySlideBegin(): void {
+    public function displaySlideBegin(): void
+    {
         echo '
 			<div class="mySlides event-slide">';
     }
@@ -426,7 +452,8 @@ class InformationView extends View
     /**
      * Display a modal to validate the creation of an information
      */
-    public function displayCreateValidate(): void {
+    public function displayCreateValidate(): void
+    {
         $page = get_page_by_title('Gestion des informations');
         $linkManageInfo = get_permalink($page->ID);
         $this->buildModal('Ajout d\'information validé', '<p class="alert alert-success"> L\'information a été ajoutée </p>', $linkManageInfo);
@@ -436,7 +463,8 @@ class InformationView extends View
      * Display a modal to validate the modification of an information
      * Redirect to manage page
      */
-    public function displayModifyValidate(): void {
+    public function displayModifyValidate(): void
+    {
         $page = get_page_by_title('Gestion des informations');
         $linkManageInfo = get_permalink($page->ID);
         $this->buildModal('Modification d\'information validée', '<p class="alert alert-success"> L\'information a été modifiée </p>', $linkManageInfo);
@@ -445,11 +473,13 @@ class InformationView extends View
     /**
      * Display a message if the insertion of the information doesn't work
      */
-    public function displayErrorInsertionInfo(): void {
+    public function displayErrorInsertionInfo(): void
+    {
         echo '<p>Il y a eu une erreur durant l\'insertion de l\'information</p>';
     }
 
-    public function informationNotAllowed(): string {
+    public function informationNotAllowed(): string
+    {
         return '
 		<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>
 		<div>

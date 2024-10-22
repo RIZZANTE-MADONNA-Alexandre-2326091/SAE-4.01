@@ -18,11 +18,13 @@ class InformationController extends Controller
 
     /**
      * @var Information
+     * Modèle des informations
      */
     private $model;
 
     /**
      * @var InformationView
+     * Vue des formulaires d'ajout d'informations
      */
     private $view;
 
@@ -140,8 +142,19 @@ class InformationController extends Controller
         if(isset($actionVideo)) // If the information is a video
         {
             $type = 'video';
-            $information->setType($type);
-           // $information->setContent($content);
+			if (str_contains($content, 'shorts'))
+			{
+				$information->setType($type . 'sh');
+			}
+			else if (str_contains($content, 'watch'))
+			{
+	            $information->setType($type . 'w');
+			}
+			else
+			{
+				$this->view->displayErrorInsertionInfo();
+			}
+            $information->setContent($content);
 
             // Try to insert the information
             if ($information->insert()) {
@@ -384,8 +397,11 @@ class InformationController extends Controller
 			else if ($information->getType() === 'tab') {
                 $type = 'Table Excel';
             }
-            else if ($information->getType() === 'video') {
-                $type = "Vidéo";
+            else if ($information->getType() === 'videosh') {
+                $type = 'Vidéo format "short"';
+            }
+            else if ($information->getType() === 'videow') {
+	            $type = 'Vidéo format "classique"';
             }
             $dataList[] = [$row, $this->view->buildCheckbox($name, $information->getId()), $information->getTitle(), $content, $information->getCreationDate(), $information->getExpirationDate(), $information->getAuthor()->getLogin(), $type, $this->view->buildLinkForModify(esc_url(get_permalink(get_page_by_title('Modifier une information'))) . '?id=' . $information->getId())];
         }
