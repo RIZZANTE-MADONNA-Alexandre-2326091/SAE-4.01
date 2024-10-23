@@ -18,49 +18,49 @@ class Information extends Model implements Entity, JsonSerializable
     /**
      * @var int
      */
-    private int $id;
+    private $id;
 
     /**
      * @var string
      */
-    private string $title;
+    private $title;
 
     /**
      * @var User
      */
-    private User $author;
+    private $author;
 
     /**
      * @var string
      */
-    private string $creationDate;
+    private $creationDate;
 
     /**
      * @var string
      */
-    private string $expirationDate;
+    private $expirationDate;
 
     /**
      * @var string
      */
-    private string $content;
+    private $content;
 
     /**
      * @var string (Text | Image | excel | PDF | Event | Video (short ou classique))
      */
-    private string $type;
+    private $type;
 
     /**
      * @var int
      */
-    private int $adminId;
+    private $adminId;
 
     /**
      * Insert an information in the database
      *
      * @return string
      */
-    public function insert(): string
+    public function insert()
     {
         $database = $this->getDatabase();
         $request = $database->prepare("INSERT INTO ecran_information (title, content, creation_date, expiration_date, type, author, administration_id) VALUES (:title, :content, :creationDate, :expirationDate, :type, :userId, :administration_id) ");
@@ -83,7 +83,7 @@ class Information extends Model implements Entity, JsonSerializable
      *
      * @return int
      */
-    public function update(): int
+    public function update()
     {
         $request = $this->getDatabase()->prepare("UPDATE ecran_information SET title = :title, content = :content, expiration_date = :expirationDate WHERE id = :id");
 
@@ -114,11 +114,11 @@ class Information extends Model implements Entity, JsonSerializable
     /**
      * Return an information corresponding to the ID
      *
-     * @param $id   int id
+     * @param $id
      *
-     * @return Information | bool
+     * @return Information|bool
      */
-    public function get($id): Information|bool|static
+    public function get($id)
     {
         $request = $this->getDatabase()->prepare("SELECT id, title, content, creation_date, expiration_date, author, type, administration_id FROM ecran_information WHERE id = :id LIMIT 1");
 
@@ -127,7 +127,7 @@ class Information extends Model implements Entity, JsonSerializable
         $request->execute();
 
         if ($request->rowCount() > 0)
-        {
+		{
             return $this->setEntity($request->fetch(PDO::FETCH_ASSOC));
         }
         return false;
@@ -137,9 +137,9 @@ class Information extends Model implements Entity, JsonSerializable
      * @param int $begin
      * @param int $numberElement
      *
-     * @return Information|array
+     * @return Information[]
      */
-    public function getList(int $begin = 0, int $numberElement = 25): Information|array
+    public function getList($begin = 0, $numberElement = 25)
     {
         $request = $this->getDatabase()->prepare("SELECT id, title, content, creation_date, expiration_date, author, type, administration_id FROM ecran_information ORDER BY id ASC LIMIT :begin, :numberElement");
 
@@ -149,21 +149,22 @@ class Information extends Model implements Entity, JsonSerializable
         $request->execute();
 
         if ($request->rowCount() > 0)
-        {
+		{
             return $this->setEntityList($request->fetchAll());
         }
         return [];
     }
 
     /**
-     * Return the list of information created by a user
+     * Return the list of information created by an user
      *
-     * @param User $author
+     * @param $author
      * @param int $begin
      * @param int $numberElement
+     *
      * @return Information|array
      */
-    public function getAuthorListInformation(User $author, int $begin = 0, int $numberElement = 25): Information|array
+    public function getAuthorListInformation($author, $begin = 0, $numberElement = 25)
     {
         $request = $this->getDatabase()->prepare('SELECT id, title, content, creation_date, expiration_date, author, type, administration_id FROM ecran_information WHERE author = :author ORDER BY expiration_date LIMIT :begin, :numberElement');
 
@@ -189,7 +190,7 @@ class Information extends Model implements Entity, JsonSerializable
      * Return the list of event present in database
      * @return array|null|object
      */
-    public function getListInformationEvent(): object|array|null
+    public function getListInformationEvent()
     {
         $request = $this->getDatabase()->prepare('SELECT id, title, content, creation_date, expiration_date, author, type FROM ecran_information WHERE type = "event" ORDER BY expiration_date ASC');
 
@@ -200,9 +201,9 @@ class Information extends Model implements Entity, JsonSerializable
 
 
     /**
-     * @return Information|array
+     * @return Information[]
      */
-    public function getFromAdminWebsite(): Information|array
+    public function getFromAdminWebsite()
     {
         $request = $this->getDatabaseViewer()->prepare('SELECT id, title, content, type, author, expiration_date, creation_date FROM ecran_information LIMIT 200');
 
@@ -213,9 +214,9 @@ class Information extends Model implements Entity, JsonSerializable
 
     /**
      *
-     * @return Information|array
+     * @return Information[]
      */
-    public function getAdminWebsiteInformation(): Information|array
+    public function getAdminWebsiteInformation()
     {
         $request = $this->getDatabase()->prepare('SELECT id, title, content, creation_date, expiration_date, author, type, administration_id FROM ecran_information WHERE administration_id IS NOT NULL LIMIT 500');
 
@@ -225,10 +226,10 @@ class Information extends Model implements Entity, JsonSerializable
     }
 
     /**
-     * @param int $id
+     * @param $id
      * @return $this|bool|Information
      */
-    public function getInformationFromAdminSite(int $id): Information|bool|static
+    public function getInformationFromAdminSite($id)
     {
         $request = $this->getDatabaseViewer()->prepare('SELECT id, title, content, type, author, expiration_date, creation_date FROM ecran_information WHERE id = :id LIMIT 1');
 
@@ -236,7 +237,8 @@ class Information extends Model implements Entity, JsonSerializable
 
         $request->execute();
 
-        if ($request->rowCount() > 0) {
+        if ($request->rowCount() > 0)
+		{
             return $this->setEntity($request->fetch(), true);
         }
         return false;
@@ -247,12 +249,13 @@ class Information extends Model implements Entity, JsonSerializable
      *
      * @param $dataList
      *
-     * @return array | Information
+     * @return array|Information
      */
-    public function setEntityList($dataList, bool $adminSite = false): array|Information
+    public function setEntityList($dataList, $adminSite = false)
     {
         $listEntity = array();
-        foreach ($dataList as $data) {
+        foreach ($dataList as $data)
+		{
             $listEntity[] = $this->setEntity($data, $adminSite);
         }
         return $listEntity;
@@ -266,7 +269,7 @@ class Information extends Model implements Entity, JsonSerializable
      *
      * @return $this
      */
-    public function setEntity($data, bool $adminSite = false): Information|static
+    public function setEntity($data, $adminSite = false)
     {
         $entity = new Information();
         $author = new User();
@@ -279,16 +282,22 @@ class Information extends Model implements Entity, JsonSerializable
 
         $entity->setType($data['type']);
 
-        if ($data['administration_id'] != null) {
+        if ($data['administration_id'] != null)
+		{
             $author->setLogin('Administration');
             $entity->setAuthor($author);
-        } else {
+        }
+		else
+		{
             $entity->setAuthor($author->get($data['author']));
         }
 
-        if ($adminSite) {
+        if ($adminSite)
+		{
             $entity->setAdminId($data['id']);
-        } else {
+        }
+		else
+		{
             $entity->setAdminId($data['administration_id']);
         }
 
@@ -298,15 +307,15 @@ class Information extends Model implements Entity, JsonSerializable
     /**
      * @return int
      */
-    public function getId(): int
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * @param $id int
+     * @param $id
      */
-    public function setId(int $id): void
+    public function setId($id)
     {
         $this->id = $id;
     }
@@ -314,15 +323,15 @@ class Information extends Model implements Entity, JsonSerializable
     /**
      * @return string
      */
-    public function getTitle(): string
+    public function getTitle()
     {
         return $this->title;
     }
 
     /**
-     * @param $title string
+     * @param $title
      */
-    public function setTitle(string $title): void
+    public function setTitle($title)
     {
         $this->title = $title;
     }
@@ -330,15 +339,15 @@ class Information extends Model implements Entity, JsonSerializable
     /**
      * @return User
      */
-    public function getAuthor(): User
+    public function getAuthor()
     {
         return $this->author;
     }
 
     /**
-     * @param $author User
+     * @param $author
      */
-    public function setAuthor(User $author): void
+    public function setAuthor($author)
     {
         $this->author = $author;
     }
@@ -346,7 +355,7 @@ class Information extends Model implements Entity, JsonSerializable
     /**
      * @return string
      */
-    public function getCreationDate(): string
+    public function getCreationDate()
     {
         return $this->creationDate;
     }
@@ -354,7 +363,7 @@ class Information extends Model implements Entity, JsonSerializable
     /**
      * @param mixed $creationDate
      */
-    public function setCreationDate(mixed $creationDate): void
+    public function setCreationDate($creationDate)
     {
         $this->creationDate = $creationDate;
     }
@@ -362,15 +371,15 @@ class Information extends Model implements Entity, JsonSerializable
     /**
      * @return string
      */
-    public function getExpirationDate(): string
+    public function getExpirationDate()
     {
         return $this->expirationDate;
     }
 
     /**
-     * @param mixed $expirationDate
+     * @param $expirationDate
      */
-    public function setExpirationDate(mixed $expirationDate): void
+    public function setExpirationDate($expirationDate)
     {
         $this->expirationDate = $expirationDate;
     }
@@ -378,15 +387,15 @@ class Information extends Model implements Entity, JsonSerializable
     /**
      * @return string
      */
-    public function getContent(): string
+    public function getContent()
     {
         return $this->content;
     }
 
     /**
-     * @param $content string
+     * @param $content
      */
-    public function setContent(string $content): void
+    public function setContent($content)
     {
         $this->content = $content;
     }
@@ -394,15 +403,15 @@ class Information extends Model implements Entity, JsonSerializable
     /**
      * @return string
      */
-    public function getType(): string
+    public function getType()
     {
         return $this->type;
     }
 
     /**
-     * @param $type string
+     * @param $type
      */
-    public function setType(string $type): void
+    public function setType($type)
     {
         $this->type = $type;
     }
@@ -410,7 +419,7 @@ class Information extends Model implements Entity, JsonSerializable
     /**
      * @return int
      */
-    public function getAdminId(): int
+    public function getAdminId()
     {
         return $this->adminId;
     }
@@ -418,7 +427,7 @@ class Information extends Model implements Entity, JsonSerializable
     /**
      * @param int $adminId
      */
-    public function setAdminId(int $adminId): void
+    public function setAdminId($adminId)
     {
         $this->adminId = $adminId;
     }

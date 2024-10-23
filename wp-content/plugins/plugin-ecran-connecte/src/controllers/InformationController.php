@@ -20,13 +20,13 @@ class InformationController extends Controller
      * @var Information
      * Modèle des informations
      */
-    private $model;
+    private Information $model;
 
     /**
      * @var InformationView
      * Vue des formulaires d'ajout d'informations
      */
-    private $view;
+    private InformationView $view;
 
     /**
      * Constructor of InformationController

@@ -508,7 +508,7 @@ class InformationView extends View
      */
     public function displayErrorInsertionInfo(): void
     {
-        echo '<p>Il y a eu une erreur durant l\'insertion de l\'information</p>';
+		$this->buildModal('Erreur lors de l\'insertion', '<p class="alert alert-danger">Il y a eu une erreur durant l\'insertion de l\'information</p>');
     }
 
     /**
@@ -516,7 +516,7 @@ class InformationView extends View
      */
     public function displayErrorVideoFormat(): void
     {
-        echo '<p>La vidéo que vous voulez modifier n\'est pas au bon format. Veuillez vérifier le bon format ou ajoutez une nouvelle information.</p>';
+		$this->buildModal('Erreur de format vidéo', '<p>La vidéo que vous voulez modifier n\'est pas au bon format. Veuillez vérifier le bon format ou ajoutez une nouvelle information.</p>');
     }
 
     public function informationNotAllowed(): string
