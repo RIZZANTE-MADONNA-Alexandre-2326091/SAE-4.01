@@ -103,7 +103,7 @@ class AlertView extends View
             $count = 2;
             foreach ($codes as $code) {
                 $form .= '
-				<div class="row">' .
+				<div class="row" id="selctId' . $count . '">' .
                     $this->buildSelectCode($years, $groups, $halfGroups, $code, $count)
                     . '<input type="button" id="selectId' . $count . '" onclick="deleteRowAlert(this.id)" class="selectbtn" value="Supprimer">
                   </div>';
@@ -111,9 +111,9 @@ class AlertView extends View
             }
         }
 
-        $form .= '<input type="button" onclick="addButtonAlert()" value="+">
-                  <button type="submit" class="btn button_ecran" name="submit">Valider</button>
-                  <button type="submit" class="btn delete_button_ecran" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette alerte ?\');">Supprimer</button>
+        $form .= '<input type="button" id="plus" onclick="addButtonAlert()" value="+">
+                  <button type="submit" class="btn button_ecran" id="valider" name="submit">Valider</button>
+                  <button type="submit" class="btn delete_button_ecran" id="supprimer" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette alerte ?\');">Supprimer</button>
                 </form>' . $this->contextModify();
 
         return $form;
