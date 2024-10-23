@@ -248,7 +248,7 @@ class InformationController extends Controller
                 $information->setContent($content);
             }
             //Verify the format of the video we want to modify
-            else if ($information->getType() == 'videosw')
+            else if ($information->getType() == 'videosh')
             {
                 if (str_contains($content, 'shorts'))
                 {
