@@ -19,14 +19,15 @@ class InformationView extends View
     /**
      * Display a form to create an information with text
      *
-     * @param $title    string
-     * @param $content  string
-     * @param $endDate  string
-     * @param $type     string
+     * @param string|null $title
+     * @param string|null $content
+     * @param string|null $endDate
+     * @param string $type
      *
      * @return string
      */
-    public function displayFormText($title = null, $content = null, $endDate = null, $type = "createText"): string
+    public function displayFormText(string $title = null, string $content = null,
+                                    string $endDate = null, string $type = "createText"): string
     {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
 
@@ -49,7 +50,8 @@ class InformationView extends View
             </div>
             <button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
 
-        if ($type == 'submit') {
+        if ($type == 'submit')
+        {
             $form .= '<button type="submit" class="btn delete_button_ecran" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette information ?\');">Supprimer</button>';
         }
 
@@ -59,14 +61,15 @@ class InformationView extends View
     /**
      * Display a form to create an information with an image
      *
-     * @param $title    string
-     * @param $content  string
-     * @param $endDate  string
-     * @param $type     string
+     * @param string|null $title
+     * @param string|null $content
+     * @param string|null $endDate
+     * @param string $type
      *
      * @return string
      */
-    public function displayFormImg($title = null, $content = null, $endDate = null, $type = "createImg"): string
+    public function displayFormImg(string $title = null, string $content = null,
+                                   string $endDate = null, string $type = "createImg"): string
     {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
 
@@ -75,7 +78,8 @@ class InformationView extends View
 		                <label for="title">Titre <span class="text-muted">(Optionnel)</span></label>
 		                <input id="title" class="form-control" type="text" name="title" placeholder="Inserer un titre" maxlength="60" value="' . $title . '">
 		            </div>';
-        if ($content != null) {
+        if ($content != null)
+        {
             $form .= '
 		       	<figure class="text-center">
 				  <img class="img-thumbnail" src="' . TV_UPLOAD_PATH . $content . '" alt="' . $title . '">
@@ -94,7 +98,8 @@ class InformationView extends View
 			</div>
 			<button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
 
-        if ($type == 'submit') {
+        if ($type == 'submit')
+        {
             $form .= '<button type="submit" class="btn delete_button_ecran" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette information ?\');">Supprimer</button>';
         }
 
@@ -104,16 +109,17 @@ class InformationView extends View
     /**
      * Display a form to create an information with a table
      *
-     * @param null $title
-     * @param null $content
-     * @param null $endDate
+     * @param string|null $title
+     * @param string|null $content
+     * @param string|null $endDate
      * @param string $type
      *
      * @return string
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      */
-    public function displayFormTab($title = null, $content = null, $endDate = null, $type = "createTab"): string
+    public function displayFormTab(string $title = null, string $content = null,
+                                   string $endDate = null, string $type = "createTab"): string
     {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
 
@@ -123,10 +129,12 @@ class InformationView extends View
 			                <input id="title" class="form-control" type="text" name="title" placeholder="Inserer un titre" maxlength="60" value="' . $title . '">
 			            </div>';
 
-        if ($content != null) {
+        if ($content != null)
+        {
             $info = new InformationController();
             $list = $info->readSpreadSheet(TV_UPLOAD_PATH . $content);
-            foreach ($list as $table) {
+            foreach ($list as $table)
+            {
                 $form .= $table;
             }
         }
@@ -145,7 +153,8 @@ class InformationView extends View
 			</div>
 			<button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
 
-        if ($type == 'submit') {
+        if ($type == 'submit')
+        {
             $form .= '<button type="submit" class="btn delete_button_ecran" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette information ?\');">Supprimer</button>';
         }
 
@@ -155,14 +164,15 @@ class InformationView extends View
     /**
      * Display a form to create an information with a PDF
      *
-     * @param $title    string
-     * @param $content  string
-     * @param $endDate  string
-     * @param $type     string
+     * @param string|null $title
+     * @param string|null $content
+     * @param string|null $endDate
+     * @param string $type
      *
      * @return string
      */
-    public function displayFormPDF($title = null, $content = null, $endDate = null, $type = "createPDF"): string
+    public function displayFormPDF(string $title = null, string $content = null,
+                                   string $endDate = null, string $type = "createPDF"): string
     {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
 
@@ -172,7 +182,8 @@ class InformationView extends View
 		                <input id="title" class="form-control" type="text" name="title" placeholder="Inserer un titre" maxlength="60" value="' . $title . '">
 		            </div>';
 
-        if ($content != null) {
+        if ($content != null)
+        {
             $form .= '
 			<div class="embed-responsive embed-responsive-16by9">
 			  <iframe class="embed-responsive-item" src="' . TV_UPLOAD_PATH . $content . '" allowfullscreen></iframe>
@@ -191,7 +202,8 @@ class InformationView extends View
 			</div>
 			<button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
 
-        if ($type == 'submit') {
+        if ($type == 'submit')
+        {
             $form .= '<button type="submit" class="btn delete_button_ecran" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette information ?\');">Supprimer</button>';
         }
 
@@ -201,12 +213,12 @@ class InformationView extends View
     /**
      * Display a form to create an event information with media or PDFs
      *
-     * @param $endDate  string
-     * @param $type     string
+     * @param string|null $endDate
+     * @param string $type
      *
      * @return string
      */
-    public function displayFormEvent($endDate = null, $type = "createEvent"): string
+    public function displayFormEvent(string $endDate = null, string $type = "createEvent"): string
     {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
         $form = '
@@ -223,7 +235,8 @@ class InformationView extends View
 			</div>
 			<button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
 
-        if ($type == 'submit') {
+        if ($type == 'submit')
+        {
             $form .= '<button type="submit" class="btn delete_button_ecran" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette information ?\');">Supprimer</button>';
         }
         $form .= '</form>';
@@ -233,6 +246,12 @@ class InformationView extends View
 
 	/**
 	 * Display a form to create a video information
+     *
+     * @param string|null $title
+     * @param string|null $content
+     * @param string|null $endDate
+     * @param string $type
+     *
 	 * @return string form
 	 * */
 	public function displayFormVideo(string $title = null, string $content = null,
@@ -260,7 +279,8 @@ class InformationView extends View
             
             <button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
 
-        if ($type == 'submit') {
+        if ($type == 'submit')
+        {
             $form .= '<button type="submit" class="btn delete_button_ecran" name="delete"
                       onclick="return confirm(\' Voulez-vous supprimer cette information ?\');">Supprimer</button>';
         }
@@ -356,47 +376,60 @@ class InformationView extends View
     /**
      * Display a slide for the slideshow
      *
-     * @param $title
-     * @param $content
-     * @param $type
+     * @param string $title
+     * @param string $content
+     * @param string $type
      * @param bool $adminSite
      */
-    public function displaySlide($title, $content, $type, $adminSite = false): void
+    public function displaySlide(string $title, string $content, string $type, bool $adminSite = false): void
     {
         echo '<div class="myInfoSlides text-center">';
 
         // If the title is empty
-        if ($title != "Sans titre") {
+        if ($title != "Sans titre")
+        {
             echo '<h2 class="titleInfo">' . $title . '</h2>';
         }
 
         $url = TV_UPLOAD_PATH;
-        if ($adminSite) {
+        if ($adminSite)
+        {
             $url = URL_WEBSITE_VIEWER . TV_UPLOAD_PATH;
         }
 
-        if ($type == 'pdf' || $type == "event" || $type == "img") {
+        if ($type == 'pdf' || $type == "event" || $type == "img")
+        {
             $extension = explode('.', $content);
             $extension = $extension[1];
         }
 
-        if ($type == 'pdf' || $type == "event" && $extension == "pdf") {
+        if ($type == 'pdf' || $type == "event" && $extension == "pdf")
+        {
             echo '
 			<div class="canvas_pdf" id="' . $content . '">
 			</div>';
-        } elseif ($type == "img" || $type == "event") {
+        }
+        elseif ($type == "img" || $type == "event")
+        {
             echo '<img class="img-thumbnail" src="' . $url . $content . '" alt="' . $title . '">';
-        } else if ($type == 'text') {
+        }
+        else if ($type == 'text')
+        {
             echo '<p class="lead">' . $content . '</p>';
-        } else if ($type == 'special') {
+        }
+        else if ($type == 'special')
+        {
             $func = explode('(Do this(function:', $content);
             $text = explode('.', $func[0]);
-            foreach ($text as $value) {
+            foreach ($text as $value)
+            {
                 echo '<p class="lead">' . $value . '</p>';
             }
             $func = explode(')end)', $func[1]);
             echo $func[0]();
-        } else {
+        }
+        else
+        {
             echo $content;
         }
         echo '</div>';
@@ -476,6 +509,14 @@ class InformationView extends View
     public function displayErrorInsertionInfo(): void
     {
         echo '<p>Il y a eu une erreur durant l\'insertion de l\'information</p>';
+    }
+
+    /**
+     * Display if the modification of a video doesn't have the good format;
+     */
+    public function displayErrorVideoFormat(): void
+    {
+        echo '<p>La vidéo que vous voulez modifier n\'est pas au bon format. Veuillez vérifier le bon format ou ajoutez une nouvelle information.</p>';
     }
 
     public function informationNotAllowed(): string
