@@ -267,8 +267,8 @@ class InformationView extends View
             </div>
             <div class="form-group">
                 <label for="contentVideo">Lien Youtube</label>
-                <input id="linkVideo" class="form-control" type="url" name="content" minlength="4" maxlength="40"
-                placeholder="Ajouter votre lien Youtube..." required="required"
+                <input id="linkVideo" class="form-control" type="url" name="content" minlength="4" maxlength="50"
+                placeholder="Ajouter votre lien Youtube de forme: \'https://www.youtube.com/watch?v=...\' OU \'https://www.youtube.com/shorts/...\'" required="required"
                 value="' . $content . '" pattern="^https:\/\/www\.youtube\.com\/((watch\?v=)|(shorts\/)).+$">
             </div>
             <div class="form-group">
@@ -417,6 +417,20 @@ class InformationView extends View
         {
             echo '<p class="lead">' . $content . '</p>';
         }
+		else if ($type == 'videosh')
+		{
+			$link = substr_replace($content,'embed',24,6);
+			echo '<iframe width="315" height="560" src="' . $link . '?&autoplay=1&mute=1"
+				  title="YouTube short player" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
+				  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>';
+		}
+		else if ($type == 'videow')
+		{
+			$link = substr_replace($content,'embed/',24,8);
+			echo '<iframe width="560" height="315" src="' . $link . '?&autoplay=1&mute=1"
+				  title="YouTube video player" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
+				  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>';
+		}
         else if ($type == 'special')
         {
             $func = explode('(Do this(function:', $content);
