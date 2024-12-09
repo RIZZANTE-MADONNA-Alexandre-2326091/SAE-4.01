@@ -57,7 +57,7 @@ class AlertView extends View
 		<hr class="half-rule">
 		<div>
 			<h2>Les alertes</h2>
-			<p class="lead">Lors de la création de votre alerte, celle-ci sera posté directement sur tous les téléviseurs qui utilisent  ce site.</p>
+			<p class="lead">Lors de la création de votre alerte, celle-ci sera posté directement sur tous les téléviseurs qui utilisent ce site.</p>
 			<p class="lead">Les alertes que vous créez seront affichées avec les alertes déjà présentes.</p>
 			<p class="lead">Les alertes sont affichées les une après les autres défilant à la chaîne en bas des téléviseurs.</p>
 			<div class="text-center">
@@ -138,7 +138,7 @@ class AlertView extends View
 				<p class="lead">Vous pouvez retrouver ici toutes les alertes qui ont été créées sur ce site.</p>
 				<p class="lead mb-4">Les alertes sont triées de la plus vieille à la plus récente.</p>
 				<p class="lead mb-4">Vous pouvez modifier une alerte en cliquant sur "Modifier" à la ligne correspondante à l\'alerte.</p>
-				<p class="lead mb-4">Vous souhaitez supprimer une / plusieurs alerte(s) ? Cochez les cases des alertes puis cliquez sur "Supprimer" le bouton ce situe en bas du tableau.</p>
+				<p class="lead mb-4">Vous souhaitez supprimer une / plusieurs alerte(s) ? Cochez les cases des alertes puis cliquez sur "Supprimer" le bouton se situant en bas du tableau.</p>
 			</div>
 		</div>
 		<a href="' . esc_url(get_permalink(get_page_by_title('Créer une alerte'))) . '">Créer une alerte</a>
