@@ -34,14 +34,16 @@ Ce plugin permet plusieurs fonctionnalités:
 
 ### Utilisateurs
 
-Il y a cinq rôles différents avec chacun leur droit :  
+Il y a sept rôles différents avec chacun leur droit :  
 
-|  Utilisateur       | Voir son emploi du temps |   Poster des informations | Poster des alertes | Inscrire des utilisateurs |
+|    Utilisateur     | Voir son emploi du temps |   Poster des informations | Poster des alertes | Inscrire des utilisateurs |
 |:------------------:|:------------------------:|:-------------------------:|:------------------:|:-------------------------:|
-| Technicien         |        Oui               |      Non                  |     Non            |     Non                   |
-| Télévision         |        Oui               |      Non                  |     Non            |     Non                   |
+|       Élève        |        Oui               |      Non                  |     Non            |     Non                   |
+|     Professeur     |        Oui               |      Non                  |     Non            |     Non                   |
+|     Technicien     |        Oui               |      Non                  |     Non            |     Non                   |
+|     Télévision     |        Oui               |      Non                  |     Non            |     Non                   |
 | Directeur d'études |        Oui               |      Oui                  |     Oui            |     Non                   |
-| Secretaire         |        Non               |      Oui                  |     Oui            |     Oui                   |
+|     Secretaire     |        Non               |      Oui                  |     Oui            |     Oui                   |
 | informationPoster  |        Non               |      Oui                  |     Non            |     Non                   |
 
 Dans ce tableau, on peut voir que technicien et télévisions ont les mêmes droits.  
