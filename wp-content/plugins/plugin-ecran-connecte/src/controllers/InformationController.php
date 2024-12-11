@@ -429,6 +429,9 @@ class InformationController extends Controller
             }
         }
         $this->view->displayEndDiv();
+
+        $rssController = new \Controllers\RssController();
+        echo $rssController->displayRssFeed();
     }
 
     public function registerNewInformation() {
