@@ -22,6 +22,7 @@ function error(err) {
     console.warn(`ERROR(${err.code}): ${err.message}`);
 }
 
+
 /**
  * Display the weather
  */

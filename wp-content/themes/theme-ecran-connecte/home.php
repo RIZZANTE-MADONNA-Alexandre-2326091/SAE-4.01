@@ -10,7 +10,7 @@
                     <h1 class="mb-3 bd-text-purple-bright"><?php bloginfo('name'); ?></h1>
                     <p class="lead">
                         Créez des informations pour toutes les télévisions connectées, les informations seront affichées sur chaque télévision en plus des informations déjà publiées.
-                        Les informations des télévisions peuvent contenir du texte, des images et même des pdf.
+                        Les informations des télévisions peuvent contenir du texte, des images, des tableaux, des événements et même des vidéos.
                     </p>
                     <p class="lead mb-4">
                         Vous pouvez faire de même avec les alertes des télévisions connectées.

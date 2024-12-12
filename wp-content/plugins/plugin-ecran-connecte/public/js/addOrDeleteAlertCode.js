@@ -1,29 +1,69 @@
-let counte = 0;
+let countRow = 0;
 
 /**
  * Create a new select to add a new group for the alert
  */
 function addButtonAlert() {
-    console.log(counte);
-    counte = counte + 1;
+    console.log(countRow);
+    countRow = countRow + 1;
+    var presenceSupp = false;
+
     $.ajax({
         url: '/wp-content/plugins/plugin-ecran-connecte/public/js/utils/allCodes.php',
     }).done(function (data) {
         let div = $('<div >', {
-            class: 'row'
+            class: 'row',
+            id: countRow
         }).appendTo('#alert');
         let select = $('<select >', {
-            id: counte,
             name: 'selectAlert[]',
-            class: 'form-control select_ecran'
+            class: 'form-control firstSelect'
         }).append(data).appendTo(div);
         let button = $('<input >', {
-            id: counte,
-            class: 'btn button_ecran',
             type: 'button',
+            id: countRow,
             onclick: 'deleteRowAlert(this.id)',
+            class: 'selectbtn',
             value: 'Supprimer'
-        }).appendTo(div)
+        }).appendTo(div);
+
+        // Delete buttons from the form.
+        let delePlus = document.getElementById("plus");
+        delePlus.remove();
+        let deleValider = document.getElementById("valider");
+        deleValider.remove();
+        if(document.getElementById("supprimer")){
+            let deleSupprimer = document.getElementById("supprimer");
+            deleSupprimer.remove();
+            presenceSupp = true;
+        }
+
+        // Adding the buttons so that they are at the end of the form.
+
+        let add = $('<input>', {
+            type: 'button',
+            id: 'plus',
+            onclick: 'addButtonAlert()',
+            class: 'btn button_ecran',
+            value: '+'
+        }).appendTo('#alert');
+        let valider = $('<button>', {
+            type: 'submit',
+            class: 'btn button_ecran',
+            id: 'valider',
+            name: 'submit',
+            text: "Valider"
+        }).appendTo('#alert');
+        if(presenceSupp){
+            let supprimer = $('<button>', {
+                type: 'submit',
+                class: 'btn delete_button_ecran',
+                id: 'supprimer',
+                name: 'delete',
+                onclick: 'return confirm(\' Voulez-vous supprimer cette alerte ?\');',
+                text: 'Supprimer'
+            }).appendTo('#alert');
+        }
     });
 }
 
@@ -36,5 +76,5 @@ function deleteRowAlert(id) {
     let dele = document.getElementById(id);
     dele.remove();
     let dele2 = document.getElementById(id);
-    dele2.remove();
+    if(dele2 != null) dele2.remove();
 }

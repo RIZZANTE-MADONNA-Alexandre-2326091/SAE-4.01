@@ -45,7 +45,7 @@ class TelevisionView extends UserView
             	<label>Premier emploi du temps</label>' .
             $this->buildSelectCode($years, $groups, $halfGroups) . '
             </div>
-            <input type="button" class="btn button_ecran" onclick="addButtonTv()" value="Ajouter des emplois du temps">
+            <input type="button" class="btn button_ecran" id="addSchedule" onclick="addButtonTv()" value="Ajouter des emplois du temps">
             <button type="submit" class="btn button_ecran" id="validTv" name="createTv">Créer</button>
         </form>';
 
@@ -115,9 +115,9 @@ class TelevisionView extends UserView
         $page = get_page_by_title('Gestion des utilisateurs');
         $linkManageUser = get_permalink($page->ID);
         $string .= '
-            <input type="button" class="btn button_ecran" onclick="addButtonTv()" value="Ajouter des emplois du temps">
+            <input type="button" class="btn button_ecran" id="addSchedule" onclick="addButtonTv()" value="Ajouter des emplois du temps">
             <button name="modifValidate" class="btn button_ecran" type="submit" id="validTv">Valider</button>
-            <a href="' . $linkManageUser . '">Annuler</a>
+            <a href="' . $linkManageUser . '" id="linkReturn">Annuler</a>
         </form>';
         return $string;
     }

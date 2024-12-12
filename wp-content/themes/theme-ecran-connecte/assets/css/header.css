@@ -1,6 +1,6 @@
 /* HEADER */
 .nav_ecran {
-    position: sticky;
+    position: static;
     top: 0;
     background-color: #00558b;
     margin-bottom: 10px;

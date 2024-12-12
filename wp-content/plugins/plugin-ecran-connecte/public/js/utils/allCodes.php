@@ -13,6 +13,7 @@ $groups = $model->getAllFromType('group');
 $halfGroups = $model->getAllFromType('halfGroup');
 
 echo '<option value="0">Aucun</option>
+      <option value="all">Tous</option>
       <optgroup label="Année">';
 foreach ($years as $year) {
     echo '<option value="' . $year->getCode() . '">' . $year->getTitle() . '</option >';
