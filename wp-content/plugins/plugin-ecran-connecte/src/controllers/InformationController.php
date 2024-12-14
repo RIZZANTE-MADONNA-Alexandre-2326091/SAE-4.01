@@ -53,7 +53,7 @@ class InformationController extends Controller
         $actionTab = filter_input(INPUT_POST, 'createTab');
         $actionPDF = filter_input(INPUT_POST, 'createPDF');
         $actionEvent = filter_input(INPUT_POST, 'createEvent');
-        $actionVideo = filter_input(INPUT_POST, 'createVideo');
+        $actionVideoYT = filter_input(INPUT_POST, 'createVideoYT');
 
         // Variables
         $title = filter_input(INPUT_POST, 'title');
@@ -159,9 +159,9 @@ class InformationController extends Controller
                 }
             }
         }
-        if(isset($actionVideo))
+        if(isset($actionVideoYT))
         {                      // If the information is a video
-            $type = 'video';
+            $type = 'YTvideo';
 			if (str_contains($content, 'shorts'))
 			{
 				$information->setType($type . 'sh');
@@ -194,14 +194,14 @@ class InformationController extends Controller
             $this->view->displayTitleSelect('table', 'Tableau') .
             $this->view->displayTitleSelect('pdf', 'PDF') .
             $this->view->displayTitleSelect('event', 'Événement') .
-            $this->view->displayTitleSelect('video','Vidéo') .
+            $this->view->displayTitleSelect('YTvideo','Vidéo Youtube') .
             $this->view->displayEndOfTitle() .
             $this->view->displayContentSelect('text', $this->view->displayFormText(), true) .
             $this->view->displayContentSelect('image', $this->view->displayFormImg()) .
             $this->view->displayContentSelect('table', $this->view->displayFormTab()) .
             $this->view->displayContentSelect('pdf', $this->view->displayFormPDF()) .
             $this->view->displayContentSelect('event', $this->view->displayFormEvent()) .
-            $this->view->displayContentSelect('video', $this->view->displayFormVideo()) .
+            $this->view->displayContentSelect('YTvideo', $this->view->displayFormVideoYT()) .
             $this->view->displayEndDiv() .
             $this->view->contextCreateInformation();
     }
@@ -248,7 +248,7 @@ class InformationController extends Controller
                 $information->setContent($content);
             }
             //Verify the format of the video we want to modify
-            else if ($information->getType() == 'videosh')
+            else if ($information->getType() == 'YTvideosh')
             {
                 if (str_contains($content, 'shorts'))
                 {
@@ -259,7 +259,7 @@ class InformationController extends Controller
                     $this->view->displayErrorVideoFormat();
                 }
             }
-            else if ($information->getType() == 'videow')
+            else if ($information->getType() == 'YTvideow')
             {
                 if (str_contains($content, 'watch'))
                 {
@@ -475,13 +475,13 @@ class InformationController extends Controller
             {
                 $type = 'Table Excel';
             }
-            else if ($information->getType() === 'videosh')
+            else if ($information->getType() === 'YTvideosh')
             {
-                $type = 'Vidéo format "short"';
+                $type = 'Vidéo YouTube format "short"';
             }
-            else if ($information->getType() === 'videow')
+            else if ($information->getType() === 'YTvideow')
             {
-	            $type = 'Vidéo format "classique"';
+	            $type = 'Vidéo YouTube format "classique"';
             }
             $dataList[] = [$row, $this->view->buildCheckbox($name, $information->getId()), $information->getTitle(), $content, $information->getCreationDate(), $information->getExpirationDate(), $information->getAuthor()->getLogin(), $type, $this->view->buildLinkForModify(esc_url(get_permalink(get_page_by_title('Modifier une information'))) . '?id=' . $information->getId())];
         }

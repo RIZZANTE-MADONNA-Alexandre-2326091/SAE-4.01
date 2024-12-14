@@ -254,8 +254,8 @@ class InformationView extends View
      *
 	 * @return string form
 	 * */
-	public function displayFormVideo(string $title = null, string $content = null,
-		string $endDate = null, string $type = 'createVideo'): string
+	public function displayFormVideoYT(string $title = null, string $content = null,
+		string $endDate = null, string $type = 'createVideoYT'): string
 	{
 		$dateMin = date('Y-m-d', strtotime("+1 day"));
 		$form = '
@@ -267,7 +267,7 @@ class InformationView extends View
             </div>
             <div class="form-group">
                 <label for="contentVideo">Lien Youtube</label>
-                <input id="linkVideo" class="form-control" type="url" name="content" minlength="4" maxlength="50"
+                <input id="linkVideo" class="form-control" type="url" name="content" minlength="25" maxlength="60"
                 placeholder="Ajouter votre lien Youtube de forme: \'https://www.youtube.com/watch?v=...\' OU \'https://www.youtube.com/shorts/...\'" required="required"
                 value="' . $content . '" pattern="^https:\/\/www\.youtube\.com\/((watch\?v=)|(shorts\/)).+$">
             </div>
@@ -330,9 +330,9 @@ class InformationView extends View
 		{
 	        return '<a href="' . esc_url( get_permalink(get_page_by_title('Gestion des informations' ))) . '">< Retour</a>' . $this->displayFormText( $title, $content, $endDate, 'submit' );
         }
-		else if ($type == "videosh" || $type == "videow")
+		else if ($type == "YTvideosh" || $type == "YTvideow")
 		{
-			return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormVideo($title, $content, $endDate, 'submit');
+			return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormVideoYT($title, $content, $endDate, 'submit');
 		}
 		elseif ($type == "img")
 		{
@@ -417,19 +417,19 @@ class InformationView extends View
         {
             echo '<p class="lead">' . $content . '</p>';
         }
-		else if ($type == 'videosh')
+		else if ($type == 'YTvideosh')
 		{
 			$link = substr_replace($content,'embed',24,6);
-			echo '<iframe width="315" height="560" src="' . $link . '?&autoplay=1&mute=1"
+			echo '<iframe id="videosh" src="' . $link . '?autoplay=1&loop=1&playlist=' . substr($link,30) . '&mute=1&disablekb=1&controls=0"
 				  title="YouTube short player" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
-				  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>';
+				  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';
 		}
-		else if ($type == 'videow')
+		else if ($type == 'YTvideow')
 		{
 			$link = substr_replace($content,'embed/',24,8);
-			echo '<iframe width="560" height="315" src="' . $link . '?&autoplay=1&mute=1"
+			echo '<iframe id="videow" src="' . $link . '?autoplay=1&loop=1&playlist=' . substr($link,30) . '&mute=1&disablekb=1&controls=0"
 				  title="YouTube video player" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
-				  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>';
+				  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';
 		}
         else if ($type == 'special')
         {

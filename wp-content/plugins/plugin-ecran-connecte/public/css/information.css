@@ -5,3 +5,59 @@
 .img-thumbnail {
     max-height: 70vh;
 }
+
+
+/*
+    Configuration pour le style des vidéos
+*/
+
+#videosh {
+    height: 70vh;
+    width: 75%;
+}
+
+#videow {
+    height: 92vh;
+    width: 65vw;
+    margin-left: -320%;
+    margin-top: -7%;
+}
+
+@media only screen and (max-width: 1000px) {
+    #videosh {
+        height: 65vh;
+    }
+    #videow {
+        height: 90vh;
+        width: 65vw;
+    }
+}
+
+@media only screen and (max-width: 1000px) {
+    #videow {
+        height: 95vh;
+        width: 62vw;
+        margin-top: -13%;
+    }
+}
+
+@media only screen and (max-height: 700px) {
+    #videosh {
+        height: 65vh;
+    }
+    #videow {
+        height: 92vh;
+        width: 62vw;
+        margin-top: -13%;
+    }
+}
+@media only screen and (max-height: 580px) {
+    #videosh {
+        height: 60vh;
+    }
+}
+@media only screen and (max-height: 500px) {
+    #videosh {
+        height: 50vh;
+    }
+}

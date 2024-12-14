@@ -46,7 +46,7 @@ class Information extends Model implements Entity, JsonSerializable
     private $content;
 
     /**
-     * @var string (Text | Image | excel | PDF | Event | Video (short ou classique))
+     * @var string (Text | Image | excel | PDF | Event | Video Youtube ou local (short ou classique))
      */
     private $type;
 
