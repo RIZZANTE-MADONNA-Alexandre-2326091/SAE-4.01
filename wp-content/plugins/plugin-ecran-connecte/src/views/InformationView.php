@@ -344,7 +344,7 @@ class InformationView extends View
 				<p class="lead">Vous pouvez retrouver ici toutes les informations qui ont été créées sur ce site.</p>
 				<p class="lead">Les informations sont triées de la plus vieille à la plus récente.</p>
 				<p class="lead">Vous pouvez modifier une information en cliquant sur "Modifier" à la ligne correspondante à l\'information.</p>
-				<p class="lead">Vous souhaitez supprimer une / plusieurs information(s) ? Cochez les cases des informations puis cliquez sur "Supprimer" le bouton ce situe en bas du tableau.</p>
+				<p class="lead">Vous souhaitez supprimer une / plusieurs information(s) ? Cochez les cases des informations puis cliquez sur "Supprimer" le bouton se situant en bas du tableau.</p>
 			</div>
 		</div>
 		<a href="' . esc_url(get_permalink(get_page_by_title('Créer une information'))) . '">Créer une information</a>

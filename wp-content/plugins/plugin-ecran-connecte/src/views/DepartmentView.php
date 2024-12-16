@@ -4,6 +4,11 @@ namespace Views;
 
 use Models\Department;
 
+/**
+ * Class DepartmentView
+ *
+ * @package Views
+ */
 class DepartmentView extends View
 {
     /**
@@ -11,14 +16,14 @@ class DepartmentView extends View
      *
      * @return string
      */
-    protected function displayFormDepartment(): string {
+    public function displayFormDepartment(): string {
         return '
             <form method="post">
                 <div class="form-group">
                     <label for="deptName">Nom du département</label>
                     <input class="form-control" type="text" name="deptName" placeholder="Nom du département" required="">
                 </div>
-                <button type="submit" class="btn button_ecran" id="valid" name="create">Créer</button>
+                <button type="submit" class="btn button_ecran" id="valid" name="createDept">Créer</button>
             </form>';
     }
 
@@ -36,7 +41,7 @@ class DepartmentView extends View
          <form method="post">
          	<label for="deptName">Nom du département</label>
             <input class="form-control" type="text" name="deptName" placeholder="Nom du département" required="">
-         <button type="submit" class="btn button_ecran" name="modifValidate">Modifier</button>
+         <button type="submit" class="btn button_ecran" name="modifDept">Modifier</button>
           <a href="'. $linkManageDept .'">Annuler</a>
         </form>';
     }
@@ -56,6 +61,61 @@ class DepartmentView extends View
             </form>';
     }
 
+	/**
+	 * Display all departments.
+	 *
+	 * @param array $departments
+	 *
+	 * @return string
+	 */
+	public function displayAllDept($departments): string {
+		$page = get_page_by_title('Modifier un département');
+		$linkManageDept = get_permalink($page->ID);
+
+		$title = 'Départements de l\'IUT';
+		$name = 'Department';
+		$header = ['Titre', 'Modifier'];
+
+		$row = array();
+		$count = 0;
+
+		foreach ($departments as $department) {
+			++$count;
+			$row[] = [$count, $this->buildCheckbox($name, $this->buildLinkForModify($linkManageDept . '?id=' . $department->getId()))];
+		}
+
+		return $this->displayAll($name, $title, $row, $header);
+	}
+
+	public function contextDisplayAll(): string{
+		return '
+		<div class="row">
+			<div class="col-6 mx-auto col-md-6 order-md-2">
+				<img src="' . TV_PLUG_PATH . 'public/img/info.png" alt="Logo information" class="img-fluid mb-3 mb-md-0">
+			</div>
+			<div class="col-md-6 order-md-1 text-center text-md-left pr-md-5">
+				<p class="lead">Vous pouvez retrouver ici tous les départements qui ont été créés sur ce site.</p>
+				<p class="lead">Les départements sont triés de la plus vieille à la plus récente.</p>
+				<p class="lead">Vous pouvez modifier un département en cliquant sur "Modifier" à la ligne correspondante au département.</p>
+				<p class="lead">Vous souhaitez supprimer un / plusieurs département(s) ? Cochez les cases des départements puis cliquez sur "Supprimer" le bouton se situant en bas du tableau.</p>
+			</div>
+		</div>
+		<a href="' . esc_url(get_permalink(get_page_by_title('Créer un département'))) . '">Créer un département</a>
+		<hr class="half-rule">';
+	}
+
+	/**
+	 * @return string
+	 */
+	public function noDepartment(): string{
+		return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des départements'))) . '">< Retour</a>
+		<div>
+			<h3>Département non trouvé</h3>
+			<p>Ce département n\'existe pas</p>
+			<a href="' . esc_url(get_permalink(get_page_by_title('Créer un département'))) . '">Créer une département</a>
+		</div>';
+	}
+
     /**
      * Display a list of departments
      *
@@ -64,7 +124,7 @@ class DepartmentView extends View
      * @return string
      */
     public function displayDepartmentsList($departments): string {
-	    $page = get_page_by_title('Modifier un dépertement');
+	    $page = get_page_by_title('Modifier un département');
 	    $linkManageUser = get_permalink($page->ID);
 
 	    $title = 'Département';
@@ -84,37 +144,50 @@ class DepartmentView extends View
     /**
      * Display a success message for department creation
      */
-    public function displayCreationSuccess() {
+    public function displayCreationSuccess(): void {
         $this->buildModal('Création réussie', '<div class="alert alert-success">Le département a été créé avec succès !</div>');
     }
 
     /**
      * Display an error message for department creation failure
      */
-    public function displayCreationError() {
+    public function displayCreationError(): void {
         $this->buildModal('Échec de la création', '<div class="alert alert-danger">Une erreur s\'est produite lors de la création du département. Veuillez réessayer.</div>');
     }
 
     /**
      * Display a success message for department deletion
      */
-    public function displayDeletionSuccess() {
+    public function displayDeletionSuccess(): void {
         $this->buildModal('Suppression réussie', '<div class="alert alert-success">Le département a été supprimé avec succès.</div>');
     }
 
     /**
      * Display an error message for department deletion failure
      */
-    public function displayDeletionError() {
+    public function displayDeletionError(): void {
         $this->buildModal('Échec de la suppression', '<div class="alert alert-danger">Impossible de supprimer le département. Veuillez réessayer.</div>');
     }
 
 	/**
 	 * Display an error message for department modification failure
 	 **/
-	public function displayModificationError() {
+	public function displayModificationSucces(): void {
+		$this->buildModal('Modification réussie', '<div class="alert alert-danger">Le département a été modifié avec succès.</div>');
+	}
+
+	/**
+	 * Display an error message for department modification failure
+	 **/
+	public function displayModificationError(): void {
 		$this->buildModal('Échec de la modification', '<div class="alert alert-danger">Impossible de modifier le département. Veuillez réessayer.</div>');
 	}
 
+	/**
+	 * Error message if name exits
+	 */
+	public function displayErrorDoubleName(): void {
+		echo '<p class="alert alert-danger"> Ce nom de département existe déjà</p>';
+	}
 
 }

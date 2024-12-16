@@ -88,6 +88,14 @@ class Department extends Model implements Entity, JsonSerializable
 		return false;
 	}
 
+	public function getAll() {
+		$request = $this->getDatabase()->prepare("SELECT id, name FROM ecran_department ORDER BY id");
+
+		$request->execute();
+
+		return $this->setEntityList($request->fetchAll(PDO::FETCH_ASSOC));
+	}
+
 	/**
 	 * @param int $begin
 	 * @param int $numberElement
