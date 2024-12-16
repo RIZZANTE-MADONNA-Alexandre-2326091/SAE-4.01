@@ -26,14 +26,14 @@ class DepartmentController extends Controller
 	}
 
 	public function insertDept(){
-		//TODO
+		//TODO : implements insertDept() method.
 	}
 
 	public function deleteDept(){
-		//TODO
+		//TODO : implements deleteDept() method.
 	}
 
 	public function updateDept(){
-		//TODO
+		//TODO : implements updateDept() method.
 	}
 }

@@ -229,7 +229,7 @@ class Information extends Model implements Entity, JsonSerializable
     }
 
     /**
-     * Build a list of informations
+     * Build a list of information
      *
      * @param $dataList
      *
