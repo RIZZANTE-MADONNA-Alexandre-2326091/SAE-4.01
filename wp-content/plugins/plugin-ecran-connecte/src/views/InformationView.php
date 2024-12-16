@@ -255,7 +255,7 @@ class InformationView extends View
 	 * @return string form
 	 * */
 	public function displayFormVideoYT(string $title = null, string $content = null,
-		string $endDate = null, string $type = 'createVideoYT'): string
+									   string $endDate = null, string $type = 'createVideoYT'): string
 	{
 		$dateMin = date('Y-m-d', strtotime("+1 day"));
 		$form = '
@@ -284,6 +284,88 @@ class InformationView extends View
             $form .= '<button type="submit" class="btn delete_button_ecran" name="delete"
                       onclick="return confirm(\' Voulez-vous supprimer cette information ?\');">Supprimer</button>';
         }
+
+		$form .= '</form>';
+		return $form;
+	}
+
+	public function displayFormVideoCLocal(string $title = null, string $content = null,
+		                                   string $endDate = null, string $type = "createVideoCLocal"): string
+	{
+		$dateMin = date('Y-m-d', strtotime("+1 day"));
+
+		$form = '<form method="post" enctype="multipart/form-data">
+					<div class="form-group">
+		                <label for="title">Titre <span class="text-muted">(Optionnel)</span></label>
+		                <input id="title" class="form-control" type="text" name="title" placeholder="Inserer un titre" minlength="4" maxlength="60" value="' . $title . '">
+		            </div>';
+
+		if ($content != null)
+		{
+			$form .= '
+			<div class="embed-responsive embed-responsive-16by9">
+			  <iframe class="embed-responsive-item" src="' . TV_UPLOAD_PATH . $content . '" allowfullscreen></iframe>
+			</div>';
+		}
+
+		$form .= '
+			<div class="form-group">
+                <label>Ajouter une vidéo hébergée localement de format "classique". Le fichier doit être au format "mp4"!</label>
+                <input class="form-control-file" type="file" name="contentFile"/>
+                <input type="hidden" name="MAX_FILE_SIZE" value="5000000"/>
+            </div>
+            
+            <div class="form-group">
+				<label for="expirationDate">Date d\'expiration</label>
+				<input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' . $dateMin . '" value="' . $endDate . '" required >
+			</div>
+			<button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
+
+		if ($type == 'submit')
+		{
+			$form .= '<button type="submit" class="btn delete_button_ecran" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette information ?\');">Supprimer</button>';
+		}
+
+		$form .= '</form>';
+		return $form;
+	}
+
+	public function displayFormVideoSLocal(string $title = null, string $content = null,
+				       					   string $endDate = null, string $type = "createVideoSLocal"): string
+	{
+		$dateMin = date('Y-m-d', strtotime("+1 day"));
+
+		$form = '<form method="post" enctype="multipart/form-data">
+					<div class="form-group">
+		                <label for="title">Titre <span class="text-muted">(Optionnel)</span></label>
+		                <input id="title" class="form-control" type="text" name="title" placeholder="Inserer un titre" minlength="4" maxlength="60" value="' . $title . '">
+		            </div>';
+
+		if ($content != null)
+		{
+			$form .= '
+			<div class="embed-responsive embed-responsive-16by9">
+			  <iframe class="embed-responsive-item" src="' . TV_UPLOAD_PATH . $content . '" allowfullscreen></iframe>
+			</div>';
+		}
+
+		$form .= '
+			<div class="form-group">
+                <label>Ajouter une vidéo hébergée localement de format "short".  Le fichier doit être au format "mp4"!</label>
+                <input class="form-control-file" type="file" name="contentFile"/>
+                <input type="hidden" name="MAX_FILE_SIZE" value="5000000"/>
+            </div>
+            
+            <div class="form-group">
+				<label for="expirationDate">Date d\'expiration</label>
+				<input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' . $dateMin . '" value="' . $endDate . '" required >
+			</div>
+			<button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
+
+		if ($type == 'submit')
+		{
+			$form .= '<button type="submit" class="btn delete_button_ecran" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette information ?\');">Supprimer</button>';
+		}
 
 		$form .= '</form>';
 		return $form;
@@ -333,6 +415,14 @@ class InformationView extends View
 		else if ($type == "YTvideosh" || $type == "YTvideow")
 		{
 			return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormVideoYT($title, $content, $endDate, 'submit');
+		}
+		else if ($type == "LocCvideo")
+		{
+			return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormVideoCLocal($title, $content, $endDate, 'submit');
+		}
+		else if ($type == "LocSvideo")
+		{
+			return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormVideoSLocal($title, $content, $endDate, 'submit');
 		}
 		elseif ($type == "img")
 		{
@@ -430,6 +520,20 @@ class InformationView extends View
 			echo '<iframe id="videow" src="' . $link . '?autoplay=1&loop=1&playlist=' . substr($link,30) . '&mute=1&disablekb=1&controls=0"
 				  title="YouTube video player" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
 				  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';
+		}
+		else if ($type == 'LocCvideo')
+		{
+			echo '<video id="localCvideo" autoplay muted>
+				      <source src="' . TV_UPLOAD_PATH . $content . '" type="video/mp4">
+				      <p>Impossible de lire la vidéo.</p>
+				  </video>';
+		}
+		else if ($type == 'LocSvideo')
+		{
+			echo '<video id="localSvideo" autoplay muted>
+				      <source src="' . TV_UPLOAD_PATH . $content . '" type="video/mp4">
+				      <p>Impossible de lire la vidéo.</p>
+				  </video>';
 		}
         else if ($type == 'special')
         {
