@@ -123,7 +123,7 @@ class CodeAdeView extends View
     }
 
     /**
-     * Display all informations of a code ade
+     * Display all information of a code ade
      *
      * @param $years        CodeAde[]
      * @param $groups       CodeAde[]

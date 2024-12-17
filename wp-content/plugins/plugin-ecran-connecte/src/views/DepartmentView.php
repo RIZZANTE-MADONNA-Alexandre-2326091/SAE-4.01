@@ -87,6 +87,9 @@ class DepartmentView extends View
 		return $this->displayAll($name, $title, $row, $header);
 	}
 
+	/**
+	 * @return string
+	 */
 	public function contextDisplayAll(): string{
 		return '
 		<div class="row">

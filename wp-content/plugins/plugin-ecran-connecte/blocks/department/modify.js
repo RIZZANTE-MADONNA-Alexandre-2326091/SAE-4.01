@@ -5,13 +5,13 @@
 {
     var el = element.createElement;
 
-    blocks.registerBlockType('tvconnecteeamu/modify-information', {
-        title: 'Modifier l\'information',
+    blocks.registerBlockType('tvconnecteeamu/modify-department', {
+        title: 'Modifier le département',
         icon: 'smiley',
         category: 'common',
 
         edit: function() {
-            return "Modifie l\'information sélectionnée";
+            return "Modifie le département sélectionné";
         },
         save: function() {
             return "test";
