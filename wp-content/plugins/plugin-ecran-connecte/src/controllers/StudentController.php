@@ -142,7 +142,7 @@ class StudentController extends UserController implements Schedule
      * @return string
      */
     public function modify($user) {
-        $page = get_page_by_title('Gestion des utilisateurs');
+        $page = get_page_by_title_V2('Gestion des utilisateurs');
         $linkManageUser = get_permalink($page->ID);
 
         $action = filter_input(INPUT_POST, 'modifvalider');

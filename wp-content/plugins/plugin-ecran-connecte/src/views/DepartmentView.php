@@ -4,6 +4,7 @@ namespace Views;
 
 use Models\Department;
 use Utils\PublicationManagement;
+use function Utils\get_page_by_title_V2;
 
 /**
  * Class DepartmentView
@@ -34,9 +35,7 @@ class DepartmentView extends View
 	 * @return string
 	 */
     public function modifyForm(): string {
-		$linkManager = new PublicationManagement();
-
-        $page = $linkManager->get_page_by_title('Gestion des départements');
+        $page = get_page_by_title_V2('Gestion des départements');
         $linkManageDept = get_permalink($page->ID);
 
         return '
@@ -72,9 +71,7 @@ class DepartmentView extends View
 	 * @return string
 	 */
 	public function displayAllDept($departments): string {
-		$linkManager = new PublicationManagement();
-
-		$page = $linkManager->get_page_by_title('Modifier un département');
+		$page = get_page_by_title_V2('Modifier un département');
 		$linkManageDept = get_permalink($page->ID);
 
 		$title = 'Départements de l\'IUT';
@@ -96,8 +93,6 @@ class DepartmentView extends View
 	 * @return string
 	 */
 	public function contextDisplayAll(): string{
-		$linkManager = new PublicationManagement();
-
 		return '
 		<div class="row">
 			<div class="col-6 mx-auto col-md-6 order-md-2">
@@ -110,7 +105,7 @@ class DepartmentView extends View
 				<p class="lead">Vous souhaitez supprimer un / plusieurs département(s) ? Cochez les cases des départements puis cliquez sur "Supprimer" le bouton se situant en bas du tableau.</p>
 			</div>
 		</div>
-		<a href="' . esc_url(get_permalink($linkManager->get_page_by_title('Créer un département'))) . '">Créer un département</a>
+		<a href="' . esc_url(get_permalink(get_page_by_title_V2('Créer un département'))) . '">Créer un département</a>
 		<hr class="half-rule">';
 	}
 
@@ -118,13 +113,11 @@ class DepartmentView extends View
 	 * @return string
 	 */
 	public function noDepartment(): string{
-		$linkManager = new PublicationManagement();
-
-		return '<a href="' . esc_url(get_permalink($linkManager->get_page_by_title('Gestion des départements'))) . '">< Retour</a>
+		return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des départements'))) . '">< Retour</a>
 		<div>
 			<h3>Département non trouvé</h3>
 			<p>Ce département n\'existe pas</p>
-			<a href="' . esc_url(get_permalink($linkManager->get_page_by_title('Créer un département'))) . '">Créer une département</a>
+			<a href="' . esc_url(get_permalink(get_page_by_title_V2('Créer un département'))) . '">Créer une département</a>
 		</div>';
 	}
 
@@ -136,9 +129,7 @@ class DepartmentView extends View
      * @return string
      */
     public function displayDepartmentsList($departments): string {
-		$linkManager = new PublicationManagement();
-
-	    $page = $linkManager->get_page_by_title('Modifier un département');
+		$page = get_page_by_title_V2('Modifier un département');
 	    $linkManageUser = get_permalink($page->ID);
 
 	    $title = 'Département';
@@ -202,12 +193,6 @@ class DepartmentView extends View
 	 */
 	public function displayErrorDoubleName(): void {
 		echo '<p class="alert alert-danger"> Ce nom de département existe déjà</p>';
-	}
-
-	public function set_publication_management( PublicationManagement $publicationManagement ): DepartmentView {
-		$this->publicationManagement = $publicationManagement;
-
-		return $this;
 	}
 
 }

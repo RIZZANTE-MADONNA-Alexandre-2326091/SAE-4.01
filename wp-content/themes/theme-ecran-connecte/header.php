@@ -6,7 +6,8 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?php bloginfo('name'); ?></title>
+    <title><?php
+	    bloginfo('name'); ?></title>
     <!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -55,9 +56,9 @@ if(in_array('television', $current_user->roles)) : ?>
                 <li class="nav-item dropdown active">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Informations</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="<?php echo esc_url(get_permalink(get_page_by_title('Créer une information'))); ?>">Créer une information</a>
+                        <a class="dropdown-item" href="<?php echo esc_url(get_permalink(get_page_by_title_V2('Créer une information'))); ?>">Créer une information</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="<?php echo esc_url(get_permalink(get_page_by_title('Gestion des informations'))); ?>">Voir mes informations</a>
+                        <a class="dropdown-item" href="<?php echo esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))); ?>">Voir mes informations</a>
                     </div>
                 </li>
             <?php endif;
@@ -65,9 +66,9 @@ if(in_array('television', $current_user->roles)) : ?>
                 <li class="nav-item dropdown active">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Alertes</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="<?php echo esc_url(get_permalink(get_page_by_title('Créer une alerte'))); ?>">Créer une alerte</a>
+                        <a class="dropdown-item" href="<?php echo esc_url(get_permalink(get_page_by_title_V2('Créer une alerte'))); ?>">Créer une alerte</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="<?php echo esc_url(get_permalink(get_page_by_title('Gestion des alertes'))); ?>">Voir mes alertes</a>
+                        <a class="dropdown-item" href="<?php echo esc_url(get_permalink(get_page_by_title_V2('Gestion des alertes'))); ?>">Voir mes alertes</a>
                     </div>
                 </li>
             <?php endif;
@@ -75,15 +76,25 @@ if(in_array('television', $current_user->roles)) : ?>
                 <li class="nav-item dropdown active">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Utilisateurs</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="<?php echo esc_url(get_permalink(get_page_by_title('Créer un utilisateur'))); ?>">Créer un utilisateur</a>
+                        <a class="dropdown-item" href="<?php echo esc_url(get_permalink(get_page_by_title_V2('Créer un utilisateur'))); ?>">Créer un utilisateur</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="<?php echo esc_url(get_permalink(get_page_by_title('Gestion des utilisateurs'))); ?>">Voir les utilisateurs</a>
+                        <a class="dropdown-item" href="<?php echo esc_url(get_permalink(get_page_by_title_V2('Gestion des utilisateurs'))); ?>">Voir les utilisateurs</a>
                     </div>
                 </li>
             <?php endif;
             if (in_array('administrator', $user_info->roles)) : ?>
                 <li class="nav-item active">
-                    <a class="nav-link" href="<?php echo esc_url(get_permalink(get_page_by_title('Gestion des codes ADE'))); ?>">Code ADE</a>
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Départements</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="<?php echo esc_url(get_permalink(get_page_by_title_V2('Créer un département'))); ?>">Créer un département</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="<?php echo esc_url(get_permalink(get_page_by_title_V2('Gestion des départements'))); ?>">Voir un département</a>
+                    </div>
+                </li>
+            <?php endif;
+            if (in_array('administrator', $user_info->roles)) : ?>
+                <li class="nav-item active">
+                    <a class="nav-link" href="<?php echo esc_url(get_permalink(get_page_by_title_V2('Gestion des codes ADE'))); ?>">Code ADE</a>
                 </li>
             <?php endif; ?>
             </ul>
@@ -91,7 +102,7 @@ if(in_array('television', $current_user->roles)) : ?>
             if(!in_array('television', $current_user->roles)) : ?>
             <ul class="nav navbar-nav navbar-right">
                     <li class="nav-item active">
-                        <a class="nav-link" href="<?php echo esc_url(get_permalink(get_page_by_title("Mon compte"))); ?>"><?php echo wp_get_current_user()->user_login; ?></a>
+                        <a class="nav-link" href="<?php echo esc_url(get_permalink(get_page_by_title_V2("Mon compte"))); ?>"><?php echo wp_get_current_user()->user_login; ?></a>
                     </li>
                     <li class="nav-item active my-2 my-lg-0">
                         <a class="nav-link" href="<?php echo wp_logout_url(get_home_url()); ?>">Déconnexion</a>
