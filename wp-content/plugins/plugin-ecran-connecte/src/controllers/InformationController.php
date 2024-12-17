@@ -524,14 +524,14 @@ class InformationController extends Controller
                 }
 				else if ($information->getType() === 'LocCvideo')
 				{
-					$content = '<video id="previsualisationVideoClassique" controls muted>
+					$content = '<video class="previsualisationVideoClassique" controls muted>
 									<source src="' . $content . $information->getContent() . '" type="video/mp4">
 									<p>Votre navigateur ne permet pas de lire les vidéos de format mp4 avec HTML5.</p>
 								</video>';
 				}
 				else if ($information->getType() === 'LocSvideo')
 				{
-					$content = '<video id="previsualisationVideoShort" controls muted>
+					$content = '<video class="previsualisationVideoShort" controls muted>
 									<source src="' . $content . $information->getContent() . '" type="video/mp4">
 									<p>Votre navigateur ne permet pas de lire les vidéos de format mp4 avec HTML5.</p>
 								</video>';
