@@ -265,7 +265,7 @@ function department_modify_render_callback(){
  */
 function block_department_modify(): void{
 	wp_register_script(
-		'department-modify-script',
+		'department_modify-script',
 		plugins_url( '/blocks/department/modify.js', __FILE__ ),
 		array( 'wp-blocks', 'wp-element', 'wp-data' )
 	);
@@ -296,7 +296,7 @@ function department_render_management_callback(){
  */
 function block_department_management(){
 	wp_register_script(
-		'department-manage-script',
+		'department_manage-script',
 		plugins_url( '/blocks/department/displayAll.js', __FILE__ ),
 		array( 'wp-blocks', 'wp-element', 'wp-data' )
 	);
