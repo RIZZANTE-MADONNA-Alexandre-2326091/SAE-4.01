@@ -83,12 +83,12 @@ if(in_array('television', $current_user->roles)) : ?>
                 </li>
             <?php endif;
             if (in_array('administrator', $user_info->roles)) : ?>
-                <li class="nav-item active">
+                <li class="nav-item dropdown active">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Départements</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="<?php echo esc_url(get_permalink(get_page_by_title_V2('Créer un département'))); ?>">Créer un département</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="<?php echo esc_url(get_permalink(get_page_by_title_V2('Gestion des départements'))); ?>">Voir un département</a>
+                        <a class="dropdown-item" href="<?php echo esc_url(get_permalink(get_page_by_title_V2('Gestion des départements'))); ?>">Voir les départements</a>
                     </div>
                 </li>
             <?php endif;
