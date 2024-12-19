@@ -8,7 +8,7 @@
     blocks.registerBlockType('tvconnecteeamu/modify-department', {
         title: 'Modifier le département',
         icon: 'smiley',
-        category: 'common',
+        category: 'widgets',
 
         edit: function() {
             return "Modifie le département sélectionné";

@@ -38,18 +38,17 @@ class DepartmentController extends Controller
 	 * @return string
 	 */
 	public function insert(): string{
-		$action = filter_input(INPUT_POST, 'createDept');
+		$action = filter_input(INPUT_POST, 'submit');
 
 		if(isset($action)){
 			$name = filter_input(INPUT_POST, 'deptName');
-			if(is_string($name) && strlen($name) > 10){
+			if(is_string($name) && strlen($name) >= 10){
 
 				$this->model->setName($name);
 
-				if(!$this->checkDuplicateDept($this->model) && $this->model->insert()){
-
+				if(!$this->checkDuplicateDept($this->model)){
+					$this->model->insert();
 					$this->view->displayCreationSuccess();
-					$this->view->refreshPage();
 
 				}else{
 					$this->view->displayErrorDoubleName();

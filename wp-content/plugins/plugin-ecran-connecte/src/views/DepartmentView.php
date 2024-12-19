@@ -23,10 +23,11 @@ class DepartmentView extends View
             <form method="post">
                 <div class="form-group">
                     <label for="deptName">Nom du département</label>
-                    <input class="form-control" type="text" name="deptName" placeholder="Nom du département" required="">
+                    <input class="form-control" type="text" name="deptName" placeholder="280 caractères maximum" required="">
                 </div>
-                <button type="submit" class="btn button_ecran" id="valid" name="createDept">Créer</button>
+                <button type="submit" class="btn button_ecran" id="valid" name="submit">Créer</button>
             </form>';
+            //<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des départements'))) . '">Voir les départements</a>' . $this->contextDisplayAll();
     }
 
 	/**

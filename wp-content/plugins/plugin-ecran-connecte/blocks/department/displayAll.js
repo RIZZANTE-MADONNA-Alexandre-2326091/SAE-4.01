@@ -8,7 +8,7 @@
     blocks.registerBlockType('tvconnecteeamu/manage-department', {
         title: 'Affiche les départements',
         icon: 'smiley',
-        category: 'common',
+        category: 'widgets',
 
         edit: function() {
             return "Affiche tous les départements";

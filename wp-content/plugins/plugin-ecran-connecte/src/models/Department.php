@@ -17,7 +17,7 @@ class Department extends Model implements Entity, JsonSerializable
 	/**
 	 * @var int
 	 */
-	private $idDept;
+	private $id;
 
 	/**
 	 * @var string
@@ -31,7 +31,7 @@ class Department extends Model implements Entity, JsonSerializable
 	 */
 	public function insert(): string {
 		$database = $this->getDatabase();
-		$request = $database ->prepare("INSERT INTO ecran_depaartment (name) VALUES (:name)");
+		$request = $database ->prepare("INSERT INTO ecran_department (name) VALUES (:name)");
 
 		$request->bindValue(':name', $this->getName(), PDO::PARAM_STR);
 

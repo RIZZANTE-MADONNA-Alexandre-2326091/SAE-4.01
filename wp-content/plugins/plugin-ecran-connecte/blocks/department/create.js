@@ -5,16 +5,16 @@
 {
     var el = element.createElement;
 
-    blocks.registerBlockType('tvconnecteeamu/add-department', {
-        title: 'Ajout département',
+    wp.blocks.registerBlockType('tvconnecteeamu/add-department', {
+        title: 'Créer un département',
         icon: 'smiley',
-        category: 'common',
+        category: 'widgets',
 
         edit: function() {
             return "Ajoute un département via un formulaire";
         },
         save: function() {
-            return "yo";
+            return "test";
         },
     });
 }(
