@@ -121,7 +121,7 @@ class Department extends Model implements Entity, JsonSerializable
 	 *
 	 * @param $name
 	 *
-	 * @return Department
+	 * @return $this|array|Department
 	 */
 	public function getDepartmentName($name) {
 		$request = $this->getDatabase()->prepare("SELECT id, name FROM ecran_department WHERE name =	:name LIMIT 1");
@@ -130,7 +130,7 @@ class Department extends Model implements Entity, JsonSerializable
 
 		$request->execute();
 
-		return $this->setEntity($request->fetchAll(PDO::FETCH_ASSOC));
+		return $this->setEntityList($request->fetchAll(PDO::FETCH_ASSOC));
 	}
 
 	/**
@@ -159,7 +159,7 @@ class Department extends Model implements Entity, JsonSerializable
 	public function setEntityList( $dataList ) {
 		$listEntity = array();
 		foreach ($dataList as $data){
-			$listEntity = $this->setEntity($data);
+			$listEntity[] = $this->setEntity($data);
 		}
 		return $listEntity;
 	}

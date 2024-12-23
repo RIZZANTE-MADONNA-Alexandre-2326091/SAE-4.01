@@ -139,7 +139,7 @@ class DepartmentController extends Controller
 		$departments = $this->model->getDepartmentName($department->getName());
 
 		foreach($departments as $dept){
-			if($dept->getName() === $department->getName()){
+			if( $department->getName() === $dept->getName()){
 				return true;
 			}
 		}
