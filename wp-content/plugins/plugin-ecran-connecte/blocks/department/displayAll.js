@@ -5,7 +5,7 @@
 {
     var el = element.createElement;
 
-    blocks.registerBlockType('tvconnecteeamu/manage-department', {
+    wp.blocks.registerBlockType('tvconnecteeamu/manage-department', {
         title: 'Affiche les départements',
         icon: 'smiley',
         category: 'common',

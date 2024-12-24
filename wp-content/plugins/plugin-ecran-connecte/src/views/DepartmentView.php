@@ -71,16 +71,16 @@ class DepartmentView extends View
 	 *
 	 * @return string
 	 */
-	public function displayAllDept(array $departments): string {
+	public function displayAllDept($departments): string {
 		$page = get_page_by_title_V2('Modifier un département');
 		$linkManageDept = get_permalink($page->ID);
 
-		$title = 'Départements de l\'IUT';
-		$name = 'dept';
+		$title = 'Départements';
+		$name = 'Dept';
 		$header = ['Nom', 'Modifier'];
 
 		$row = array();
-		$count = 0;
+		$count = 1;
 
 		foreach ($departments as $dept) {
 			$row[] = [$count, $this->buildCheckbox($name, $dept->getId()),

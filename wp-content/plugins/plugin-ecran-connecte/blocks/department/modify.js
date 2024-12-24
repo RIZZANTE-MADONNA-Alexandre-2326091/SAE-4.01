@@ -5,7 +5,7 @@
 {
     var el = element.createElement;
 
-    blocks.registerBlockType('tvconnecteeamu/modify-department', {
+    wp.blocks.registerBlockType('tvconnecteeamu/modify-department', {
         title: 'Modifier le département',
         icon: 'smiley',
         category: 'common',
