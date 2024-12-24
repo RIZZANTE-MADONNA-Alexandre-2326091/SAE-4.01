@@ -236,7 +236,7 @@ function block_department(){
 	wp_register_script(
 		'department-script',
 		plugins_url( '/blocks/department/create.js', __FILE__ ),
-		array( 'wp-blocks', 'wp-element', 'wp-data', 'wp-editor' )
+		array( 'wp-blocks', 'wp-element', 'wp-data' )
 	);
 
 	register_block_type('tvconnecteeamu/add-department', array(
@@ -267,7 +267,7 @@ function block_department_modify(): void{
 	wp_register_script(
 		'department_modify-script',
 		plugins_url( '/blocks/department/modify.js', __FILE__ ),
-		array( 'wp-blocks', 'wp-element', 'wp-data', 'wp-editor'  )
+		array( 'wp-blocks', 'wp-element', 'wp-data'  )
 	);
 
 	register_block_type('tvconnecteeamu/modify-department', array(
@@ -285,6 +285,7 @@ add_action('init', 'block_department_modify');
 function department_render_management_callback(){
 	if(is_page()) {
 		$department = new DepartmentController();
+		$department->delete();
 		return $department->displayAll();
 	}
 }
@@ -298,7 +299,7 @@ function block_department_management(){
 	wp_register_script(
 		'department_manage-script',
 		plugins_url( '/blocks/department/displayAll.js', __FILE__ ),
-		array( 'wp-blocks', 'wp-element', 'wp-data', 'wp-editor'  )
+		array( 'wp-blocks', 'wp-element', 'wp-data'  )
 	);
 	register_block_type('tvconnecteeamu/manage-department', array(
 		'editor_script' => 'department-manage-script',

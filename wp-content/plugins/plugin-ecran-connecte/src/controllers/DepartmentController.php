@@ -68,8 +68,8 @@ class DepartmentController extends Controller
 		$action = filter_input(INPUT_GET, 'deleteDepartment');
 
 		if(isset($action)) {
-			if ( isset( $_REQUEST['checkboxStatusCode'] ) ) {
-				$checked_values = $_REQUEST['checkboxStatusCode'];
+			if ( isset( $_REQUEST['checkboxStatusDept'] ) ) {
+				$checked_values = $_REQUEST['checkboxStatusDept'];
 				foreach ( $checked_values as $id ) {
 					$this->model = $this->model->get($id);
 					$this->model->delete();
@@ -86,9 +86,10 @@ class DepartmentController extends Controller
 	 * @return string
 	 */
 	public function modify(): string{
+
 		$id = $_GET['id'];
 
-		if(empty($id)){
+		if(!is_numeric($id) || !$this->model->get($id)){
 			return $this->view->noDepartment();
 		}
 
@@ -122,7 +123,7 @@ class DepartmentController extends Controller
 	 *
 	 * @return void
 	 */
-	public function displayAll(): void{
+	public function displayAll(){
 		$departments = $this->model->getAll();
 
 		$this->view->displayAllDept($departments);

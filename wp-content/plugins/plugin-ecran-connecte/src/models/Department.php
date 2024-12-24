@@ -69,6 +69,37 @@ class Department extends Model implements Entity, JsonSerializable
 	}
 
 	/**
+	 * Create a department
+	 *
+	 * @param $data
+	 *
+	 * @return $this
+	 */
+	public function setEntity( $data ) {
+		$entity = new Department();
+
+		$entity->setId($data['id']);
+		$entity->setName($data['name']);
+
+		return $entity;
+	}
+
+	/**
+	 * Build a list of department
+	 *
+	 * @param $dataList
+	 *
+	 * @return array | Department
+	 */
+	public function setEntityList( $dataList ) {
+		$listEntity = array();
+		foreach ($dataList as $data){
+			$listEntity[] = $this->setEntity($data);
+		}
+		return $listEntity;
+	}
+
+	/**
 	 * Return a department corresponding to the ID
 	 *
 	 * @param $id   int id
@@ -88,7 +119,12 @@ class Department extends Model implements Entity, JsonSerializable
 		return false;
 	}
 
-	public function getAll() {
+	/**
+	 * Return the list of the all departments
+	 *
+	 * @return array
+	 */
+	public function getAll(): array {
 		$request = $this->getDatabase()->prepare("SELECT id, name FROM ecran_department ORDER BY id");
 
 		$request->execute();
@@ -131,37 +167,6 @@ class Department extends Model implements Entity, JsonSerializable
 		$request->execute();
 
 		return $this->setEntityList($request->fetchAll(PDO::FETCH_ASSOC));
-	}
-
-	/**
-	 * Create a department
-	 *
-	 * @param $data
-	 *
-	 * @return $this
-	 */
-	public function setEntity( $data ) {
-		$entity = new Department();
-
-		$entity->setId($data['id']);
-		$entity->setName($data['name']);
-
-		return $entity;
-	}
-
-	/**
-	 * Build a list of department
-	 *
-	 * @param $dataList
-	 *
-	 * @return array | Department
-	 */
-	public function setEntityList( $dataList ) {
-		$listEntity = array();
-		foreach ($dataList as $data){
-			$listEntity[] = $this->setEntity($data);
-		}
-		return $listEntity;
 	}
 
 	/**

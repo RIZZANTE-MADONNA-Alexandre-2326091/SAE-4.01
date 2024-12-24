@@ -27,7 +27,7 @@ class DepartmentView extends View
                 </div>
                 <button type="submit" class="btn button_ecran" id="valid" name="submit">Créer</button>
             </form>';
-            //<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des départements'))) . '">Voir les départements</a>' . $this->contextDisplayAll();
+            //$this->contextDisplayAll();
     }
 
 	/**
@@ -43,7 +43,7 @@ class DepartmentView extends View
          <a href="' . esc_url(get_permalink($page)) . '">< Retour</a>
          <form method="post">
          	<label for="deptName">Nom du département</label>
-            <input class="form-control" type="text" name="deptName" placeholder="Nom du département" required="">
+            <input class="form-control" type="text" name="deptName" placeholder="280 caractères maximum" required="">
          <button type="submit" class="btn button_ecran" name="modifDept">Modifier</button>
           <a href="'. $linkManageDept .'">Annuler</a>
         </form>';
@@ -71,23 +71,24 @@ class DepartmentView extends View
 	 *
 	 * @return string
 	 */
-	public function displayAllDept($departments): string {
+	public function displayAllDept(array $departments): string {
 		$page = get_page_by_title_V2('Modifier un département');
 		$linkManageDept = get_permalink($page->ID);
 
 		$title = 'Départements de l\'IUT';
-		$name = 'Department';
-		$header = ['Titre', 'Modifier'];
+		$name = 'dept';
+		$header = ['Nom', 'Modifier'];
 
 		$row = array();
 		$count = 0;
 
-		foreach ($departments as $department) {
+		foreach ($departments as $dept) {
+			$row[] = [$count, $this->buildCheckbox($name, $dept->getId()),
+				$dept->getName(), $this->buildLinkForModify($linkManageDept . '?id=' . $dept->getId())];
 			++$count;
-			$row[] = [$count, $this->buildCheckbox($name, $this->buildLinkForModify($linkManageDept . '?id=' . $department->getId()))];
 		}
 
-		return $this->displayAll($name, $title, $row, $header);
+		return $this->displayAll($name, $title, $header, $row);
 	}
 
 	/**
@@ -131,18 +132,18 @@ class DepartmentView extends View
      */
     public function displayDepartmentsList($departments): string {
 		$page = get_page_by_title_V2('Modifier un département');
-	    $linkManageUser = get_permalink($page->ID);
+	    $linkManageDept = get_permalink($page->ID);
 
-	    $title = 'Département';
-	    $name = 'dept';
-	    $header = ['Nom du département'];
+	    $title = 'Départements';
+	    $name = 'Dept';
+	    $header = ['Nom du département', "Modifier"];
 
 	    $row = array();
 	    $count = 0;
 	    foreach ($departments as $dept) {
+		    $row[] = [$count, $this->buildCheckbox($name, $dept->getId()), $this->buildLinkForModify($linkManageDept . '?id='. $dept->getId())];
 		    ++$count;
-		    $row[] = [$count, $this->buildCheckbox($name, $dept->getId()), $dept->getLogin(), sizeof($dept->getCodes()), $dept->buildLinkForModify($linkManageUser . '?id=' . $dept->getId())];
-	    }
+		}
 
 	    return $this->displayAll($name, $title, $header, $row);
     }
