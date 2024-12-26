@@ -208,7 +208,6 @@ function installDatabaseEcran(): void
     		id INT(10) NOT NULL AUTO_INCREMENT,
     		longitude DECIMAL(10,10) NOT NULL,
     		latitude DECIMAL(10,10) NOT NULL,
-    		address VARCHAR(60) NOT NULL,
     		user_id BIGINT(20) UNSIGNED NOT NULL,
     		PRIMARY KEY (id),
 	        FOREIGN KEY (user_id) REFERENCES wp_users(ID) ON DELETE 

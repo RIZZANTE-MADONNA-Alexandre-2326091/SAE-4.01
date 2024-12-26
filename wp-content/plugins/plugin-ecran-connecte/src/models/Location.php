@@ -30,11 +30,6 @@ class Location extends Model implements Entity, JsonSerializable {
 	private float $latitude;
 
 	/**
-	 * @var string
-	 */
-	private string $adress;
-
-	/**
 	 * @var int
 	 */
 	private int $id_user;
@@ -47,11 +42,10 @@ class Location extends Model implements Entity, JsonSerializable {
 	 */
 	public function insert():string {
 		$database = $this->getDatabase();
-		$request = $database->prepare("INSERT INTO ecran_location (longitude, latitude, address, user_id) VALUES (:longitude, :latitude, :address, :id_user)");
+		$request = $database->prepare("INSERT INTO ecran_location (longitude, latitude, user_id) VALUES (:longitude, :latitude, :id_user)");
 
 		$request->bindValue(':longitude', $this->getLongitude(), PDO::PARAM_INT);
 		$request->bindValue(':latitude', $this->getLatitude(), PDO::PARAM_INT);
-		$request->bindValue(':address', $this->getAdress(), PDO::PARAM_STR);
 		$request->bindValue(':user_id', $this->getIdUser(), PDO::PARAM_INT);
 
 		$request->execute();
@@ -61,11 +55,10 @@ class Location extends Model implements Entity, JsonSerializable {
 
 	public function update():int {
 		$request = $this->getDatabase()->prepare("UPDATE ecran_location SET longitude = :longitude, latitude = :latitude,
-                          address = :address, user_id = :user_id WHERE id = :id");
+                          user_id = :user_id WHERE id = :id");
 
 		$request->bindValue(':longitude', $this->getLongitude(), PDO::PARAM_INT);
 		$request->bindValue(':latitude', $this->getLatitude(), PDO::PARAM_INT);
-		$request->bindValue(':address', $this->getAdress(), PDO::PARAM_STR);
 		$request->bindValue(':user_id', $this->getIdUser(), PDO::PARAM_INT);
 
 		$request->execute();
@@ -84,7 +77,7 @@ class Location extends Model implements Entity, JsonSerializable {
 	}
 
 	public function get( $id ): array|false {
-		$request = $this->getDatabase()->prepare("SELECT id, name FROM ecran_location WHERE id = :id LIMIT 1");
+		$request = $this->getDatabase()->prepare("SELECT id, longitude, latitude, id_user FROM ecran_location WHERE id = :id LIMIT 1");
 
 		$request->bindParam(':id', $id, PDO::PARAM_INT);
 
@@ -97,7 +90,7 @@ class Location extends Model implements Entity, JsonSerializable {
 	}
 
 	public function getList(int $begin = 0, int $numberElement = 25): array {
-		$request = $this->getDatabase()->prepare("SELECT id, longitude, latitude, address, id_user  FROM ecran_department ORDER BY id ASC LIMIT :begin, :numberElement");
+		$request = $this->getDatabase()->prepare("SELECT id, longitude, latitude, id_user  FROM ecran_department ORDER BY id ASC LIMIT :begin, :numberElement");
 
 		$request->bindValue(':begin', $begin, PDO::PARAM_INT);
 		$request->bindValue(':numberElement', $numberElement, PDO::PARAM_INT);
@@ -153,22 +146,6 @@ class Location extends Model implements Entity, JsonSerializable {
 	}
 
 	/**
-	 * @return string
-	 */
-	public function getAdress(): string {
-		return $this->adress;
-	}
-
-	/**
-	 * @param string $adresse
-	 *
-	 * @return void
-	 */
-	public function setAdresse( string $adress ): void {
-		$this->adress = $adress;
-	}
-
-	/**
 	 * @return int
 	 */
 	public function getIdUser(): int {
@@ -194,7 +171,6 @@ class Location extends Model implements Entity, JsonSerializable {
 		$entity->setId($data['id']);
 		$entity->setLongitude( $data['longitude'] );
 		$entity->setLatitude( $data['latitude'] );
-		$entity->setAdresse( $data['address'] );
 		$entity->setIdUser( $data['id_user'] );
 
 		return $entity;
