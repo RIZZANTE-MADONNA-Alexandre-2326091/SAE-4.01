@@ -1,3 +1,9 @@
+var options = {
+    enableHighAccuracy: true,
+    timeout: 5000,
+    maximumAge: 0,
+};
+
 /**
  * Handles the successful retrieval of the user's position coordinates.
  *
@@ -30,28 +36,27 @@ function error(err) {
  * @return {void} This function does not return a value but processes and logs the server's response or any errors encountered.
  */
 function searchLocation(longitude, latitude){
-    const formData = new FormData();
+    var formData = new FormData();
 
-    formData.append("action", "process_location");
+    formData.append("action", "handleWeatherAjaxData");
     formData.append("longitude", longitude);
     formData.append("latitude", latitude);
+    formData.append('nonce', locationValues.ajaxNonce);
+    formData.append('currentUserId', locationValues.currentUserId);
 
-    fetch("your-server-endpoint", {
-        method: "POST",
-        body: formData,
+    fetch(locationValues.ajaxUrl, {
+        method: 'POST',
+        body: formData
     })
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Succès:', data);
+            } else {
+                console.log('Erreur:', data.data);
             }
-            return response.json();
         })
-        .then((data) => {
-            console.log("Succès:", data);
-        })
-        .catch((error) => {
-            console.error("Erreur:", error);
-        });
+        .catch(error => console.error('Erreur de requête:', error));
 }
 
-navigator.geolocation.getCurrentPosition(success, error);
+navigator.geolocation.getCurrentPosition(success, error, options);

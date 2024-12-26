@@ -36,70 +36,97 @@ class Location extends Model implements Entity, JsonSerializable {
 
 
 	/**
-	 * Insert a location in the database.ZS
+	 * Insert a location in the database.
 	 *
 	 * @return string
 	 */
-	public function insert():string {
+	public function insert(): string {
 		$database = $this->getDatabase();
-		$request = $database->prepare("INSERT INTO ecran_location (longitude, latitude, user_id) VALUES (:longitude, :latitude, :id_user)");
+		$request  = $database->prepare( "INSERT INTO ecran_location (longitude, latitude, user_id) VALUES (:longitude, :latitude, :id_user)" );
 
-		$request->bindValue(':longitude', $this->getLongitude(), PDO::PARAM_INT);
-		$request->bindValue(':latitude', $this->getLatitude(), PDO::PARAM_INT);
-		$request->bindValue(':user_id', $this->getIdUser(), PDO::PARAM_INT);
+		$request->bindValue( ':longitude', $this->getLongitude(), PDO::PARAM_INT );
+		$request->bindValue( ':latitude', $this->getLatitude(), PDO::PARAM_INT );
+		$request->bindValue( ':user_id', $this->getIdUser(), PDO::PARAM_INT );
 
 		$request->execute();
 
 		return $database->lastInsertId();
 	}
 
-	public function update():int {
-		$request = $this->getDatabase()->prepare("UPDATE ecran_location SET longitude = :longitude, latitude = :latitude,
-                          user_id = :user_id WHERE id = :id");
+	/**
+	 * Update a location in the database.
+	 *
+	 * @return int
+	 */
+	public function update(): int {
+		$request = $this->getDatabase()->prepare( "UPDATE ecran_location SET longitude = :longitude, latitude = :latitude,
+                          user_id = :user_id WHERE id = :id" );
 
-		$request->bindValue(':longitude', $this->getLongitude(), PDO::PARAM_INT);
-		$request->bindValue(':latitude', $this->getLatitude(), PDO::PARAM_INT);
-		$request->bindValue(':user_id', $this->getIdUser(), PDO::PARAM_INT);
+		$request->bindValue( ':longitude', $this->getLongitude(), PDO::PARAM_INT );
+		$request->bindValue( ':latitude', $this->getLatitude(), PDO::PARAM_INT );
+		$request->bindValue( ':user_id', $this->getIdUser(), PDO::PARAM_INT );
 
 		$request->execute();
 
 		return $request->rowCount();
 	}
 
+	/**
+	 * Delete a location in the database.
+	 *
+	 * @return int
+	 */
 	public function delete(): int {
-		$request = $this->getDatabase()->prepare('DELETE FROM ecran_location WHERE id = :id');
+		$request = $this->getDatabase()->prepare( 'DELETE FROM ecran_location WHERE id = :id' );
 
-		$request->bindValue(':id', $this->getId(), PDO::PARAM_INT);
+		$request->bindValue( ':id', $this->getId(), PDO::PARAM_INT );
 
 		$request->execute();
 
 		return $request->rowCount();
 	}
 
-	public function get( $id ): array|false {
-		$request = $this->getDatabase()->prepare("SELECT id, longitude, latitude, id_user FROM ecran_location WHERE id = :id LIMIT 1");
+	/**
+	 * Retrieves an entity from the database based on the provided ID.
+	 *
+	 * @param int $id The ID of the entity to retrieve.
+	 *
+	 * @return array|false The entity data as an associative array if found, or false if no matching entity was found.
+	 */
+	public function get( $id ): Location|false {
+		$request = $this->getDatabase()->prepare( "SELECT id, longitude, latitude, id_user FROM ecran_location WHERE id = :id LIMIT 1" );
 
-		$request->bindParam(':id', $id, PDO::PARAM_INT);
+		$request->bindParam( ':id', $id, PDO::PARAM_INT );
 
 		$request->execute();
 
-		if ($request->rowCount() > 0) {
-			return $this->setEntity($request->fetch(PDO::FETCH_ASSOC));
+		if ( $request->rowCount() > 0 ) {
+			return $this->setEntity($request->fetch( PDO::FETCH_ASSOC ));
 		}
+
 		return false;
 	}
 
-	public function getList(int $begin = 0, int $numberElement = 25): array {
-		$request = $this->getDatabase()->prepare("SELECT id, longitude, latitude, id_user  FROM ecran_department ORDER BY id ASC LIMIT :begin, :numberElement");
+	/**
+	 * Retrieves a list of entities from the database based on the given parameters.
+	 *
+	 * @param int $begin The starting position for the query results.
+	 * @param int $numberElement The number of elements to retrieve.
+	 *
+	 * @return array The list of entities fetched from the database.
+	 */
+	public function getList( int $begin = 0, int $numberElement = 25 ): array {
+		$request = $this->getDatabase()->prepare( "SELECT id, longitude, latitude, id_user  FROM ecran_department ORDER BY id ASC LIMIT :begin, :numberElement" );
 
-		$request->bindValue(':begin', $begin, PDO::PARAM_INT);
-		$request->bindValue(':numberElement', $numberElement, PDO::PARAM_INT);
+		$request->bindValue( ':begin', $begin, PDO::PARAM_INT );
+		$request->bindValue( ':numberElement', $numberElement, PDO::PARAM_INT );
 
 		$request->execute();
 
-		if ($request->rowCount() > 0) {
-			return $this->setEntityList($request->fetchAll());
+		if ( $request->rowCount() > 0 ) {
+			return $this->setEntityList( $request->fetchAll() );
 		}
+
 		return [];
 	}
 
@@ -119,7 +146,10 @@ class Location extends Model implements Entity, JsonSerializable {
 		$this->id = $id;
 	}
 
-	private function getLongitude() {
+	/**
+	 * @return float
+	 */
+	public function getLongitude(): float {
 		return $this->longitude;
 	}
 
@@ -132,7 +162,10 @@ class Location extends Model implements Entity, JsonSerializable {
 		$this->longitude = $longitude;
 	}
 
-	private function getLatitude() {
+	/**
+	 * @return float
+	 */
+	public function getLatitude(): float {
 		return $this->latitude;
 	}
 
@@ -164,11 +197,12 @@ class Location extends Model implements Entity, JsonSerializable {
 	/**
 	 * @param $data
 	 *
+	 * @return Location
 	 */
-	public function setEntity( $data ) {
+	public function setEntity( $data ): Location {
 		$entity = new Location();
 
-		$entity->setId($data['id']);
+		$entity->setId( $data['id'] );
 		$entity->setLongitude( $data['longitude'] );
 		$entity->setLatitude( $data['latitude'] );
 		$entity->setIdUser( $data['id_user'] );
@@ -182,16 +216,65 @@ class Location extends Model implements Entity, JsonSerializable {
 	 */
 	public function setEntityList( $dataList ) {
 		$listEntity = array();
-		foreach ($dataList as $data){
-			$listEntity[] = $this->setEntity($data);
+		foreach ( $dataList as $data ) {
+			$listEntity[] = $this->setEntity( $data );
 		}
+
 		return $listEntity;
+	}
+
+	/**
+	 * Checks if a location with the specified longitude, latitude, and user ID exists in the database.
+	 *
+	 * @param float $longitude The longitude of the location.
+	 * @param float $latitude The latitude of the location.
+	 * @param int $id_user The ID of the user associated with the location.
+	 *
+	 * @return Location|false Returns a Location entity if the location exists, or false otherwise.
+	 */
+	public function checkIfLocationExists($longitude, $latitude, $id_user ): Location|false{
+		$request = $this->getDatabase()->prepare( "SELECT id, longitude, latitude, id_user FROM ecran_department
+                                        WHERE longitude = :longitude AND latitude = :latitude AND id_user = :id_user" );
+
+		$request->bindValue( ':longitude', $longitude, PDO::PARAM_INT );
+		$request->bindValue( ':latitude', $latitude, PDO::PARAM_INT );
+		$request->bindValue( ':id_user', $id_user, PDO::PARAM_INT );
+
+		$request->execute();
+
+		if ( $request->rowCount() > 0 ) {
+			return $this->setEntity( $request->fetch( PDO::FETCH_ASSOC ) );
+		}
+
+		return false;
+	}
+
+	/**
+	 * Checks if a user ID exists in the database and retrieves their location.
+	 *
+	 * @param int $userId The ID of the user to check.
+	 *
+	 * @return Location|false Returns a Location object if the user ID exists, or false otherwise.
+	 */
+	public function checkIfUserIdExists($userId):Location|false{
+		$request = $this->getDatabase()->prepare( "SELECT id, longitude, latitude, id_user FROM ecran_location WHERE id_user = :id_user LIMIT 1" );
+
+    	$request->bindValue( ':id_user', $userId, PDO::PARAM_INT );
+
+    	$request->execute();
+
+    	if ( $request->rowCount() > 0 ) {
+    		return $this->setEntity( $request->fetch( PDO::FETCH_ASSOC ) );
+    	}
+
+    	return false;
 	}
 
 	/**
 	 * @return array
 	 */
 	public function jsonSerialize(): array {
-		return get_object_vars($this);
+		return get_object_vars( $this );
+
 	}
 }

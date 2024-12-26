@@ -1,6 +1,6 @@
 var meteoRequest = new XMLHttpRequest();
-var longitude = crd.longitude;
-var latitude = crd.latitude;
+var longitude = weatherValues.longitude;
+var latitude = weatherValues.latitude;
 var url = "https://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&lang=fr&APPID=ae546c64c1c36e47123b3d512efa723e";
 
 /**
