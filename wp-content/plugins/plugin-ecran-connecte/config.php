@@ -96,9 +96,11 @@ function loadScriptsEcran()
 add_action('wp_enqueue_scripts', 'loadScriptsEcran');
 
 /**
- * Create tables in the database (Alert & Information)
+ * Create tables in the database (Alert & Information).
+ *
+ * @return void
  */
-function installDatabaseEcran()
+function installDatabaseEcran(): void
 {
     global $wpdb;
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -199,6 +201,18 @@ function installDatabaseEcran()
 		) $charset_collate;";
 
 	dbDelta($sql);
+
+	$table_name = 'ecran_location';
+
+	$sql = "CREATE TABLE IF NOT EXISTS $table_name(
+    		id INT(10) NOT NULL AUTO_INCREMENT,
+    		longitude DECIMAL(10,10) NOT NULL,
+    		latitude DECIMAL(10,10) NOT NULL,
+    		address VARCHAR(60) NOT NULL,
+    		user_id BIGINT(20) UNSIGNED NOT NULL,
+    		PRIMARY KEY (id),
+	        FOREIGN KEY (user_id) REFERENCES wp_users(ID) ON DELETE 
+    	)$charset_collate;";
 }
 
 add_action('plugins_loaded', 'installDatabaseEcran');
@@ -292,3 +306,5 @@ add_action('rest_api_init', function () {
     $controller = new ProfileRestController();
     $controller->register_routes();
 });
+
+

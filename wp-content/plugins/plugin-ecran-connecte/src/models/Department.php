@@ -138,11 +138,11 @@ class Department extends Model implements Entity, JsonSerializable
 	 *
 	 * @return Department[]|void
 	 */
-	public function getList($begin = 0, $numberElement = 25) {
+	public function getList(int $begin = 0, int $numberElement = 25) {
 		$request = $this->getDatabase()->prepare("SELECT id, name FROM ecran_department ORDER BY id ASC LIMIT :begin, :numberElement");
 
-		$request->bindValue(':begin', (int)$begin, PDO::PARAM_INT);
-		$request->bindValue(':numberElement', (int)$numberElement, PDO::PARAM_INT);
+		$request->bindValue(':begin', $begin, PDO::PARAM_INT);
+		$request->bindValue(':numberElement', $numberElement, PDO::PARAM_INT);
 
 		$request->execute();
 
