@@ -242,7 +242,7 @@ class View
      * Display a message if the two password are different
      */
     public function displayBadPassword() {
-        $this->buildModal('Mauvais mot de passe', '<p class=\'alert alert-danger\'>Les deux mots de passe ne sont pas corrects </p>');
+        $this->buildModal('Mauvais mot de passe', '<p class=\'alert alert-danger\'>Les deux mots de passe ne sont pas correctes </p>');
     }
 
     /**
@@ -253,7 +253,7 @@ class View
     public function displayErrorDouble($doubles) {
         $content = "";
         foreach ($doubles as $double) {
-            $content .= '<p class="alert alert-danger">' . $double . ' a rencontré un problème lors de l\'enregistrement, veuillez vérifiez son login et son email !</p>';
+            $content .= '<p class="alert alert-danger">' . $double . ' a rencontré un problème lors de l\'enregistrement, vérifié son login et son email !</p>';
         }
         $this->buildModal('Erreur durant l\'inscription', $content);
     }
@@ -294,10 +294,10 @@ class View
     }
 
     public function errorMessageInvalidForm() {
-        $this->buildModal('Le formulaire n\'a pas été correctement remplie', '<p class="alert alert-danger">Le formulaire a été mal rempli, veuillez revoir les données rentrées et réessayez.</p>');
+        $this->buildModal('Le formulaire n\'a pas été correctement remplie', '<p class="alert alert-danger">Le formulaire a été mal remplie, veuillez revoir les données rentrées et réessayez.</p>');
     }
 
     public function errorMessageCantAdd() {
-        $this->buildModal('L\'ajout a échoué', '<p class="alert alert-danger">Une erreur s\'est produite lors de l\'envoi du formulaire, veuillez réessayer après avoir vérifié vos informations.</p>');
+        $this->buildModal('L\'ajout a échoué', '<p class="alert alert-danger">Une erreur s\'est produite lors de l\'envoie du formulaire, veuillez réessayer après avoir vérifié vos informations.</p>');
     }
 }

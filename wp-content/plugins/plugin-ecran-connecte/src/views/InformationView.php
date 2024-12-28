@@ -19,39 +19,33 @@ class InformationView extends View
     /**
      * Display a form to create an information with text
      *
-     * @param string|null $title
-     * @param string|null $content
-     * @param string|null $endDate
-     * @param string $type
+     * @param $title    string
+     * @param $content  string
+     * @param $endDate  string
+     * @param $type     string
      *
      * @return string
      */
-    public function displayFormText(string $title = null, string $content = null,
-                                    string $endDate = null, string $type = "createText"): string
-    {
+    public function displayFormText($title = null, $content = null, $endDate = null, $type = "createText") {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
 
         $form = '
         <form method="post">
             <div class="form-group">
                 <label for="title">Titre <span class="text-muted">(Optionnel)</span></label>
-                <input id="info" class="form-control" type="text" name="title" minlength="4" maxlength="40"
-                placeholder="Titre..." value="' . $title . '">
+                <input id="info" class="form-control" type="text" name="title" minlength="4" maxlength="40" placeholder="Titre..." value="' . $title . '">
             </div>
             <div class="form-group">
                 <label for="content">Contenu</label>
-                <textarea class="form-control" id="content" name="content" rows="3" maxlength="280" minlength="4"
-                placeholder="280 caractères au maximum" required="required">' . $content . '</textarea>
+                <textarea class="form-control" id="content" name="content" rows="3" placeholder="280 caractères au maximum" maxlength="280" minlength="4" required>' . $content . '</textarea>
             </div>
             <div class="form-group">
                 <label for="expirationDate">Date d\'expiration</label>
-                <input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' . $dateMin . '"
-                value="' . $endDate . '" required="required">
+                <input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' . $dateMin . '" value="' . $endDate . '" required >
             </div>
             <button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
 
-        if ($type == 'submit')
-        {
+        if ($type == 'submit') {
             $form .= '<button type="submit" class="btn delete_button_ecran" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette information ?\');">Supprimer</button>';
         }
 
@@ -61,16 +55,14 @@ class InformationView extends View
     /**
      * Display a form to create an information with an image
      *
-     * @param string|null $title
-     * @param string|null $content
-     * @param string|null $endDate
-     * @param string $type
+     * @param $title    string
+     * @param $content  string
+     * @param $endDate  string
+     * @param $type     string
      *
      * @return string
      */
-    public function displayFormImg(string $title = null, string $content = null,
-                                   string $endDate = null, string $type = "createImg"): string
-    {
+    public function displayFormImg($title = null, $content = null, $endDate = null, $type = "createImg") {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
 
         $form = '<form method="post" enctype="multipart/form-data">
@@ -78,8 +70,7 @@ class InformationView extends View
 		                <label for="title">Titre <span class="text-muted">(Optionnel)</span></label>
 		                <input id="title" class="form-control" type="text" name="title" placeholder="Inserer un titre" maxlength="60" value="' . $title . '">
 		            </div>';
-        if ($content != null)
-        {
+        if ($content != null) {
             $form .= '
 		       	<figure class="text-center">
 				  <img class="img-thumbnail" src="' . TV_UPLOAD_PATH . $content . '" alt="' . $title . '">
@@ -98,8 +89,7 @@ class InformationView extends View
 			</div>
 			<button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
 
-        if ($type == 'submit')
-        {
+        if ($type == 'submit') {
             $form .= '<button type="submit" class="btn delete_button_ecran" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette information ?\');">Supprimer</button>';
         }
 
@@ -109,18 +99,16 @@ class InformationView extends View
     /**
      * Display a form to create an information with a table
      *
-     * @param string|null $title
-     * @param string|null $content
-     * @param string|null $endDate
+     * @param null $title
+     * @param null $content
+     * @param null $endDate
      * @param string $type
      *
      * @return string
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      */
-    public function displayFormTab(string $title = null, string $content = null,
-                                   string $endDate = null, string $type = "createTab"): string
-    {
+    public function displayFormTab($title = null, $content = null, $endDate = null, $type = "createTab") {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
 
         $form = '<form method="post" enctype="multipart/form-data">
@@ -129,12 +117,10 @@ class InformationView extends View
 			                <input id="title" class="form-control" type="text" name="title" placeholder="Inserer un titre" maxlength="60" value="' . $title . '">
 			            </div>';
 
-        if ($content != null)
-        {
+        if ($content != null) {
             $info = new InformationController();
             $list = $info->readSpreadSheet(TV_UPLOAD_PATH . $content);
-            foreach ($list as $table)
-            {
+            foreach ($list as $table) {
                 $form .= $table;
             }
         }
@@ -153,8 +139,7 @@ class InformationView extends View
 			</div>
 			<button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
 
-        if ($type == 'submit')
-        {
+        if ($type == 'submit') {
             $form .= '<button type="submit" class="btn delete_button_ecran" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette information ?\');">Supprimer</button>';
         }
 
@@ -164,16 +149,14 @@ class InformationView extends View
     /**
      * Display a form to create an information with a PDF
      *
-     * @param string|null $title
-     * @param string|null $content
-     * @param string|null $endDate
-     * @param string $type
+     * @param $title    string
+     * @param $content  string
+     * @param $endDate  string
+     * @param $type     string
      *
      * @return string
      */
-    public function displayFormPDF(string $title = null, string $content = null,
-                                   string $endDate = null, string $type = "createPDF"): string
-    {
+    public function displayFormPDF($title = null, $content = null, $endDate = null, $type = "createPDF") {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
 
         $form = '<form method="post" enctype="multipart/form-data">
@@ -182,8 +165,7 @@ class InformationView extends View
 		                <input id="title" class="form-control" type="text" name="title" placeholder="Inserer un titre" maxlength="60" value="' . $title . '">
 		            </div>';
 
-        if ($content != null)
-        {
+        if ($content != null) {
             $form .= '
 			<div class="embed-responsive embed-responsive-16by9">
 			  <iframe class="embed-responsive-item" src="' . TV_UPLOAD_PATH . $content . '" allowfullscreen></iframe>
@@ -202,8 +184,7 @@ class InformationView extends View
 			</div>
 			<button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
 
-        if ($type == 'submit')
-        {
+        if ($type == 'submit') {
             $form .= '<button type="submit" class="btn delete_button_ecran" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette information ?\');">Supprimer</button>';
         }
 
@@ -213,13 +194,12 @@ class InformationView extends View
     /**
      * Display a form to create an event information with media or PDFs
      *
-     * @param string|null $endDate
-     * @param string $type
+     * @param $endDate  string
+     * @param $type     string
      *
      * @return string
      */
-    public function displayFormEvent(string $endDate = null, string $type = "createEvent"): string
-    {
+    public function displayFormEvent($endDate = null, $type = "createEvent") {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
         $form = '
 		<form method="post" enctype="multipart/form-data">
@@ -235,8 +215,7 @@ class InformationView extends View
 			</div>
 			<button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
 
-        if ($type == 'submit')
-        {
+        if ($type == 'submit') {
             $form .= '<button type="submit" class="btn delete_button_ecran" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette information ?\');">Supprimer</button>';
         }
         $form .= '</form>';
@@ -244,140 +223,12 @@ class InformationView extends View
         return $form;
     }
 
-	/**
-	 * Display a form to create a video information
-     *
-     * @param string|null $title
-     * @param string|null $content
-     * @param string|null $endDate
-     * @param string $type
-     *
-	 * @return string form
-	 * */
-	public function displayFormVideoYT(string $title = null, string $content = null,
-									   string $endDate = null, string $type = 'createVideoYT'): string
-	{
-		$dateMin = date('Y-m-d', strtotime("+1 day"));
-		$form = '
-		<form method="post" enctype="multipart/form-data">
-		    <div class="form-group">
-                <label for="title">Titre <span class="text-muted">(Optionnel)</span></label>
-                <input id="info" class="form-control" type="text" name="title" minlength="4" maxlength="40"
-                placeholder="Titre..." value="' . $title . '">
-            </div>
-            <div class="form-group">
-                <label for="contentVideo">Lien Youtube</label>
-                <input id="linkVideo" class="form-control" type="url" name="content" minlength="25" maxlength="60"
-                placeholder="Ajouter votre lien Youtube de forme: \'https://www.youtube.com/watch?v=...\' OU \'https://www.youtube.com/shorts/...\'" required="required"
-                value="' . $content . '" pattern="^https:\/\/www\.youtube\.com\/((watch\?v=)|(shorts\/)).+$">
-            </div>
-            <div class="form-group">
-                <label for="expirationDate">Date d\'expiration</label>
-                <input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' .
-		        $dateMin . '" value="' . $endDate . '" required="required">
-            </div>
-
-            <button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
-
-        if ($type == 'submit')
-        {
-            $form .= '<button type="submit" class="btn delete_button_ecran" name="delete"
-                      onclick="return confirm(\' Voulez-vous supprimer cette information ?\');">Supprimer</button>';
-        }
-
-		$form .= '</form>';
-		return $form;
-	}
-
-	public function displayFormVideoCLocal(string $title = null, string $content = null,
-		                                   string $endDate = null, string $type = "createVideoCLocal"): string
-	{
-		$dateMin = date('Y-m-d', strtotime("+1 day"));
-
-		$form = '<form method="post" enctype="multipart/form-data">
-					<div class="form-group">
-		                <label for="title">Titre <span class="text-muted">(Optionnel)</span></label>
-		                <input id="title" class="form-control" type="text" name="title" placeholder="Inserer un titre" minlength="4" maxlength="60" value="' . $title . '">
-		            </div>';
-
-		if ($content != null)
-		{
-			$form .= '
-			<div class="embed-responsive embed-responsive-16by9">
-			  <iframe class="embed-responsive-item" src="' . TV_UPLOAD_PATH . $content . '" allowfullscreen></iframe>
-			</div>';
-		}
-
-		$form .= '
-			<div class="form-group">
-                <label>Ajouter une vidéo hébergée localement de format "classique". Le fichier doit être au format "mp4"!</label>
-                <input class="form-control-file" type="file" name="contentFile"/>
-                <input type="hidden" name="MAX_FILE_SIZE" value="5000000"/>
-            </div>
-
-            <div class="form-group">
-				<label for="expirationDate">Date d\'expiration</label>
-				<input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' . $dateMin . '" value="' . $endDate . '" required >
-			</div>
-			<button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
-
-		if ($type == 'submit')
-		{
-			$form .= '<button type="submit" class="btn delete_button_ecran" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette information ?\');">Supprimer</button>';
-		}
-
-		$form .= '</form>';
-		return $form;
-	}
-
-	public function displayFormVideoSLocal(string $title = null, string $content = null,
-				       					   string $endDate = null, string $type = "createVideoSLocal"): string
-	{
-		$dateMin = date('Y-m-d', strtotime("+1 day"));
-
-		$form = '<form method="post" enctype="multipart/form-data">
-					<div class="form-group">
-		                <label for="title">Titre <span class="text-muted">(Optionnel)</span></label>
-		                <input id="title" class="form-control" type="text" name="title" placeholder="Inserer un titre" minlength="4" maxlength="60" value="' . $title . '">
-		            </div>';
-
-		if ($content != null)
-		{
-			$form .= '
-			<div class="embed-responsive embed-responsive-16by9">
-			  <iframe class="embed-responsive-item" src="' . TV_UPLOAD_PATH . $content . '" allowfullscreen></iframe>
-			</div>';
-		}
-
-		$form .= '
-			<div class="form-group">
-                <label>Ajouter une vidéo hébergée localement de format "short".  Le fichier doit être au format "mp4"!</label>
-                <input class="form-control-file" type="file" name="contentFile"/>
-                <input type="hidden" name="MAX_FILE_SIZE" value="5000000"/>
-            </div>
-
-            <div class="form-group">
-				<label for="expirationDate">Date d\'expiration</label>
-				<input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' . $dateMin . '" value="' . $endDate . '" required >
-			</div>
-			<button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
-
-		if ($type == 'submit')
-		{
-			$form .= '<button type="submit" class="btn delete_button_ecran" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette information ?\');">Supprimer</button>';
-		}
-
-		$form .= '</form>';
-		return $form;
-	}
-
     /**
      * Explain how the information's display
      *
      * @return string
      */
-    public function contextCreateInformation(): string
-    {
+    public function contextCreateInformation() {
         return '
 		<hr class="half-rule">
 		<div>
@@ -406,51 +257,24 @@ class InformationView extends View
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      */
-    public function displayModifyInformationForm($title, $content, $endDate, $type): string
-    {
-        if ($type == "text")
-		{
-	        return '<a href="' . esc_url( get_permalink(get_page_by_title('Gestion des informations' ))) . '">< Retour</a>' . $this->displayFormText( $title, $content, $endDate, 'submit' );
-        }
-		else if ($type == "YTvideosh" || $type == "YTvideow")
-		{
-			return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormVideoYT($title, $content, $endDate, 'submit');
-		}
-		else if ($type == "LocCvideo")
-		{
-			return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormVideoCLocal($title, $content, $endDate, 'submit');
-		}
-		else if ($type == "LocSvideo")
-		{
-			return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormVideoSLocal($title, $content, $endDate, 'submit');
-		}
-		elseif ($type == "img")
-		{
-            return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormImg($title, $content, $endDate, 'submit');
-        }
-		elseif ($type == "tab")
-		{
-            return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormTab($title, $content, $endDate, 'submit');
-        }
-		elseif ($type == "pdf")
-		{
-            return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormPDF($title, $content, $endDate, 'submit');
-        }
-		elseif ($type == "event")
-		{
+    public function displayModifyInformationForm($title, $content, $endDate, $type) {
+        if ($type == "text") {
+            return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormText($title, $content, $endDate, 'submit');
+        } elseif ($type == "img") {
+            return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormImg($title, $content, $endDate, 'submit');
+        } elseif ($type == "tab") {
+            return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormTab($title, $content, $endDate, 'submit');
+        } elseif ($type == "pdf") {
+            return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormPDF($title, $content, $endDate, 'submit');
+        } elseif ($type == "event") {
             $extension = explode('.', $content);
             $extension = $extension[1];
-            if ($extension == "pdf")
-			{
-                return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormPDF($title, $content, $endDate, 'submit');
+            if ($extension == "pdf") {
+                return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormPDF($title, $content, $endDate, 'submit');
+            } else {
+                return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormImg($title, $content, $endDate, 'submit');
             }
-			else
-			{
-                return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormImg($title, $content, $endDate, 'submit');
-            }
-        }
-		else
-		{
+        } else {
             return $this->noInformation();
         }
     }
@@ -458,103 +282,59 @@ class InformationView extends View
     /**
      * Display the begin of the slideshow
      */
-    public function displayStartSlideshow(): void
-    {
+    public function displayStartSlideshow() {
         echo '<div class="slideshow-container">';
     }
 
     /**
      * Display a slide for the slideshow
      *
-     * @param string $title
-     * @param string $content
-     * @param string $type
+     * @param $title
+     * @param $content
+     * @param $type
      * @param bool $adminSite
      */
-    public function displaySlide(string $title, string $content, string $type, bool $adminSite = false): void
-    {
+    public function displaySlide($title, $content, $type, $adminSite = false) {
         echo '<div class="myInfoSlides text-center">';
 
         // If the title is empty
-        if ($title != "Sans titre")
-        {
+        if ($title != "Sans titre") {
             echo '<h2 class="titleInfo">' . $title . '</h2>';
         }
 
         $url = TV_UPLOAD_PATH;
-        if ($adminSite)
-        {
+        if ($adminSite) {
             $url = URL_WEBSITE_VIEWER . TV_UPLOAD_PATH;
         }
 
-        if ($type == 'pdf' || $type == "event" || $type == "img")
-        {
+        if ($type == 'pdf' || $type == "event" || $type == "img") {
             $extension = explode('.', $content);
             $extension = $extension[1];
         }
 
-        if ($type == 'pdf' || $type == "event" && $extension == "pdf")
-        {
+        if ($type == 'pdf' || $type == "event" && $extension == "pdf") {
             echo '
 			<div class="canvas_pdf" id="' . $content . '">
 			</div>';
-        }
-        elseif ($type == "img" || $type == "event")
-        {
+        } elseif ($type == "img" || $type == "event") {
             echo '<img class="img-thumbnail" src="' . $url . $content . '" alt="' . $title . '">';
-        }
-        else if ($type == 'text')
-        {
+        } else if ($type == 'text') {
             echo '<p class="lead">' . $content . '</p>';
-        }
-		else if ($type == 'YTvideosh')
-		{
-			$link = substr_replace($content,'embed',24,6);
-			echo '<iframe class="videosh" src="' . $link . '?autoplay=1&loop=1&playlist=' . substr($link,30) . '&mute=1&disablekb=1&controls=0"
-				  title="YouTube short player" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
-				  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';
-		}
-		else if ($type == 'YTvideow')
-		{
-			$link = substr_replace($content,'embed/',24,8);
-			echo '<iframe class="videow" src="' . $link . '?autoplay=1&loop=1&playlist=' . substr($link,30) . '&mute=1&disablekb=1&controls=0"
-				  title="YouTube video player" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
-				  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';
-		}
-		else if ($type == 'LocCvideo')
-		{
-			echo '<video class="localCvideo" muted loop>
-				      <source src="' . TV_UPLOAD_PATH . $content . '" type="video/mp4">
-				      <p>Impossible de lire la vidéo.</p>
-				  </video>';
-		}
-		else if ($type == 'LocSvideo')
-		{
-			echo '<video class="localSvideo" muted loop>
-				      <source src="' . TV_UPLOAD_PATH . $content . '" type="video/mp4">
-				      <p>Impossible de lire la vidéo.</p>
-				  </video>';
-		}
-        else if ($type == 'special')
-        {
+        } else if ($type == 'special') {
             $func = explode('(Do this(function:', $content);
             $text = explode('.', $func[0]);
-            foreach ($text as $value)
-            {
+            foreach ($text as $value) {
                 echo '<p class="lead">' . $value . '</p>';
             }
             $func = explode(')end)', $func[1]);
             echo $func[0]();
-        }
-        else
-        {
+        } else {
             echo $content;
         }
         echo '</div>';
     }
 
-    public function contextDisplayAll(): string
-    {
+    public function contextDisplayAll() {
         return '
 		<div class="row">
 			<div class="col-6 mx-auto col-md-6 order-md-2">
@@ -564,29 +344,27 @@ class InformationView extends View
 				<p class="lead">Vous pouvez retrouver ici toutes les informations qui ont été créées sur ce site.</p>
 				<p class="lead">Les informations sont triées de la plus vieille à la plus récente.</p>
 				<p class="lead">Vous pouvez modifier une information en cliquant sur "Modifier" à la ligne correspondante à l\'information.</p>
-				<p class="lead">Vous souhaitez supprimer une / plusieurs information(s) ? Cochez les cases des informations puis cliquez sur "Supprimer" le bouton ce situe en bas du tableau.</p>
+				<p class="lead">Vous souhaitez supprimer une / plusieurs information(s) ? Cochez les cases des informations puis cliquez sur "Supprimer" le bouton se situant en bas du tableau.</p>
 			</div>
 		</div>
-		<a href="' . esc_url(get_permalink(get_page_by_title('Créer une information'))) . '">Créer une information</a>
+		<a href="' . esc_url(get_permalink(get_page_by_title_V2('Créer une information'))) . '">Créer une information</a>
 		<hr class="half-rule">';
     }
 
-    public function noInformation(): string
-    {
+    public function noInformation() {
         return '
-		<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>
+		<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>
 		<div>
 			<h3>Information non trouvée</h3>
 			<p>Cette information n\'éxiste pas, veuillez bien vérifier d\'avoir bien cliqué sur une information.</p>
-			<a href="' . esc_url(get_permalink(get_page_by_title('Créer une information'))) . '">Créer une information</a>
+			<a href="' . esc_url(get_permalink(get_page_by_title_V2('Créer une information'))) . '">Créer une information</a>
 		</div>';
     }
 
     /**
      * Start the slideshow
      */
-    public function displayStartSlideEvent(): void
-    {
+    public function displayStartSlideEvent() {
         echo '
             <div id="slideshow-container" class="slideshow-container">';
     }
@@ -594,8 +372,7 @@ class InformationView extends View
     /**
      * Start a slide
      */
-    public function displaySlideBegin(): void
-    {
+    public function displaySlideBegin() {
         echo '
 			<div class="mySlides event-slide">';
     }
@@ -603,9 +380,8 @@ class InformationView extends View
     /**
      * Display a modal to validate the creation of an information
      */
-    public function displayCreateValidate(): void
-    {
-        $page = get_page_by_title('Gestion des informations');
+    public function displayCreateValidate() {
+        $page = get_page_by_title_V2('Gestion des informations');
         $linkManageInfo = get_permalink($page->ID);
         $this->buildModal('Ajout d\'information validé', '<p class="alert alert-success"> L\'information a été ajoutée </p>', $linkManageInfo);
     }
@@ -614,9 +390,8 @@ class InformationView extends View
      * Display a modal to validate the modification of an information
      * Redirect to manage page
      */
-    public function displayModifyValidate(): void
-    {
-        $page = get_page_by_title('Gestion des informations');
+    public function displayModifyValidate() {
+        $page = get_page_by_title_V2('Gestion des informations');
         $linkManageInfo = get_permalink($page->ID);
         $this->buildModal('Modification d\'information validée', '<p class="alert alert-success"> L\'information a été modifiée </p>', $linkManageInfo);
     }
@@ -624,27 +399,17 @@ class InformationView extends View
     /**
      * Display a message if the insertion of the information doesn't work
      */
-    public function displayErrorInsertionInfo(): void
-    {
-		$this->buildModal('Erreur lors de l\'insertion', '<p class="alert alert-danger">Il y a eu une erreur durant l\'insertion de l\'information</p>');
+    public function displayErrorInsertionInfo() {
+        echo '<p>Il y a eu une erreur durant l\'insertion de l\'information</p>';
     }
 
-    /**
-     * Display if the modification of a video doesn't have the good format;
-     */
-    public function displayErrorVideoFormat(): void
-    {
-		$this->buildModal('Erreur de format vidéo', '<p>La vidéo que vous voulez modifier n\'est pas au bon format. Veuillez vérifier le bon format ou ajoutez une nouvelle information.</p>');
-    }
-
-    public function informationNotAllowed(): string
-    {
+    public function informationNotAllowed() {
         return '
-		<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>
+		<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>
 		<div>
 			<h3>Vous ne pouvez pas modifier cette alerte</h3>
 			<p>Cette information appartient à quelqu\'un d\'autre, vous ne pouvez donc pas modifier cette information.</p>
-			<a href="' . esc_url(get_permalink(get_page_by_title('Créer une information'))) . '">Créer une information</a>
+			<a href="' . esc_url(get_permalink(get_page_by_title_V2('Créer une information'))) . '">Créer une information</a>
 		</div>';
     }
 }

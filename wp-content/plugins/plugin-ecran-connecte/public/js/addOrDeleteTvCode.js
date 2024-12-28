@@ -6,10 +6,6 @@ let count = 0;
 function addButtonTv() {
     console.log(count);
     count = count + 1;
-    var presenceReturn = false;
-
-
-    let idReturn = document.getElementById("linkReturn");
 
     $.ajax({
         url: '/wp-content/plugins/plugin-ecran-connecte/public/js/utils/allCodes.php',
@@ -21,7 +17,7 @@ function addButtonTv() {
         let select = $('<select >', {
             id: count,
             name: 'selectTv[]',
-            class: 'form-control select_ecran'
+            class: 'form-control firstSelect'
         }).append(data).appendTo(div);
         let button = $('<input >', {
             id: count,
@@ -36,12 +32,15 @@ function addButtonTv() {
         delePlus.remove();
         let deleValider = document.getElementById("validTv");
         deleValider.remove();
-        // if(document.getElementById("linkReturn")){
-        //
-        //     let deleReturn = idReturn;
-        //     deleReturn.remove();
-        //     presenceReturn = true;
-        // }
+
+        var presenceReturn = false;
+        let idReturn;
+        if(document.getElementById("linkReturn")){
+            idReturn = document.getElementById("linkReturn");
+            let deleReturn = idReturn;
+            deleReturn.remove();
+            presenceReturn = true;
+        }
 
         // Adding the buttons so that they are at the end of the form.
         let add = $('<input>', {
@@ -58,14 +57,13 @@ function addButtonTv() {
             name: 'createTv',
             text: "Créer"
         }).appendTo('#registerTvForm');
-        // if(presenceReturn) {
-        //     var page = get_page_by_title('Gestion des utilisateurs');
-        //     let linkReturn = $('<a>', {
-        //         href: '',
-        //         id: 'linkReturn',
-        //         text: 'Annuler'
-        //     }).appendTo('#registerTvForm');
-        // }
+        if(presenceReturn) {
+            let linkReturn = $('<a>', {
+                href: idReturn.getAttribute('href'),
+                id: 'linkReturn',
+                text: 'Annuler'
+            }).appendTo('#registerTvForm')
+        }
     });
 }
 

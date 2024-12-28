@@ -1,17 +1,17 @@
 /**
  * Build the block
  */
-(function( blocks, element, data)
+(function(blocks, element, data)
 {
     var el = element.createElement;
 
-    blocks.registerBlockType('tvconnecteeamu/modify-information', {
-        title: 'Modifier l\'information',
+    wp.blocks.registerBlockType('tvconnecteeamu/add-department', {
+        title: 'Créer un département',
         icon: 'smiley',
         category: 'common',
 
         edit: function() {
-            return "Modifie l\'information sélectionnée";
+            return "Ajoute un département via un formulaire";
         },
         save: function() {
             return "test";

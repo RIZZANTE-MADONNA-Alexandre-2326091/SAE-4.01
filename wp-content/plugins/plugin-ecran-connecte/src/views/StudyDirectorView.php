@@ -56,7 +56,7 @@ class StudyDirectorView extends UserView
      * @return string
      */
     public function displayAllStudyDirector($users) {
-        $page = get_page_by_title('Modifier un utilisateur');
+        $page = get_page_by_title_V2('Modifier un utilisateur');
         $linkManageUser = get_permalink($page->ID);
 
         $title = 'Directeur d\'études';
@@ -88,7 +88,7 @@ class StudyDirectorView extends UserView
      * @return string
      */
     public function displayModifyStudyDirector($user) {
-        $page = get_page_by_title('Gestion des utilisateurs');
+        $page = get_page_by_title_V2('Gestion des utilisateurs');
         $linkManageUser = get_permalink($page->ID);
 
         $code = 'Aucun code';
@@ -97,7 +97,7 @@ class StudyDirectorView extends UserView
         }
 
         return '
-        <a href="' . esc_url(get_permalink(get_page_by_title('Gestion des utilisateurs'))) . '">< Retour</a>
+        <a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des utilisateurs'))) . '">< Retour</a>
         <h2>' . $user->getLogin() . '</h2>
         <form method="post">
             <div class="form-group">
