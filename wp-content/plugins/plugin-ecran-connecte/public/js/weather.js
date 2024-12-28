@@ -22,7 +22,6 @@ function error(err) {
     console.warn(`ERROR(${err.code}): ${err.message}`);
 }
 
-
 /**
  * Display the weather
  */
@@ -39,23 +38,33 @@ meteoRequest.onload = function () {
     if (document.getElementById('Weather') !== null) {
         var div = document.getElementById('Weather');
         div.innerHTML = "";
+
         var weather = document.createElement("DIV");
-        weather.innerHTML = temp + "<span class=\"degree\">°C</span>";
         weather.id = "weather";
+
         var imgTemp = document.createElement("IMG");
         imgTemp.id = "icon";
         imgTemp.src = "/wp-content/plugins/plugin-ecran-connecte/public/img/" + getIcon(json) + ".png";
         imgTemp.alt = getAlt(json);
+
+        var tempText = document.createElement("SPAN");
+        tempText.innerHTML = temp + "<span class=\"degree\">°C</span>";
+
         weather.appendChild(imgTemp);
+        weather.appendChild(tempText);
+
         var wind = document.createElement("DIV");
         wind.innerHTML = vent + "<span class=\"kmh\">km/h</span>";
         wind.id = "wind";
+
         var imgVent = document.createElement("IMG");
         imgVent.src = "/wp-content/plugins/plugin-ecran-connecte/public/img/wind.png";
         imgVent.alt = "Img du vent";
+
         wind.appendChild(imgVent);
         div.appendChild(weather);
         div.appendChild(wind);
+
         setTimeout(refreshWeather, 900000);
     }
 };

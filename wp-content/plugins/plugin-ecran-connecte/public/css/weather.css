@@ -1,74 +1,75 @@
-/* CSS WEATHER */
-
+/* General styles for box-sizing and font-weight */
 * {
-    box-sizing: border-box
+    box-sizing: border-box;
+    font-weight: 400;
 }
 
 .Infos {
-    width: 100%;
-    background-color: #00558b;
-    box-sizing: border-box;
+    display: flex;
+    align-items: center;    /* Centre horizontalement */
+    background-color: #5f33b4; /* Fond violet */
     color: #FFF;
+    height: 100%; /* Prend toute la hauteur disponible */
+    font-family: 'AMUMonumentGrotesk', sans-serif;
+}
+
+.TimeDate {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 15px 20px;
     text-align: center;
+    min-width: 295px;
+    min-height: 150px;
 }
 
-.Infos .Weather {
-    box-sizing: border-box;
-    border-top: solid 1px #FFF;
-    font-size: 1.6vw;
-    text-align: center;
-    width: 100%;
-    height: 5vh;
-    margin-bottom: 0 !important;
+.Time {
+    font-size: 3.5vw;
+    font-weight: bold;
+    margin: 0;
 }
 
-.Infos .Weather #weather {
-    border-right: solid 1px #FFF;
-    display: inline-block;
-    height: 100%;
-    width: 49%;
+.Date {
+    font-size: 1vw;
+    margin: -15px 0 0;
+    text-transform: lowercase;
 }
 
-.Infos .Weather #wind {
-    display: inline-block;
-    height: 100%;
-    width: 50%;
+.Weather {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8vw;
+    margin-top: 20px;
 }
 
-.Infos .Weather img {
-    display: inline-block;
-    height: 70%;
+.Weather img {
+    height: 3vw;
+    margin-right: 10px;
 }
 
-.Infos .Time {
-    text-align: center;
-    font-size: 1.6vw;
-    font-weight: 600;
-    height: 5vh;
-    margin: -2px 0 -4px 0;
+.Weather .degree, .Weather .kmh {
+    font-size: 1.8vw;
 }
 
-.Infos .Date {
-    font-size: 1.6vw;
-    height: 5vh;
-    margin-bottom: 0 !important;
-}
-
-.kmh, .degree {
-    font-size: 1.4vw;
-}
-
+/* Responsive styles */
 @media only screen and (max-device-width: 1000px) {
     .Infos {
-        height: 8.7vh;
-        width: 100%;
+        height: auto; /* Adapt height for smaller devices */
+        padding: 5px;
     }
 
-    .Infos .Time {
-        font-size: 2.4vh;
+    .Time, .Date {
+        font-size: 4vw; /* Adjust for mobile scaling */
     }
 
-    .Infos .Date {
-        font-size: 1.6vh;
+    .Weather {
+        font-size: 3vw;
+    }
+
+    .Weather img {
+        height: 6vw; /* Adjust icon size for mobile */
+    }
+
+    .Weather .degree, .Weather .kmh {
+        font-size: 3vw; /* Resize for mobile */
     }
 }

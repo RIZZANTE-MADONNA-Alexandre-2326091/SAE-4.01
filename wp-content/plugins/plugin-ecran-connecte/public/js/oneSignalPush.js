@@ -45,7 +45,7 @@
                     } else {
                         if (state.isOptedOut) {
                             /* Opted out, opt them back in */
-                            return OneSignal.   setSubscription(true);
+                            return OneSignal.setSubscription(true);
                         } else {
                             /* Unsubscribed, subscribe them */
                             return OneSignal.registerForPushNotifications();

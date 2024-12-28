@@ -78,7 +78,7 @@ class UserView extends View
             <img src="' . TV_PLUG_PATH . '/public/img/user.png" alt="Logo utilisateur" class="img-fluid mb-3 mb-md-0">
             </div>
             <div class="col-md-6 order-md-1 text-center text-md-left pr-md-5">
-                <h2 class="mb-3 bd-text-purple-bright">Les utilisateurs</h2>
+                <h2 class="title-white mb-3 bd-text-purple-bright">Les utilisateurs</h2>
                 <p class="lead">Vous pouvez créer ici les utilisateurs</p>
                 <p class="lead">Il y a plusieurs types d\'utilisateur : Les étudiants, enseignants, directeurs d\'études, scrétaires, techniciens, télévisions.</p>
                 <p class="lead">Les étudiants ont accès à leur emploi du temps et reçoivent les alertes les concernants et les informations.</p>
@@ -201,7 +201,7 @@ class UserView extends View
                 <img src="' . TV_PLUG_PATH . '/public/img/background.png" alt="Logo Amu" class="img-fluid mb-3 mb-md-0">
             </div>
             <div class="col-md-6 order-md-2 text-center text-md-left pr-md-5">
-                <h1 class="mb-3 bd-text-purple-bright">' . get_bloginfo("name") . '</h1>
+                <h1 class="title-white mb-3 bd-text-purple-bright>' . get_bloginfo("name") . '</h1>
                 <p class="lead">Bienvenue sur le site de l\'écran connecté !</p>
                 <p class="lead mb-4">Accédez à votre emploi du temps tant en recevant diverses informations de la part de votre département.</p>
             </div>

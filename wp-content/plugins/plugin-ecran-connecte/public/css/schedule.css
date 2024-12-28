@@ -2,6 +2,48 @@
 CSS de l'emploi du temps
  */
 
+@font-face {
+    font-family: 'AMUMonumentGrotesk';
+    font-style: normal;
+    font-weight: 400;
+    src: local('AMUMonumentGrotesk-Regular'), url('/wp-content/themes/theme-ecran-connecte/assets/font/AMUMonumentGrotesk-Regular.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'AMUMonumentGrotesk';
+    font-style: italic;
+    font-weight: 400;
+    src: local('AMUMonumentGrotesk-RegularItalic'), url('/wp-content/themes/theme-ecran-connecte/assets/font/AMUMonumentGrotesk-RegularItalic.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'AMUMonumentGrotesk';
+    font-style: normal;
+    font-weight: 500;
+    src: local('AMUMonumentGrotesk-Medium'), url('/wp-content/themes/theme-ecran-connecte/assets/font/AMUMonumentGrotesk-Medium.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'AMUMonumentGrotesk';
+    font-style: italic;
+    font-weight: 500;
+    src: local('AMUMonumentGrotesk-MediumItalic'), url('/wp-content/themes/theme-ecran-connecte/assets/font/AMUMonumentGrotesk-MediumItalicc.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'AMUMonumentGrotesk';
+    font-style: normal;
+    font-weight: 700;
+    src: local('AMUMonumentGrotesk-Bold'), url('/wp-content/themes/theme-ecran-connecte/assets/font/AMUMonumentGrotesk-Bold.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'AMUMonumentGrotesk';
+    font-style: italic;
+    font-weight: 700;
+    src: local('AMUMonumentGrotesk-BoldItalic'), url('/wp-content/themes/theme-ecran-connecte/assets/font/AMUMonumentGrotesk-BoldItalic.woff') format('woff');
+}
+
 .shedule_tech{
     width: 50%;
 }
@@ -27,12 +69,8 @@ CSS de l'emploi du temps
     display: block;
 }
 
-.tabSchedule {
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-}
-
 .headerTab {
-    background-color: #00558a;
+    background-color: #660099;
 }
 
 @media (max-width: 1200px) {
