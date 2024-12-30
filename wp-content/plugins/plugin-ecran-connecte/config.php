@@ -89,7 +89,6 @@ function loadScriptsEcran()
 	wp_enqueue_script('search_script_ecran', TV_PLUG_PATH . 'public/js/search.js', array('jquery'), '1.0', true);
 	wp_enqueue_script('slideshow_script_ecran', TV_PLUG_PATH . 'public/js/slideshow.js', array('jquery'), '2.0', true);
 	wp_enqueue_script('sortTable_script_ecran', TV_PLUG_PATH . 'public/js/sortTable.js', array('jquery'), '1.0', true);
-    wp_enqueue_script('weather_script_ecran', TV_PLUG_PATH . 'public/js/weather.js', array('jquery'), '1.0', true);
 	wp_enqueue_script('weatherTime_script_ecran', TV_PLUG_PATH . 'public/js/weather_and_time.js', array('jquery'), '1.0', true);
 }
 
@@ -210,8 +209,8 @@ function installDatabaseEcran(): void
     		latitude DECIMAL(10,10) NOT NULL,
     		user_id BIGINT(20) UNSIGNED NOT NULL,
     		PRIMARY KEY (id),
-	        FOREIGN KEY (user_id) REFERENCES wp_users(ID) ON DELETE 
-    	)$charset_collate;";
+	        FOREIGN KEY (user_id) REFERENCES wp_users(ID) ON DELETE CASCADE
+    	) $charset_collate;";
 
 	dbDelta($sql);
 }

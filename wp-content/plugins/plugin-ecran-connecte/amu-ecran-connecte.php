@@ -58,14 +58,6 @@ function downloadFileICS_func()
     foreach ($codesAde as $codeAde) {
         $controllerAde->addFile($codeAde->getCode());
     }
-
-	/*
-    $information = new InformationController();
-    $information->registerNewInformation();
-
-    $alert = new AlertController();
-    $alert->registerNewAlert();
-	*/
 }
 
 add_action('downloadFileICS', 'downloadFileICS_func');

@@ -38,6 +38,8 @@ function error(err) {
 function searchLocation(longitude, latitude){
     var formData = new FormData();
 
+
+
     formData.append("action", "handleWeatherAjaxData");
     formData.append("longitude", longitude);
     formData.append("latitude", latitude);
