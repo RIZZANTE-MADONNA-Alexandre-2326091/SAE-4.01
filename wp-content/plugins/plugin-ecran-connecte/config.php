@@ -209,6 +209,7 @@ function installDatabaseEcran(): void
     		latitude FLOAT NOT NULL,
     		user_id BIGINT(20) UNSIGNED NOT NULL,
     		PRIMARY KEY (id),
+        	UNIQUE KEY unique_user (user_id),    		
 	        FOREIGN KEY (user_id) REFERENCES wp_users(ID) ON DELETE CASCADE
     	) $charset_collate;";
 

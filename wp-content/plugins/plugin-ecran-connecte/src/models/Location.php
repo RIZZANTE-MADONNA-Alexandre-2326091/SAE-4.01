@@ -112,7 +112,7 @@ class Location extends Model implements Entity, JsonSerializable {
 	 * @return array|false The entity data as an associative array if found, or false if no matching entity was found.
 	 */
 	public function get( $id ): Location|false {
-		$request = $this->getDatabase()->prepare( "SELECT id, longitude, latitude, id_user FROM ecran_location WHERE id = :id LIMIT 1" );
+		$request = $this->getDatabase()->prepare( "SELECT id, longitude, latitude, user_id FROM ecran_location WHERE id = :id LIMIT 1" );
 
 		$request->bindParam( ':id', $id, PDO::PARAM_INT );
 
@@ -134,7 +134,7 @@ class Location extends Model implements Entity, JsonSerializable {
 	 * @return array The list of entities fetched from the database.
 	 */
 	public function getList( int $begin = 0, int $numberElement = 25 ): array {
-		$request = $this->getDatabase()->prepare( "SELECT id, longitude, latitude, id_user  FROM ecran_department ORDER BY id ASC LIMIT :begin, :numberElement" );
+		$request = $this->getDatabase()->prepare( "SELECT id, longitude, latitude, user_id  FROM ecran_location ORDER BY id ASC LIMIT :begin, :numberElement" );
 
 		$request->bindValue( ':begin', $begin, PDO::PARAM_INT );
 		$request->bindValue( ':numberElement', $numberElement, PDO::PARAM_INT );
@@ -223,7 +223,7 @@ class Location extends Model implements Entity, JsonSerializable {
 		$entity->setId( $data['id'] );
 		$entity->setLongitude( $data['longitude'] );
 		$entity->setLatitude( $data['latitude'] );
-		$entity->setIdUser( $data['id_user'] );
+		$entity->setIdUser( $data['user_id'] );
 
 		return $entity;
 	}
@@ -252,11 +252,11 @@ class Location extends Model implements Entity, JsonSerializable {
 	 * @return Location|false Returns a Location entity if the location exists, or false otherwise.
 	 */
 	public function checkIfLocationExists($longitude, $latitude, $id_user ): Location|false{
-		$request = $this->getDatabase()->prepare( "SELECT id, longitude, latitude, id_user FROM ecran_department
-                                        WHERE longitude = :longitude AND latitude = :latitude AND id_user = :id_user" );
+		$request = $this->getDatabase()->prepare( "SELECT id, longitude, latitude, user_id FROM ecran_location
+                                        WHERE longitude = :longitude AND latitude = :latitude AND user_id = :id_user" );
 
-		$request->bindValue( ':longitude', $longitude, PDO::PARAM_INT );
-		$request->bindValue( ':latitude', $latitude, PDO::PARAM_INT );
+		$request->bindValue( ':longitude', $longitude);
+		$request->bindValue( ':latitude', $latitude );
 		$request->bindValue( ':id_user', $id_user, PDO::PARAM_INT );
 
 		$request->execute();
@@ -276,7 +276,7 @@ class Location extends Model implements Entity, JsonSerializable {
 	 * @return Location|false Returns a Location object if the user ID exists, or false otherwise.
 	 */
 	public function checkIfUserIdExists($userId):Location|false{
-		$request = $this->getDatabase()->prepare( "SELECT id, longitude, latitude, id_user FROM ecran_location WHERE id_user = :id_user LIMIT 1" );
+		$request = $this->getDatabase()->prepare( "SELECT id, longitude, latitude, user_id FROM ecran_location WHERE user_id = :id_user LIMIT 1" );
 
 		$request->bindValue( ':id_user', $userId, PDO::PARAM_INT );
 
