@@ -205,8 +205,8 @@ function installDatabaseEcran(): void
 
 	$sql = "CREATE TABLE IF NOT EXISTS $table_name(
     		id INT(10) NOT NULL AUTO_INCREMENT,
-    		longitude DECIMAL(10,10) NOT NULL,
-    		latitude DECIMAL(10,10) NOT NULL,
+    		longitude FLOAT NOT NULL,
+    		latitude FLOAT NOT NULL,
     		user_id BIGINT(20) UNSIGNED NOT NULL,
     		PRIMARY KEY (id),
 	        FOREIGN KEY (user_id) REFERENCES wp_users(ID) ON DELETE CASCADE

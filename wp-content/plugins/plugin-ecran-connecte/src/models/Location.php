@@ -4,6 +4,7 @@ namespace Models;
 
 use JsonSerializable;
 use PDO;
+use PDOException;
 
 /**
  * Class Location
@@ -42,15 +43,31 @@ class Location extends Model implements Entity, JsonSerializable {
 	 */
 	public function insert(): string {
 		$database = $this->getDatabase();
-		$request  = $database->prepare( "INSERT INTO ecran_location (longitude, latitude, user_id) VALUES (:longitude, :latitude, :id_user)" );
 
-		$request->bindValue( ':longitude', $this->getLongitude());
-		$request->bindValue( ':latitude', $this->getLatitude());
-		$request->bindValue( ':user_id', $this->getIdUser());
+		try {
+			$database->beginTransaction();
 
-		$request->execute();
+			$request = $database->prepare(
+				"INSERT INTO ecran_location (longitude, latitude, user_id) VALUES (:longitude, :latitude, :id_user)"
+			);
 
-		return $database->lastInsertId();
+			$request->bindValue(':longitude', $this->getLongitude());
+			$request->bindValue(':latitude', $this->getLatitude());
+			$request->bindValue(':id_user', $this->getIdUser());
+
+			$request->execute();
+
+			// Valider la transaction
+			$lastId = $database->lastInsertId();
+			$database->commit();
+
+			return $lastId;
+
+		} catch (PDOException $e) {
+			$database->rollBack(); // Annule la transaction en cas d'erreur
+			error_log('Error during INSERT: ' . $e->getMessage());
+			throw $e;
+		}
 	}
 
 	/**
@@ -261,15 +278,15 @@ class Location extends Model implements Entity, JsonSerializable {
 	public function checkIfUserIdExists($userId):Location|false{
 		$request = $this->getDatabase()->prepare( "SELECT id, longitude, latitude, id_user FROM ecran_location WHERE id_user = :id_user LIMIT 1" );
 
-    	$request->bindValue( ':id_user', $userId, PDO::PARAM_INT );
+		$request->bindValue( ':id_user', $userId, PDO::PARAM_INT );
 
-    	$request->execute();
+		$request->execute();
 
-    	if ( $request->rowCount() > 0 ) {
-    		return $this->setEntity( $request->fetch( PDO::FETCH_ASSOC ) );
-    	}
+		if ( $request->rowCount() > 0 ) {
+			return $this->setEntity( $request->fetch( PDO::FETCH_ASSOC ) );
+		}
 
-    	return false;
+		return false;
 	}
 
 	/**

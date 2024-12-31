@@ -41,27 +41,41 @@ add_action('wp_enqueue_scripts', 'injectLocationValues');
 function handleWeatherAjaxData(): void {
 	check_ajax_referer('locationNonce', 'nonce');
 
-	if (isset($_POST['longitude']) && isset($_POST['latitude'])) {
-		$longitude = sanitize_text_field( $_POST['longitude'] );
-		$latitude  = sanitize_text_field( $_POST['latitude'] );
-		$id_user = sanitize_text_field( $_POST['currentUserId'] );
+	$longitude = isset($_POST['longitude']) ? floatval($_POST['longitude']) : null;
+	$latitude = isset($_POST['latitude']) ? floatval($_POST['latitude']) : null;
+	$id_user = get_current_user_id();
 
-		$location = new Location();
-
-		$location->setLongitude( $longitude );
-		$location->setLatitude( $latitude );
-		$location->setIdUser( $id_user );
-
-		$location->insert();
-
-		wp_send_json_success( array(
-			'message'   => 'Nouvelle position ajoutée avec succès dans la base de données',
-			'currentUserId' => $id_user,
-			'longitude' => $longitude,
-			'latitude'  => $latitude
-		));
-	} else {
+	if ( $longitude === null || $latitude === null) {
 		wp_send_json_error(array( 'message' => 'Données manquantes ou invalides pour ajouter la position' ), 400 );
+	}
+
+	$location = new Location();
+
+	$location->setLongitude( $longitude );
+	$location->setLatitude( $latitude );
+	$location->setIdUser( $id_user );
+
+	$location->insert();
+
+	wp_send_json_success( array(
+		'message'   => 'Nouvelle position ajoutée avec succès dans la base de données',
+		'currentUserId' => $id_user,
+		'longitude' => $longitude,
+		'latitude'  => $latitude
+	));
+
+	try {
+		// Insère les données dans la base de données
+		$insertedId = $location->insert();
+
+		wp_send_json_success([
+			'message' => 'User location data saved successfully',
+			'id' => $insertedId,
+			'longitude' => $longitude,
+			'latitude' => $latitude
+		]);
+	} catch (Exception $e) {
+		wp_send_json_error(['message' => 'Error while saving data: ' . $e->getMessage()]);
 	}
 }
 
