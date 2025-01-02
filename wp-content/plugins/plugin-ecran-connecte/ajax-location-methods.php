@@ -12,20 +12,31 @@ use Models\Location;
  * @return void
  */
 function injectLocationValues():void {
-	$model = new Location();
 
-	if($user = $model->checkIfUserIdExists(get_current_user_id())) {
+	$currentUserId = get_current_user_id();
+
+	if (!$currentUserId) {
+		error_log('Aucun utilisateur actif');
+		return;
+	}
+
+	$model = new Location();
+	$user = $model->checkIfUserIdExists($currentUserId);
+
+	if ($user !== false) {
 		$longitude = $user->getLongitude();
 		$latitude = $user->getLatitude();
-	}else{
+		error_log("Coordonnées trouvées pour l'utilisateur {$currentUserId} : {$longitude}, {$latitude}");
+	} else {
 		$longitude = 5.4510;
 		$latitude = 43.5156;
+		error_log("Aucune localisation trouvée pour l'utilisateur {$currentUserId}, coordonnées par défaut utilisées.");
 	}
 
 	wp_enqueue_script('weather_script_ecran', TV_PLUG_PATH . 'public/js/weather.js', array('jquery'), '1.0', true);
-	wp_enqueue_script( 'searchLocationTV_script_ecran', TV_PLUG_PATH . 'public/js/searchLocationTV.js', array( 'jquery' ), '1.0', true );
+	wp_enqueue_script('searchLocationTV_script_ecran', TV_PLUG_PATH . 'public/js/searchLocationTV.js', array( 'jquery' ), '1.0', true);
 
-	wp_localize_script( 'weather_script_ecran', 'weatherValues', array(
+	wp_localize_script('weather_script_ecran', 'weatherValues', array(
 		'long' => $longitude,
 		'lat' => $latitude
 	));
@@ -53,7 +64,7 @@ function handleWeatherAjaxData(): void {
 
 	$location->setLongitude( $longitude );
 	$location->setLatitude( $latitude );
-	$location->setIdUser( $id_user );
+	$location->setUserId( $id_user );
 
 	$location->insert();
 
