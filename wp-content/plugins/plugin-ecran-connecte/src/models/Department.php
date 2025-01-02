@@ -49,6 +49,7 @@ class Department extends Model implements Entity, JsonSerializable
 		$request = $this->getDatabase()->prepare("UPDATE ecran_department SET name = :name WHERE id = :id");
 
 		$request->bindValue(':name', $this->getName(), PDO::PARAM_STR);
+		$request->bindValue(':id', $this->getId(), PDO::PARAM_INT);
 
 		$request->execute();
 

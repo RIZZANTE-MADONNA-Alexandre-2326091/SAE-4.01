@@ -101,8 +101,8 @@ class DepartmentController extends Controller
 				$this->model->setId($id);
 				$this->model->setName($newName);
 
-				if(!$this->checkDuplicateDept($this->model) && $this->model->update()){
-
+				if(!$this->checkDuplicateDept($this->model)){
+					$this->model->update();
 					$this->view->displayModificationSucces();
 
 				}else{

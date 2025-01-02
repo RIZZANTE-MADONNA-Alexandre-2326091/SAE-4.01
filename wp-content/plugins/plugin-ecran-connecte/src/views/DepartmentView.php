@@ -101,7 +101,7 @@ class DepartmentView extends View
      * @return string
      */
    public function displayAllDept($departments): string {
-	   $page = get_page_by_title_V2('Gestion des départements');
+	   $page = get_page_by_title_V2('Modifier un département');
 	   $linkManageDept = get_permalink($page->ID);
 
 	    $title = 'Départements';
