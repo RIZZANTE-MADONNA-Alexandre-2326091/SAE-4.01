@@ -280,7 +280,7 @@ add_action('init', 'block_department_modify');
 /**
  * Function on the block.
  *
- * @return void|null
+ * @return string
  */
 function department_render_management_callback(){
 	if(is_page()) {
