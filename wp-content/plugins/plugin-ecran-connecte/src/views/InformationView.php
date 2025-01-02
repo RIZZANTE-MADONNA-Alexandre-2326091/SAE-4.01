@@ -510,27 +510,27 @@ class InformationView extends View
 		else if ($type == 'YTvideosh')
 		{
 			$link = substr_replace($content,'embed',24,6);
-			echo '<iframe class="videosh" src="' . $link . '?autoplay=1&loop=1&playlist=' . substr($link,30) . '&mute=1&disablekb=1&controls=0"
+			echo '<iframe class="videosh" src="' . $link . '?autoplay=1&loop=1&playlist=' . substr($link,30) . '&mute=1&controls=0&disablekb=1&enablejsapi=1"
 				  title="YouTube short player" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
 				  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';
 		}
 		else if ($type == 'YTvideow')
 		{
 			$link = substr_replace($content,'embed/',24,8);
-			echo '<iframe class="videow" src="' . $link . '?autoplay=1&loop=1&playlist=' . substr($link,30) . '&mute=1&disablekb=1&controls=0"
+			echo '<iframe class="videow" src="' . $link . '?autoplay=1&loop=1&playlist=' . substr($link,30) . '&mute=1&controls=0&disablekb=1&enablejsapi=1"
 				  title="YouTube video player" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
 				  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';
 		}
 		else if ($type == 'LocCvideo')
 		{
-			echo '<video class="localCvideo" autoplay muted>
+			echo '<video class="localCvideo" muted>
 				      <source src="' . TV_UPLOAD_PATH . $content . '" type="video/mp4">
 				      <p>Impossible de lire la vidéo.</p>
 				  </video>';
 		}
 		else if ($type == 'LocSvideo')
 		{
-			echo '<video class="localSvideo" autoplay muted>
+			echo '<video class="localSvideo" muted>
 				      <source src="' . TV_UPLOAD_PATH . $content . '" type="video/mp4">
 				      <p>Impossible de lire la vidéo.</p>
 				  </video>';

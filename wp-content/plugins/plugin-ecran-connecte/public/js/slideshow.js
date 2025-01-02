@@ -5,12 +5,28 @@ let totalPage = null; // Nombre de pages
 let endPage = false;
 let stop = false;
 
+/**
+ * Ce bloc de 4 lignes sert à lancer de manière asynchrone l'IFrame Player API d'après la documentation officielle de [Youtube Iframe API](https://developers.google.com/youtube/iframe_api_reference?hl=fr)
+ * */
 let tag = document.createElement('script');
 tag.src = "https://www.youtube.com/iframe_api";
 let firstScriptTag = document.getElementsByTagName('script')[0];
 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-let urlYoutube = "https://www.youtube.com/"
+
+/**
+ * Lien URL vers YouTube
+ * */
+let urlYoutube = "https://www.youtube.com/";
+
+/**
+ *
+ * */
 let player;
+
+/**
+ * Savoir si une vidéo YouTube est terminée
+ * @defaultValue false
+ * */
 let done = false;
 
 infoSlideShow();
@@ -40,6 +56,8 @@ function scheduleSlideshow()
 
 /**
  * Display a slideshow
+ * @param slides Les slides (informations) qui défileront dans la partie "Information"
+ * @param slideIndex index de la slide dans la liste {@linkcode slides}, c'est-à-dire le numéro de l'information
  */
 function displayOrHide(slides, slideIndex)
 {
@@ -156,25 +174,56 @@ function displayOrHide(slides, slideIndex)
                             }
                         });
                     }
-
+                    /*
+                    * Si c'est une vidéo,
+                    * ⇒ différents traitements en fonction du type de la vidéo
+                    * */
                     // If it's a YouTube short video
                     if (slides[slideIndex].childNodes[i].className === 'videosh') {
-                        console.log("--Lecture vidéo Youtube short")
+                        console.log("--Lecture vidéo Youtube short");
+                        console.log(slides[slideIndex].childNodes[i]);
+
                         // TODO
                     }
                     // If it's a YouTube normal video
                     else if (slides[slideIndex].childNodes[i].className === 'videow') {
                         console.log("--Lecture vidéo Youtube classique");
+                        console.log(slides[slideIndex].childNodes[i]);
+
                         // TODO
                     }
                     // If it's a local normal video
                     else if (slides[slideIndex].childNodes[i].className === 'localCvideo') {
                         console.log("--Lecture vidéo locale classique");
+                        const listeVideosClassiqueLocal = document.querySelectorAll(".localCvideo");
+                        for (let indexVideoClassiqueLocal = 0; indexVideoClassiqueLocal < listeVideosClassiqueLocal.length; ++indexVideoClassiqueLocal) {
+                            let videoClassiqueLocal = listeVideosClassiqueLocal[indexVideoClassiqueLocal];
+                            console.log(videoClassiqueLocal);
+                            videoClassiqueLocal.load();
+                            videoClassiqueLocal.currentTime = 0;
+                            videoClassiqueLocal.play();
+                            videoClassiqueLocal.onended = () => {
+                                videoClassiqueLocal.pause();
+                                videoClassiqueLocal.currentTime = 0;
+                            }
+                        }
                         // TODO
                     }
-                    // If it's a local normal video
+                    // If it's a local short video
                     else if (slides[slideIndex].childNodes[i].className === 'localSvideo') {
                         console.log("--Lecture vidéo locale short");
+                        const listeVideosShortLocal = document.querySelectorAll(".localSvideo");
+                        for (let indexVideoShortLocal = 0; indexVideoShortLocal < listeVideosShortLocal.length; ++indexVideoShortLocal) {
+                            let videoShortLocal = listeVideosShortLocal[indexVideoShortLocal];
+                            console.log(videoShortLocal);
+                            videoShortLocal.load();
+                            videoShortLocal.currentTime = 0;
+                            videoShortLocal.play();
+                            videoShortLocal.onended = () => {
+                                videoShortLocal.pause();
+                                videoShortLocal.currentTime = 0;
+                            }
+                        }
                         // TODO
                     }
                 }
@@ -196,32 +245,46 @@ function displayOrHide(slides, slideIndex)
     }
 }
 
-/*
-TODO fonctions API Youtube et HTMLMediaElement
+
+//TODO fonctions API Youtube et HTMLMediaElement
 function onYouTubeIframeAPIReady() {
-    player = new YT.Player('player', {
-        height: '360',
-        width: '640',
-        videoId: 'M7lc1UVf-VE',
+    console.log("API Youtube démarée");
+    player = new YT.Player('videow', {
         events: {
             'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange
+            'onStateChange': onPlayerStateChange,
         }
     });
 }
 
 function onPlayerReady(event) {
-    event.target.playVideo();
+    const slides = document.getElementsByClassName("myInfoSlides");
+    for (let i = 0; i < slides.length; ++i) {
+        if (slides[i].childNodes && slides[i] !== undefined) {
+            for (let j = 0; j < slides[i].childNodes.length; ++j) {
+                event.target.setPlaybackQuality("default");
+                if ((slides[i].childNodes[j].className === 'videosh' || slides[i].childNodes[j].className === 'videosh')
+                    && slides[i].style.display === "block") {
+                    console.log("Vidéo YT lancée");
+                    event.target.seekTo(0);
+                    event.target.playVideo();
+                } else if ((slides[i].childNodes[j].className === 'videosh' || slides[i].childNodes[j].className === 'videosh')
+                    && slides[i].style.display === "none") {
+                    console.log("Vidéo YT arrêté");
+                    stopVideo();
+                }
+            }
+        }
+    }
 }
-
 
 function onPlayerStateChange(event) {
     if (event.data === YT.PlayerState.PLAYING && !done) {
-        setTimeout(stopVideo, 6000);
+        setTimeout(stopVideo, event.target.getDuration());
+        console.log("Vidéo YT terminée");
         done = true;
     }
 }
 function stopVideo() {
     player.stopVideo();
-}*/
-
+}
