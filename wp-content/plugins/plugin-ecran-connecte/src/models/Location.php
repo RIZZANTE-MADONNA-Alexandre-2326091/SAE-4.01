@@ -48,7 +48,11 @@ class Location extends Model implements Entity, JsonSerializable {
 			$database->beginTransaction();
 
 			$request = $database->prepare(
-				"INSERT INTO ecran_location (longitude, latitude, user_id) VALUES (:longitude, :latitude, :id_user)"
+				"INSERT INTO ecran_location (longitude, latitude, user_id)
+                VALUES (:longitude, :latitude, :id_user)
+                ON DUPLICATE KEY UPDATE 
+                    longitude = :longitude, 
+                    latitude = :latitude;"
 			);
 
 			$request->bindValue(':longitude', $this->getLongitude());

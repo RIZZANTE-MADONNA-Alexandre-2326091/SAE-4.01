@@ -64,16 +64,16 @@ function handleWeatherAjaxData(): void {
 
 	$location->setLongitude( $longitude );
 	$location->setLatitude( $latitude );
-	$location->setUserId( $id_user );
+	$location->setIdUser( $id_user );
 
-	$location->insert();
-
-	wp_send_json_success( array(
-		'message'   => 'Nouvelle position ajoutée avec succès dans la base de données',
-		'currentUserId' => $id_user,
-		'longitude' => $longitude,
-		'latitude'  => $latitude
-	));
+//	$location->insert();
+//
+//	wp_send_json_success( array(
+//		'message'   => 'Nouvelle position ajoutée avec succès dans la base de données',
+//		'currentUserId' => $id_user,
+//		'longitude' => $longitude,
+//		'latitude'  => $latitude
+//	));
 
 	try {
 		// Insère les données dans la base de données
