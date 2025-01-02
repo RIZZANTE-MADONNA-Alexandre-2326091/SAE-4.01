@@ -310,9 +310,9 @@ class InformationView extends View
 
 		$form .= '
 			<div class="form-group">
-                <label>Ajouter une vidéo hébergée localement de format "classique". Le fichier doit être au format "mp4"!</label>
-                <input class="form-control-file" type="file" name="contentFile"/>
-                <input type="hidden" name="MAX_FILE_SIZE" value="5000000"/>
+                <label>Ajouter une vidéo hébergée localement de format "classique". Le fichier doit être au format "mp4" et ne pas dépasser 1Go!</label>
+                <input class="form-control-file" type="file" accept=".mp4" name="contentFile"/>
+                <input type="hidden" name="MAX_FILE_SIZE" value="1073741824"/>
             </div>
             
             <div class="form-group">
@@ -351,9 +351,9 @@ class InformationView extends View
 
 		$form .= '
 			<div class="form-group">
-                <label>Ajouter une vidéo hébergée localement de format "short".  Le fichier doit être au format "mp4"!</label>
-                <input class="form-control-file" type="file" name="contentFile"/>
-                <input type="hidden" name="MAX_FILE_SIZE" value="5000000"/>
+                <label>Ajouter une vidéo hébergée localement de format "short". Le fichier doit être au format "mp4" et ne pas dépasser 1Go!</label>
+                <input class="form-control-file" type="file" accept=".mp4" name="contentFile"/>
+                <input type="hidden" name="MAX_FILE_SIZE" value="1073741824"/>
             </div>
             
             <div class="form-group">
@@ -635,6 +635,22 @@ class InformationView extends View
     public function displayErrorVideoFormat(): void
     {
 		$this->buildModal('Erreur de format vidéo', '<p>La vidéo que vous voulez modifier n\'est pas au bon format. Veuillez vérifier le bon format ou ajoutez une nouvelle information.</p>');
+    }
+
+    /**
+     * Display if the video exceeds the maximum size;
+     */
+    public function displayVideoExceedsMaxSize(): void
+    {
+        $this->buildModal('Taille excessive de vidéo', '<p>La vidéo que vous voulez modifier dépasse la taille maximum possible. Veuillez réduire la vidéo ou baisser sa résolution avant de réessayer.</p>');
+    }
+
+    /**
+     * Display if the video is not conform
+     */
+    public function displayNotConformVideo(): void
+    {
+        $this->buildModal('Vidéo non valide', '<p>Ce fichier est une vidéo non valide, veuillez choisir une autre vidéo</p>');
     }
 
     public function informationNotAllowed(): string

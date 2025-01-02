@@ -208,9 +208,13 @@ class InformationController extends Controller
 			{
 				$this->registerFile($filename, $fileTmpName, $information);
 			}
+            else if ($_FILES['contentFile']['size'] > 1073741824)
+            {
+                $this->view->displayVideoExceedsMaxSize();
+            }
 			else
 			{
-				$this->view->buildModal('Vidéo non valide', '<p>Ce fichier est une vidéo non valide, veuillez choisir une autre vidéo</p>');
+				$this->view->displayNotConformVideo();
 			}
 		}
         // Return a selector with all forms
