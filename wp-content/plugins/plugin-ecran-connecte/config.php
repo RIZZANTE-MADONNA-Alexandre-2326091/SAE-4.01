@@ -181,7 +181,7 @@ function installDatabaseEcran(): void
 
     $table_name = 'ecran_code_delete_account';
 
-    $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+	$query = "CREATE TABLE IF NOT EXISTS $table_name (
 			id INT(10) NOT NULL AUTO_INCREMENT,
 			user_id BIGINT(20) UNSIGNED NOT NULL,
 			code VARCHAR(40) NOT NULL,
@@ -189,14 +189,27 @@ function installDatabaseEcran(): void
 			FOREIGN KEY (user_id) REFERENCES wp_users(ID) ON DELETE CASCADE
 		) $charset_collate;";
 
-    dbDelta($sql);
+    dbDelta($query);
 
 	$table_name = 'ecran_department';
 
 	$sql = "CREATE TABLE IF NOT EXISTS $table_name (
-			id INT(10) NOT NULL AUTO_INCREMENT,
+			dept_id INT(10) NOT NULL AUTO_INCREMENT,
 			name VARCHAR(40) NOT NULL,
-			PRIMARY KEY (id)
+			PRIMARY KEY (dept_id)
+		) $charset_collate;";
+
+	dbDelta($sql);
+
+	$table_name = 'ecran_dept_user';
+
+	$sql = "CREATE TABLE IF NOT EXISTS $table_name (
+            id INT(10) NOT NULL AUTO_INCREMENT,
+			dept_id INT(10) NOT NULL,
+			user_id BIGINT(20) UNSIGNED NOT NULL ,
+			PRIMARY KEY (id, dept_id, user_id),
+			FOREIGN KEY (dept_id) REFERENCES ecran_department(dept_id) ON DELETE CASCADE,
+			FOREIGN KEY (user_id) REFERENCES wp_users(ID) ON DELETE CASCADE
 		) $charset_collate;";
 
 	dbDelta($sql);

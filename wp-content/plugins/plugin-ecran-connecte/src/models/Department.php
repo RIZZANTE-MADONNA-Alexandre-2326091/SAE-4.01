@@ -46,7 +46,7 @@ class Department extends Model implements Entity, JsonSerializable
 	 * @return int
 	 */
 	public function update(): int {
-		$request = $this->getDatabase()->prepare("UPDATE ecran_department SET name = :name WHERE id = :id");
+		$request = $this->getDatabase()->prepare("UPDATE ecran_department SET name = :name WHERE dept_id = :id");
 
 		$request->bindValue(':name', $this->getName(), PDO::PARAM_STR);
 		$request->bindValue(':id', $this->getId(), PDO::PARAM_INT);
@@ -60,7 +60,7 @@ class Department extends Model implements Entity, JsonSerializable
 	 * Delete a department in the database
 	 */
 	public function delete() {
-		$request = $this->getDatabase()->prepare('DELETE FROM ecran_department WHERE id = :id');
+		$request = $this->getDatabase()->prepare('DELETE FROM ecran_department WHERE dept_id = :id');
 
 		$request->bindValue(':id', $this->getId(), PDO::PARAM_INT);
 
@@ -79,7 +79,7 @@ class Department extends Model implements Entity, JsonSerializable
 	public function setEntity( $data ) {
 		$entity = new Department();
 
-		$entity->setId($data['id']);
+		$entity->setId($data['dept_id']);
 		$entity->setName($data['name']);
 
 		return $entity;
@@ -108,7 +108,7 @@ class Department extends Model implements Entity, JsonSerializable
 	 * @return Department | bool
 	 */
 	public function get( $id ) {
-		$request = $this->getDatabase()->prepare("SELECT id, name FROM ecran_department WHERE id = :id LIMIT 1");
+		$request = $this->getDatabase()->prepare("SELECT dept_id, name FROM ecran_department WHERE dept_id = :id LIMIT 1");
 
 		$request->bindParam(':id', $id, PDO::PARAM_INT);
 
@@ -126,7 +126,7 @@ class Department extends Model implements Entity, JsonSerializable
 	 * @return array
 	 */
 	public function getAll(): array {
-		$request = $this->getDatabase()->prepare("SELECT id, name FROM ecran_department ORDER BY id");
+		$request = $this->getDatabase()->prepare("SELECT dept_id, name FROM ecran_department ORDER BY dept_id");
 
 		$request->execute();
 
@@ -140,7 +140,7 @@ class Department extends Model implements Entity, JsonSerializable
 	 * @return Department[]|void
 	 */
 	public function getList(int $begin = 0, int $numberElement = 25) {
-		$request = $this->getDatabase()->prepare("SELECT id, name FROM ecran_department ORDER BY id ASC LIMIT :begin, :numberElement");
+		$request = $this->getDatabase()->prepare("SELECT dept_id, name FROM ecran_department ORDER BY dept_id ASC LIMIT :begin, :numberElement");
 
 		$request->bindValue(':begin', $begin, PDO::PARAM_INT);
 		$request->bindValue(':numberElement', $numberElement, PDO::PARAM_INT);
@@ -161,7 +161,7 @@ class Department extends Model implements Entity, JsonSerializable
 	 * @return $this|array|Department
 	 */
 	public function getDepartmentName($name) {
-		$request = $this->getDatabase()->prepare("SELECT id, name FROM ecran_department WHERE name =	:name LIMIT 1");
+		$request = $this->getDatabase()->prepare("SELECT dept_id, name FROM ecran_department WHERE name = :name LIMIT 1");
 
 		$request->bindValue(':name', $name, PDO::PARAM_STR);
 
