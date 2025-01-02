@@ -61,6 +61,7 @@ function scheduleSlideshow()
  */
 function displayOrHide(slides, slideIndex)
 {
+    let timeout = 10000;
     if(slides.length > 0) {
         if(slides.length > 1) {
             for (let i = 0; i < slides.length; ++i) {
@@ -198,6 +199,10 @@ function displayOrHide(slides, slideIndex)
                         const listeVideosClassiqueLocal = document.querySelectorAll(".localCvideo");
                         for (let indexVideoClassiqueLocal = 0; indexVideoClassiqueLocal < listeVideosClassiqueLocal.length; ++indexVideoClassiqueLocal) {
                             let videoClassiqueLocal = listeVideosClassiqueLocal[indexVideoClassiqueLocal];
+                            if (listeVideosClassiqueLocal[indexVideoClassiqueLocal] === slides[slideIndex].childNodes[i]) {
+                                timeout = videoClassiqueLocal.duration * 1000;
+                            }
+                            console.log("timeout = " + timeout + "\tduration = " + videoClassiqueLocal.duration);
                             console.log(videoClassiqueLocal);
                             videoClassiqueLocal.load();
                             videoClassiqueLocal.currentTime = 0;
@@ -215,6 +220,10 @@ function displayOrHide(slides, slideIndex)
                         const listeVideosShortLocal = document.querySelectorAll(".localSvideo");
                         for (let indexVideoShortLocal = 0; indexVideoShortLocal < listeVideosShortLocal.length; ++indexVideoShortLocal) {
                             let videoShortLocal = listeVideosShortLocal[indexVideoShortLocal];
+                            if (listeVideosShortLocal[indexVideoShortLocal] === slides[slideIndex].childNodes[i]) {
+                                timeout = videoShortLocal.duration * 1000;
+                            }
+                            console.log("timeout = " + timeout + "\tduration = " + videoShortLocal.duration);
                             console.log(videoShortLocal);
                             videoShortLocal.load();
                             videoShortLocal.currentTime = 0;
@@ -240,8 +249,8 @@ function displayOrHide(slides, slideIndex)
         }
     }
 
-     if(slides.length !== 1 || totalPage !== 1) {
-        setTimeout(function(){displayOrHide(slides, slideIndex)} , 10000);
+    if(slides.length !== 1 || totalPage !== 1) {
+        setTimeout(function(){displayOrHide(slides, slideIndex)} , timeout);
     }
 }
 
@@ -249,7 +258,7 @@ function displayOrHide(slides, slideIndex)
 //TODO fonctions API Youtube et HTMLMediaElement
 function onYouTubeIframeAPIReady() {
     console.log("API Youtube démarée");
-    player = new YT.Player('videow', {
+    player = new YT.Player('videosh', {
         events: {
             'onReady': onPlayerReady,
             'onStateChange': onPlayerStateChange,
