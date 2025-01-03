@@ -72,22 +72,6 @@ class User extends Model implements Entity, JsonSerializable
 
                 $request->execute();
             }
-        } else if ($this->getRole() == 'enseignant' || $this->getRole() == 'directeuretude') {
-
-            $codeAde = new CodeAde();
-
-            $codeAde->setTitle($this->getLogin());
-            $codeAde->setCode($this->getCodes());
-            $codeAde->setType('teacher');
-
-            $idCode = $codeAde->insert();
-
-            $request = $this->getDatabase()->prepare('INSERT INTO ecran_code_user (user_id, code_ade_id) VALUES (:userId, :codeAdeId)');
-
-            $request->bindParam(':userId', $id, PDO::PARAM_INT);
-            $request->bindValue(':codeAdeId', $idCode, PDO::PARAM_INT);
-
-            $request->execute();
         }
         return $id;
     }
