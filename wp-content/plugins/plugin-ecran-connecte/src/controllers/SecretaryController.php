@@ -93,9 +93,6 @@ class SecretaryController extends UserController
      * @return string
      */
     public function createUsers() {
-        $student = new StudentController();
-        $teacher = new TeacherController();
-        $studyDirector = new StudyDirectorController();
         $secretary = new SecretaryController();
         $technician = new TechnicianController();
         $television = new TelevisionController();
