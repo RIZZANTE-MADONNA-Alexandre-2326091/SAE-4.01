@@ -73,7 +73,6 @@ class DepartmentController extends Controller
 				foreach ( $checked_values as $id ) {
 					$this->model = $this->model->get($id);
 					$this->model->delete();
-					$this->view->refreshPage();
 				}
 			}
 		}
@@ -102,10 +101,9 @@ class DepartmentController extends Controller
 				$this->model->setId($id);
 				$this->model->setName($newName);
 
-				if(!$this->checkDuplicateDept($this->model) && $this->model->update()){
-
-					$this->view->displayModificationValidate();
-					$this->view->refreshPage();
+				if(!$this->checkDuplicateDept($this->model)){
+					$this->model->update();
+					$this->view->displayModificationSucces();
 
 				}else{
 					$this->view->displayErrorDoubleName();
@@ -121,12 +119,12 @@ class DepartmentController extends Controller
 	/**
 	 * Display all departments in a table
 	 *
-	 * @return void
+	 * @return string
 	 */
-	public function displayAll(){
+	public function displayAll(): string{
 		$departments = $this->model->getAll();
 
-		$this->view->displayAllDept($departments);
+		return $this->view->displayAllDept($departments);
 	}
 
 	/**

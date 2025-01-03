@@ -46,27 +46,23 @@ class UserController extends Controller
         $user = $this->model->get($id);
         $userData = get_userdata($id);
         $user->delete();
-        if (in_array("enseignant", $userData->roles) || in_array("secretaire", $userData->roles) ||
-            in_array("administrator", $userData->roles) || in_array("directeuretude", $userData->roles)) {
+        if (in_array("secretaire", $userData->roles) || in_array("administrator", $userData->roles)) {
             $modelAlert = new Alert();
             $alerts = $modelAlert->getAuthorListAlert($user->getLogin());
             foreach ($alerts as $alert) {
                 $alert->delete();
             }
-        }
 
-        if (in_array("secretaire", $userData->roles) || in_array("administrator", $userData->roles) ||
-            in_array("directeuretude", $userData->roles)) {
-            $modelInfo = new Information();
-            $infos = $modelInfo->getAuthorListInformation($user->getId());
-            foreach ($infos as $info) {
-                $goodType = ['img', 'pdf', 'tab', 'event'];
-                if (in_array($info->getType(), $goodType)) {
-                    $infoController = new InformationController();
-                    $infoController->deleteFile($info->getId());
-                }
-                $modelInfo->delete();
-            }
+	        $modelInfo = new Information();
+	        $infos = $modelInfo->getAuthorListInformation($user->getId());
+	        foreach ($infos as $info) {
+		        $goodType = ['img', 'pdf', 'tab', 'event'];
+		        if (in_array($info->getType(), $goodType)) {
+			        $infoController = new InformationController();
+			        $infoController->deleteFile($info->getId());
+		        }
+		        $modelInfo->delete();
+	        }
         }
     }
 

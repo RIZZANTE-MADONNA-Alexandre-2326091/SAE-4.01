@@ -80,10 +80,7 @@ class UserView extends View
             <div class="col-md-6 order-md-1 text-center text-md-left pr-md-5">
                 <h2 class="mb-3 bd-text-purple-bright">Les utilisateurs</h2>
                 <p class="lead">Vous pouvez créer ici les utilisateurs</p>
-                <p class="lead">Il y a plusieurs types d\'utilisateur : Les étudiants, enseignants, directeurs d\'études, scrétaires, techniciens, télévisions.</p>
-                <p class="lead">Les étudiants ont accès à leur emploi du temps et reçoivent les alertes les concernants et les informations.</p>
-                <p class="lead">Les enseignants ont accès à leur emploi du temps et peuvent poster des alertes.</p>
-                <p class="lead">Les directeurs d\'études ont accès à leur emploi du temps et peuvent poster des alertes et des informations.</p>
+                <p class="lead">Il y a plusieurs types d\'utilisateur : Les scrétaires, techniciens, télévisions.</p>
                 <p class="lead">Les secrétaires peuvent poster des alertes et des informations. Ils peuvent aussi créer des utilisateurs.</p>
                 <p class="lead">Les techniciens ont accès aux emplois du temps des promotions.</p>
                 <p class="lead">Les télévisions sont les utilisateurs utilisés pour afficher ce site sur les téléviseurs. Les comptes télévisions peuvent afficher autant d\'emploi du temps que souhaité.</p>
@@ -104,17 +101,6 @@ class UserView extends View
             <input type="text" class="form-control text-center" name="codeDelete" placeholder="Code à rentrer" required="">
             <button type="submit" name="deleteAccount" class="btn button_ecran">Supprimer</button>
         </form>';
-    }
-
-    /**
-     * Display the subscription button
-     */
-    public function displayButtonSubscription() {
-        $wpnonce = wp_create_nonce('wp_rest');
-
-        return '
-        <a href="#" id="my-notification-button" class="btn btn-danger">Recevoir des notifications</a></br>
-        <input id="wpnonce" type="hidden" value="' . $wpnonce . '" />';
     }
 
     /**
