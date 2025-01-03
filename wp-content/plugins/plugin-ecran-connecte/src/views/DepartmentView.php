@@ -12,7 +12,7 @@ use Models\Department;
 class DepartmentView extends View
 {
     /**
-     * Display a creation form for a department
+     * Display a creation form for a department and an admin account.
      *
      * @return string
      */
@@ -21,10 +21,11 @@ class DepartmentView extends View
             <form method="post">
                 <div class="form-group">
                     <label for="deptName">Nom du département</label>
-                    <input class="form-control" type="text" name="deptName" placeholder="280 caractères maximum" required="">
+                    <input class="form-control" type="text" name="deptName" placeholder="Nom du département" minlength="4" maxlength="25" required="">
                 </div>
                 <button type="submit" class="btn button_ecran" id="valid" name="submit">Créer</button>
-            </form>';
+            </form>
+            <a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des départements'))) . '">Voir les départements</a>' . $this->contextCreateDept();
     }
 
 	/**
@@ -45,6 +46,17 @@ class DepartmentView extends View
           <a href="'. $linkManageDept .'">Annuler</a>
         </form>';
     }
+
+
+	private function contextCreateDept() {
+		return '
+		<hr class="half-rule">
+		<div>
+			<h2>Les départements</h2>
+			<p class="lead">Créer un département permet à chaque département de l\'IUT de pouvoir gérer son propre personnel et ses propres télévisions.</p>
+			<p class="lead">À la création d\'un département, un compte administrateur est alors créé. Veuillez opter pour un identifiant contenant entre 4 et 25 caractères.</p>
+		</div>';
+	}
 
     /**
      * Display a form for deleting a department
@@ -111,9 +123,9 @@ class DepartmentView extends View
 	    $count = 1;
 	    foreach ($departments as $dept) {
 		    $row[] = [ $count,
-			    $this->buildCheckbox($name, $dept->getId()),
+			    $this->buildCheckbox($name, $dept->getIdDept()),
 			    htmlspecialchars($dept->getName()),
-			    $this->buildLinkForModify($linkManageDept . '?id=' . $dept->getId())
+			    $this->buildLinkForModify($linkManageDept . '?id=' . $dept->getIdDept())
 		    ];
 		    ++$count;
 		}

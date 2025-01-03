@@ -257,26 +257,6 @@ $result = add_role(
 );
 
 $result = add_role(
-    'etudiant',
-    __('Etudiant'),
-    array(
-        'read' => true,  // true allows this capability
-        'edit_posts' => true,
-        'delete_posts' => false, // Use false to explicitly deny
-    )
-);
-
-$result = add_role(
-    'enseignant',
-    __('Enseignant'),
-    array(
-        'read' => true,  // true allows this capability
-        'edit_posts' => true,
-        'delete_posts' => false, // Use false to explicitly deny
-    )
-);
-
-$result = add_role(
     'technicien',
     __('Technicien'),
     array(
@@ -286,15 +266,6 @@ $result = add_role(
     )
 );
 
-$result = add_role(
-    'directeuretude',
-    __('Directeur etude'),
-    array(
-        'read' => true,  // true allows this capability
-        'edit_posts' => true,
-        'delete_posts' => false, // Use false to explicitly deny
-    )
-);
 $result = add_role(
     'informationposter',
     __('informationPoster'),
