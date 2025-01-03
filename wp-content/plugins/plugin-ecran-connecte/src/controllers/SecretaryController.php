@@ -101,16 +101,10 @@ class SecretaryController extends UserController
         $television = new TelevisionController();
         return
             $this->view->displayStartMultiSelect() .
-            $this->view->displayTitleSelect('student', 'Étudiants', true) .
-            $this->view->displayTitleSelect('teacher', 'Enseignants') .
-            $this->view->displayTitleSelect('studyDirector', 'Directeurs d\'études') .
             $this->view->displayTitleSelect('secretary', 'Secrétaires') .
             $this->view->displayTitleSelect('technician', 'Technicien') .
             $this->view->displayTitleSelect('television', 'Télévisions') .
             $this->view->displayEndOfTitle() .
-            $this->view->displayContentSelect('student', $student->insert(), true) .
-            $this->view->displayContentSelect('teacher', $teacher->insert()) .
-            $this->view->displayContentSelect('studyDirector', $studyDirector->insert()) .
             $this->view->displayContentSelect('secretary', $secretary->insert()) .
             $this->view->displayContentSelect('technician', $technician->insert()) .
             $this->view->displayContentSelect('television', $television->insert()) .
@@ -122,24 +116,15 @@ class SecretaryController extends UserController
      * Display users by roles
      */
     public function displayUsers() {
-        $student = new StudentController();
-        $teacher = new TeacherController();
-        $studyDirector = new StudyDirectorController();
         $secretary = new SecretaryController();
         $technician = new TechnicianController();
         $television = new TelevisionController();
         return
             $this->view->displayStartMultiSelect() .
-            $this->view->displayTitleSelect('student', 'Étudiants', true) .
-            $this->view->displayTitleSelect('teacher', 'Enseignants') .
-            $this->view->displayTitleSelect('studyDirector', 'Directeurs d\'études') .
             $this->view->displayTitleSelect('secretary', 'Secrétaires') .
             $this->view->displayTitleSelect('technician', 'Technicien') .
             $this->view->displayTitleSelect('television', 'Télévisions') .
             $this->view->displayEndOfTitle() .
-            $this->view->displayContentSelect('student', $student->displayAllStudents(), true) .
-            $this->view->displayContentSelect('teacher', $teacher->displayAllTeachers()) .
-            $this->view->displayContentSelect('studyDirector', $studyDirector->displayAllStudyDirector()) .
             $this->view->displayContentSelect('secretary', $secretary->displayAllSecretary()) .
             $this->view->displayContentSelect('technician', $technician->displayAllTechnician()) .
             $this->view->displayContentSelect('television', $television->displayAllTv()) .
@@ -156,16 +141,7 @@ class SecretaryController extends UserController
 
             $wordpressUser = get_user_by('id', $id);
 
-            if (in_array("etudiant", $wordpressUser->roles)) {
-                $controller = new StudentController();
-                return $controller->modify($user);
-            } elseif (in_array("enseignant", $wordpressUser->roles)) {
-                $controller = new TeacherController();
-                return $controller->modify($user);
-            } elseif (in_array("directeuretude", $wordpressUser->roles)) {
-                $controller = new StudyDirectorController();
-                return $controller->modify($user);
-            } elseif (in_array("television", $wordpressUser->roles)) {
+            if (in_array("television", $wordpressUser->roles)) {
                 $controller = new TelevisionController();
                 return $controller->modify($user);
             } else {
@@ -181,7 +157,7 @@ class SecretaryController extends UserController
      */
     public function deleteUsers() {
         $actionDelete = filter_input(INPUT_POST, 'delete');
-        $roles = ['Etu', 'Teacher', 'Direc', 'Tech', 'Secre', 'Tele'];
+        $roles = ['Tech', 'Secre', 'Tele'];
         if (isset($actionDelete)) {
             foreach ($roles as $role) {
                 if (isset($_REQUEST['checkboxStatus' . $role])) {
