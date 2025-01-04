@@ -24,8 +24,10 @@ class TelevisionView extends UserView
      *
      * @return string
      */
-    public function displayFormTelevision($years, $groups, $halfGroups) {
-        $form = '
+    public function displayFormTelevision($years, $groups, $halfGroups, $departments, $isAdmin = null, $currentDept = null) {
+	    $disabled = $isAdmin ? '' : 'disabled';
+
+		$form = '
         <h2> Compte télévision</h2>
         <p class="lead">Pour créer des télévisions, remplissez ce formulaire avec les valeurs demandées.</p>
         <p class="lead">Vous pouvez mettre autant d\'emploi du temps que vous souhaitez, cliquez sur "Ajouter des emplois du temps</p>
@@ -40,6 +42,12 @@ class TelevisionView extends UserView
             	<input type="password" class="form-control" id="pwdTv" name="pwdTv" placeholder="Mot de passe" minlength="8" maxlength="25" required="" onkeyup=checkPwd("Tv")>
             	<input type="password" class="form-control" id="pwdConfTv" name="pwdConfirmTv" placeholder="Confirmer le Mot de passe" minlength="8" maxlength="25" required="" onkeyup=checkPwd("Tv")>
             	<small id="passwordHelpBlock" class="form-text text-muted">Votre mot de passe doit contenir entre 8 et 25 caractère</small>
+            </div>
+            <div class="form-group">
+                <label for="deptTv">Département</label>  
+                <select name="deptTv" class="form-control"' . $disabled. '>
+                    ' . $this->displayAllDept($departments, $currentDept) . '
+                </select>
             </div>
             <div class="form-group">
             	<label>Premier emploi du temps</label>' .
@@ -59,19 +67,19 @@ class TelevisionView extends UserView
      *
      * @return string
      */
-    public function displayAllTv($users) {
+    public function displayAllTv($users, $userDeptList) {
         $page = get_page_by_title_V2('Modifier un utilisateur');
         $linkManageUser = get_permalink($page->ID);
 
         $title = 'Televisions';
         $name = 'Tele';
-        $header = ['Login', 'Nombre d\'emplois du temps ', 'Modifier'];
+        $header = ['Login', 'Nombre d\'emplois du temps ', 'Départements', 'Modifier'];
 
         $row = array();
         $count = 0;
         foreach ($users as $user) {
             ++$count;
-            $row[] = [$count, $this->buildCheckbox($name, $user->getId()), $user->getLogin(), sizeof($user->getCodes()), $this->buildLinkForModify($linkManageUser . '?id=' . $user->getId())];
+            $row[] = [$count, $this->buildCheckbox($name, $user->getId()), $user->getLogin(), sizeof($user->getCodes()), $userDeptList[$count-1], $this->buildLinkForModify($linkManageUser . '?id=' . $user->getId())];
         }
 
         return $this->displayAll($name, $title, $header, $row, 'tele');

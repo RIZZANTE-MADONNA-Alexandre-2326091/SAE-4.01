@@ -117,8 +117,10 @@ function installDatabaseEcran(): void
 			author BIGINT(20) UNSIGNED NOT NULL,
 			type VARCHAR (10) DEFAULT 'text' NOT NULL,
 			administration_id INT(10) DEFAULT NULL,
+    		dept_id INT(10) DEFAULT NULL,
 			PRIMARY KEY (id),
-			FOREIGN KEY (author) REFERENCES wp_users(ID) ON DELETE CASCADE
+			FOREIGN KEY (author) REFERENCES wp_users(ID) ON DELETE CASCADE,
+    		FOREIGN KEY (dept_id) REFERENCES ecran_departement(dept_id) ON DELETE CASCADE
 		) $charset_collate;";
 
     dbDelta($sql);

@@ -4,6 +4,7 @@ namespace Controllers;
 
 use Models\Alert;
 use Models\CodeAde;
+use Models\Department;
 use Models\Information;
 use Models\User;
 use R34ICS;
@@ -293,4 +294,10 @@ class UserController extends Controller
 
         return $this->view->displayModifyMyCodes($this->model->getCodes(), $years, $groups, $halfGroups);
     }
+
+	public function displayAllDepartement() {
+		$deptModel = new Department();
+		$dept = $deptModel->getAll();
+		return $this->view->displayAllDept($dept);
+	}
 }

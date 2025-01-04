@@ -2,6 +2,7 @@
 
 namespace Controllers;
 
+use Models\Department;
 use Models\User;
 use Views\SecretaryView;
 
@@ -48,12 +49,19 @@ class SecretaryController extends UserController
     public function insert() {
         $action = filter_input(INPUT_POST, 'createSecre');
 
+	    $currentUser = wp_get_current_user();
+
+	    $deptModel = new Department();
+	    $isAdmin = in_array('administrator', $currentUser->roles);
+	    $currentDept = $isAdmin ? -1 : $deptModel->getDepartmentUsers($currentUser->ID)->getId();
+
         if (isset($action)) {
 
             $login = filter_input(INPUT_POST, 'loginSecre');
             $password = filter_input(INPUT_POST, 'pwdSecre');
             $passwordConfirm = filter_input(INPUT_POST, 'pwdConfirmSecre');
             $email = filter_input(INPUT_POST, 'emailSecre');
+	        $deptId = $isAdmin ? filter_input(INPUT_POST, 'deptIdSecre') : $currentUser;
 
             if (is_string($login) && strlen($login) >= 4 && strlen($login) <= 25 &&
                 is_string($password) && strlen($password) >= 8 && strlen($password) <= 25 &&
@@ -63,6 +71,7 @@ class SecretaryController extends UserController
                 $this->model->setPassword($password);
                 $this->model->setEmail($email);
                 $this->model->setRole('secretaire');
+				$this->model->setDeptId($deptId);
 
                 if (!$this->checkDuplicateUser($this->model) && $this->model->insert()) {
                     $this->view->displayInsertValidate();
@@ -73,7 +82,10 @@ class SecretaryController extends UserController
                 $this->view->displayErrorCreation();
             }
         }
-        return $this->view->displayFormSecretary();
+
+		$departments = $deptModel->getAll();
+
+        return $this->view->displayFormSecretary($departments, $isAdmin, $currentDept);
     }
 
     /**
@@ -82,7 +94,14 @@ class SecretaryController extends UserController
      */
     public function displayAllSecretary() {
         $users = $this->model->getUsersByRole('secretaire');
-        return $this->view->displayAllSecretary($users);
+
+		$deptModel = new Department();
+		$userDeptList = array();
+		foreach ($users as $user) {
+			$userDeptList[] = $deptModel->getDepartmentUsers($user->getDeptId());
+		}
+
+        return $this->view->displayAllSecretary($users, $userDeptList);
     }
 
     /*** MANAGE USER ***/

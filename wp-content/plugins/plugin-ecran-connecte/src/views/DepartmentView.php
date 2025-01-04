@@ -24,7 +24,7 @@ class DepartmentView extends View
                     <input class="form-control" type="text" name="deptName" placeholder="280 caractères maximum" required="">
                 </div>
                 <button type="submit" class="btn button_ecran" id="valid" name="submit">Créer</button>
-            </form>';
+            </form>' . $this->displayContextCreate();
     }
 
 	/**
@@ -60,6 +60,15 @@ class DepartmentView extends View
                 <button type="submit" class="btn button_ecran" name="deleteDepartment">Supprimer</button>
             </form>';
     }
+
+
+	private function displayContextCreate() {
+		return '<hr class="half-rule">
+		<div>
+			<h2>Les départements</h2>
+			<p class="lead">Vous pouvez créer les différents départements présents au sein de l\'IUT.</p>
+		</div>';
+	}
 
 	/**
 	 * @return string

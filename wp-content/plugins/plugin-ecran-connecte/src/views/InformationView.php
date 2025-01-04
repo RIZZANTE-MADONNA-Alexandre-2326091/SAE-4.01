@@ -26,8 +26,9 @@ class InformationView extends View
      *
      * @return string
      */
-    public function displayFormText($title = null, $content = null, $endDate = null, $type = "createText") {
+    public function displayFormText($departments, $isAdmin, $currentDept, $title = null, $content = null, $endDate = null, $type = "createText") {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
+		$disabled = $isAdmin ? '' : 'disabled';
 
         $form = '
         <form method="post">
@@ -39,6 +40,12 @@ class InformationView extends View
                 <label for="content">Contenu</label>
                 <textarea class="form-control" id="content" name="content" rows="3" placeholder="280 caractères au maximum" maxlength="280" minlength="4" required>' . $content . '</textarea>
             </div>
+            <div class="form-group">
+            	<label for="content">Département</label>
+            	<select id="infoDept" name="infoDept" class="form-control" ' . $disabled . ' >
+            		' . $this->displayAllDept($departments, $currentDept) . '
+            	</select>
+			</div>
             <div class="form-group">
                 <label for="expirationDate">Date d\'expiration</label>
                 <input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' . $dateMin . '" value="' . $endDate . '" required >
@@ -62,8 +69,9 @@ class InformationView extends View
      *
      * @return string
      */
-    public function displayFormImg($title = null, $content = null, $endDate = null, $type = "createImg") {
+    public function displayFormImg($departments, $isAdmin, $currentDept, $title = null, $content = null, $endDate = null, $type = "createImg") {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
+	    $disabled = $isAdmin ? '' : 'disabled';
 
         $form = '<form method="post" enctype="multipart/form-data">
 					<div class="form-group">
@@ -83,6 +91,12 @@ class InformationView extends View
 		        <input class="form-control-file" id="contentFile" type="file" name="contentFile"/>
 		        <input type="hidden" name="MAX_FILE_SIZE" value="5000000"/>
 	        </div>
+	        <div class="form-group">
+            	<label for="content">Département</label>
+            	<select id="infoDept" name="infoDept" class="form-control" ' . $disabled . ' >
+            		' . $this->displayAllDept($departments, $currentDept) . '
+            	</select>
+			</div>
 	        <div class="form-group">
 				<label for="expirationDate">Date d\'expiration</label>
 				<input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' . $dateMin . '" value="' . $endDate . '" required >
@@ -108,8 +122,9 @@ class InformationView extends View
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      */
-    public function displayFormTab($title = null, $content = null, $endDate = null, $type = "createTab") {
+    public function displayFormTab($departments, $isAdmin, $currentDept, $title = null, $content = null, $endDate = null, $type = "createTab") {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
+	    $disabled = $isAdmin ? '' : 'disabled';
 
         $form = '<form method="post" enctype="multipart/form-data">
 						<div class="form-group">
@@ -134,6 +149,12 @@ class InformationView extends View
                 <small id="tabHelp" class="form-text text-muted">Nous vous conseillons également de ne pas mettre trop de contenu dans une cellule.</small>
             </div>
             <div class="form-group">
+            	<label for="content">Département</label>
+            	<select id="infoDept" name="infoDept" class="form-control" ' . $disabled . ' >
+            		' . $this->displayAllDept($departments, $currentDept) . '
+            	</select>
+			</div>
+            <div class="form-group">
 				<label for="expirationDate">Date d\'expiration</label>
 				<input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' . $dateMin . '" value="' . $endDate . '" required >
 			</div>
@@ -156,8 +177,9 @@ class InformationView extends View
      *
      * @return string
      */
-    public function displayFormPDF($title = null, $content = null, $endDate = null, $type = "createPDF") {
+    public function displayFormPDF($departments, $isAdmin, $currentDept, $title = null, $content = null, $endDate = null, $type = "createPDF") {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
+	    $disabled = $isAdmin ? '' : 'disabled';
 
         $form = '<form method="post" enctype="multipart/form-data">
 					<div class="form-group">
@@ -179,6 +201,12 @@ class InformationView extends View
                 <input type="hidden" name="MAX_FILE_SIZE" value="5000000"/>
             </div>
             <div class="form-group">
+            	<label for="content">Département</label>
+            	<select id="infoDept" name="infoDept" class="form-control" ' . $disabled . ' >
+            		' . $this->displayAllDept($departments, $currentDept) . '
+            	</select>
+			</div>
+            <div class="form-group">
 				<label for="expirationDate">Date d\'expiration</label>
 				<input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' . $dateMin . '" value="' . $endDate . '" required >
 			</div>
@@ -199,8 +227,10 @@ class InformationView extends View
      *
      * @return string
      */
-    public function displayFormEvent($endDate = null, $type = "createEvent") {
+    public function displayFormEvent($departments, $isAdmin, $currentDept, $endDate = null, $type = "createEvent") {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
+	    $disabled = $isAdmin ? '' : 'disabled';
+
         $form = '
 		<form method="post" enctype="multipart/form-data">
 			<div class="form-group">
@@ -209,6 +239,12 @@ class InformationView extends View
                 <input type="hidden" name="MAX_FILE_SIZE" value="5000000"/>
                 <small id="fileHelp" class="form-text text-muted">Images ou PDF</small>
         	</div>
+        	<div class="form-group">
+            	<label for="content">Département</label>
+            	<select id="infoDept" name="infoDept" class="form-control" ' . $disabled . ' >
+            		' . $this->displayAllDept($departments, $currentDept) . '
+            	</select>
+			</div>
         	<div class="form-group">
 				<label for="expirationDate">Date d\'expiration</label>
 				<input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' . $dateMin . '" value="' . $endDate . '" required >
@@ -257,7 +293,7 @@ class InformationView extends View
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      */
-    public function displayModifyInformationForm($title, $content, $endDate, $type) {
+    public function displayModifyInformationForm($title, $content, $endDate, $type, $departments, $isAdmin, $currentDept) {
         if ($type == "text") {
             return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormText($title, $content, $endDate, 'submit');
         } elseif ($type == "img") {

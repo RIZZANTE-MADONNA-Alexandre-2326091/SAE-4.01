@@ -8,16 +8,17 @@ use Models\User;
 
 class UserView extends View
 {
-
-    /**
+	/**
      * Display a creation form
      *
      * @param $name     string
      *
      * @return string
      */
-    protected function displayBaseForm($name) {
-        return '
+    protected function displayBaseForm($name, $departements, $isAdmin, $currentDept) {
+	    $disabled = $isAdmin ? '' : 'disabled';
+
+		return '
             <form method="post" class="cadre">
             	<div class="form-group">
                 	<label for="login' . $name . '">Login</label>
@@ -28,6 +29,12 @@ class UserView extends View
                 	<label for="email' . $name . '">Email</label>
                 	<input class="form-control" type="email" name="email' . $name . '" placeholder="Email" required="">
                 </div>
+                <div class="form-group">
+                	<label for="dept' . $name . '">Département</label>
+                	<select name="deptId' . $name . '" class="form-control" ' . $disabled . '>
+                		'. $this->displayAllDept($departements, $currentDept) .'
+                	</select>
+				</div>
                 <div class="form-group">
                 	<label for="pwd' . $name . '">Mot de passe</label>
                 	<input class="form-control" minlength="8" maxlength="25" type="password" id="pwd' . $name . '" name="pwd' . $name . '" placeholder="Mot de passe" minlength="8" maxlength="25" required="" onkeyup=checkPwd("' . $name . '")>
@@ -70,7 +77,7 @@ class UserView extends View
             </form>';
     }
 
-    public function contextCreateUser() {
+	public function contextCreateUser() {
         return '
         <hr class="half-rule">
         <div class="row">

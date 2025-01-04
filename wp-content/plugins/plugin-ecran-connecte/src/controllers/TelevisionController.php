@@ -3,6 +3,7 @@
 namespace Controllers;
 
 use Models\CodeAde;
+use Models\Department;
 use Models\User;
 use Views\TelevisionView;
 
@@ -44,13 +45,19 @@ class TelevisionController extends UserController implements Schedule
         $action = filter_input(INPUT_POST, 'createTv');
 
         $codeAde = new CodeAde();
+		$currentUser = wp_get_current_user();
+
+	    $deptModel = new Department();
+		$isAdmin = in_array('administrator', $currentUser->roles);
+		$currentDept = $isAdmin ? null : $deptModel->getDepartmentUsers($currentUser->ID)->getId();
 
         if (isset($action)) {
 
             $login = filter_input(INPUT_POST, 'loginTv');
             $password = filter_input(INPUT_POST, 'pwdTv');
             $passwordConfirm = filter_input(INPUT_POST, 'pwdConfirmTv');
-            $codes = $_POST['selectTv'];
+	        $deptId = $isAdmin ? null : filter_input(INPUT_POST, 'deptTv');
+			$codes = filter_input(INPUT_POST, 'selectTv');
 
             if (is_string($login) && strlen($login) >= 4 && strlen($login) <= 25 &&
                 is_string($password) && strlen($password) >= 8 && strlen($password) <= 25 &&
@@ -72,6 +79,7 @@ class TelevisionController extends UserController implements Schedule
                 $this->model->setPassword($password);
                 $this->model->setRole('television');
                 $this->model->setCodes($codesAde);
+	            $this->model->setDeptId($deptId);
 
                 if (!$this->checkDuplicateUser($this->model) && $this->model->insert()) {
                     $this->view->displayInsertValidate();
@@ -87,7 +95,9 @@ class TelevisionController extends UserController implements Schedule
         $groups = $codeAde->getAllFromType('group');
         $halfGroups = $codeAde->getAllFromType('halfGroup');
 
-        return $this->view->displayFormTelevision($years, $groups, $halfGroups);
+	    $departments = $deptModel->getAll();
+
+        return $this->view->displayFormTelevision($years, $groups, $halfGroups, $departments, $isAdmin, $currentDept);
     }
 
     /**
@@ -106,7 +116,7 @@ class TelevisionController extends UserController implements Schedule
         $action = filter_input(INPUT_POST, 'modifValidate');
 
         if (isset($action)) {
-            $codes = $_POST['selectTv'];
+	        $codes = filter_input(INPUT_POST, 'selectTv');
 
             $codesAde = array();
             foreach ($codes as $code) {
@@ -138,7 +148,14 @@ class TelevisionController extends UserController implements Schedule
      */
     public function displayAllTv() {
         $users = $this->model->getUsersByRole('television');
-        return $this->view->displayAllTv($users);
+
+	    $deptModel = new Department();
+	    $userDeptList = array();
+	    foreach ($users as $user) {
+		    $userDeptList[] = $deptModel->getDepartmentUsers($user->getDeptId());
+	    }
+
+        return $this->view->displayAllTv($users, $userDeptList[]);
     }
 
     /**

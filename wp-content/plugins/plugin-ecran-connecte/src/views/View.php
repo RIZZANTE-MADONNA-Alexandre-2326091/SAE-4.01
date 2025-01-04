@@ -229,6 +229,15 @@ class View
         echo $modal;
     }
 
+	public function displayAllDept( array $dept, $currentDept = null ) {
+		$form = '';
+		foreach ( $dept as $d ) {
+			$selected = $d->getId() == $currentDept ? 'selected' : '';
+			$form .= '<option' . $selected . ' value="' . $d->getId() . '">' . $d->getName() . '</option>';
+		}
+		return $form;
+	}
+
     /**
      * Close a div
      *
@@ -242,7 +251,7 @@ class View
      * Display a message if the two password are different
      */
     public function displayBadPassword() {
-        $this->buildModal('Mauvais mot de passe', '<p class=\'alert alert-danger\'>Les deux mots de passe ne sont pas correctes </p>');
+        $this->buildModal('Mauvais mot de passe', '<p class=\'alert alert-danger\'>Les deux mots de passe ne sont pas corrects </p>');
     }
 
     /**
@@ -263,20 +272,6 @@ class View
      */
     public function displayInsertValidate() {
         $this->buildModal('Inscription validée', '<p class=\'alert alert-success\'>Votre inscription a été validée.</p>');
-    }
-
-    /**
-     * Display a message if the extension of the file is wrong
-     */
-    public function displayWrongExtension() {
-        $this->buildModal('Mauvais fichier !', '<p class="alert alert-danger"> Mauvaise extension de fichier !</p>');
-    }
-
-    /**
-     * Display a message if the file isn't a good file
-     */
-    public function displayWrongFile() {
-        $this->buildModal('Mauvais fichier !', '<p class="alert alert-danger"> Vous utilisez un mauvais fichier excel / ou vous avez changé le nom des colonnes</p>');
     }
 
     /**

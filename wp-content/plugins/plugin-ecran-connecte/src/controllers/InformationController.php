@@ -2,6 +2,7 @@
 
 namespace Controllers;
 
+use Models\Department;
 use Models\Information;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Views\InformationView;
@@ -44,6 +45,13 @@ class InformationController extends Controller
     public function create() {
         $current_user = wp_get_current_user();
 
+		$deptModel = new Department();
+		$isAdmin = in_array('administrator', $current_user->roles);
+
+		$currentDept = $isAdmin ? null : $deptModel->getDepartmentUsers($current_user->ID)->getId();
+
+		$departments = $deptModel->getAll();
+
         // All forms
         $actionText = filter_input(INPUT_POST, 'createText');
         $actionImg = filter_input(INPUT_POST, 'createImg');
@@ -56,6 +64,7 @@ class InformationController extends Controller
         $content = filter_input(INPUT_POST, 'content');
         $endDate = filter_input(INPUT_POST, 'expirationDate');
         $creationDate = date('Y-m-d');
+		$idDept = $isAdmin ? filter_input(INPUT_POST, 'department') : $currentDept;
 
         // If the title is empty
         if ($title == '') {
@@ -70,6 +79,7 @@ class InformationController extends Controller
         $information->setCreationDate($creationDate);
         $information->setExpirationDate($endDate);
         $information->setAdminId(null);
+		$information->setIdDept($idDept);
 
         if (isset($actionText)) {   // If the information is a text
             $information->setContent($content);
@@ -92,7 +102,7 @@ class InformationController extends Controller
             if (in_array(end($explodeName), $goodExtension)) {
                 $this->registerFile($filename, $fileTmpName, $information);
             } else {
-                $this->view->buildModal('Image non valide', '<p>Ce fichier est une image non valide, veuillez choisir une autre image</p>');
+                $this->view->buildModal('Image non valide', '<p>Ce fichier est une image non valide, veuillez choisir une autre image.</p>');
             }
         }
         if (isset($actionTab)) { // If the information is a table
@@ -105,7 +115,7 @@ class InformationController extends Controller
             if (in_array(end($explodeName), $goodExtension)) {
                 $this->registerFile($filename, $fileTmpName, $information);
             } else {
-                $this->view->buildModal('Tableau non valide', '<p>Ce fichier est un tableau non valide, veuillez choisir un autre tableau</p>');
+                $this->view->buildModal('Tableau non valide', '<p>Ce fichier est un tableau non valide, veuillez choisir un autre tableau.</p>');
             }
         }
         if (isset($actionPDF)) {
@@ -117,7 +127,7 @@ class InformationController extends Controller
                 $fileTmpName = $_FILES['contentFile']['tmp_name'];
                 $this->registerFile($filename, $fileTmpName, $information);
             } else {
-                $this->view->buildModal('PDF non valide', '<p>Ce fichier est un tableau non PDF, veuillez choisir un autre PDF</p>');
+                $this->view->buildModal('PDF non valide', '<p>Ce fichier est un tableau non PDF, veuillez choisir un autre PDF.</p>');
             }
         }
         if (isset($actionEvent)) {
@@ -144,11 +154,11 @@ class InformationController extends Controller
             $this->view->displayTitleSelect('pdf', 'PDF') .
             $this->view->displayTitleSelect('event', 'Événement') .
             $this->view->displayEndOfTitle() .
-            $this->view->displayContentSelect('text', $this->view->displayFormText(), true) .
-            $this->view->displayContentSelect('image', $this->view->displayFormImg()) .
-            $this->view->displayContentSelect('table', $this->view->displayFormTab()) .
-            $this->view->displayContentSelect('pdf', $this->view->displayFormPDF()) .
-            $this->view->displayContentSelect('event', $this->view->displayFormEvent()) .
+            $this->view->displayContentSelect('text', $this->view->displayFormText($departments, $isAdmin, $currentDept), true) .
+            $this->view->displayContentSelect('image', $this->view->displayFormImg($departments, $isAdmin, $currentDept)) .
+            $this->view->displayContentSelect('table', $this->view->displayFormTab($departments, $isAdmin, $currentDept)) .
+            $this->view->displayContentSelect('pdf', $this->view->displayFormPDF($departments, $isAdmin, $currentDept)) .
+            $this->view->displayContentSelect('event', $this->view->displayFormEvent($departments, $isAdmin, $currentDept)) .
             $this->view->displayEndDiv() .
             $this->view->contextCreateInformation();
     }
@@ -168,6 +178,11 @@ class InformationController extends Controller
         }
 
         $current_user = wp_get_current_user();
+		$deptModel = new Department();
+		$departments = $deptModel->getAll();
+		$isAdmin = in_array('administrator', $current_user->roles);
+		$currentDept = $isAdmin ? null : $deptModel->getDepartmentUsers($current_user->ID)->getId();
+
         $information = $this->model->get($id);
 
         if (!(in_array('administrator', $current_user->roles) || in_array('secretaire', $current_user->roles) || $information->getAuthor()->getId() == $current_user->ID)) {
@@ -237,7 +252,7 @@ class InformationController extends Controller
             $information->delete();
             $this->view->displayModifyValidate();
         }
-        return $this->view->displayModifyInformationForm($information->getTitle(), $information->getContent(), $information->getExpirationDate(), $information->getType());
+        return $this->view->displayModifyInformationForm($information->getTitle(), $information->getContent(), $information->getExpirationDate(), $information->getType(), $departments, $isAdmin, $currentDept);
     }
 
 
@@ -310,14 +325,18 @@ class InformationController extends Controller
             $pageNumber = $maxPage;
         }
         $current_user = wp_get_current_user();
-        if (in_array('administrator', $current_user->roles) || in_array('secretaire', $current_user->roles)) {
+
+	    $deptModel = new Department();
+
+        if (in_array('administrator', $current_user->roles)) {
             $informationList = $this->model->getList($begin, $number);
         } else {
-            $informationList = $this->model->getAuthorListInformation($current_user->ID, $begin, $number);
+            $informationList = $this->model->getInformationDept($deptModel->getDepartmentUsers($current_user->ID)->getId());
         }
 
+
         $name = 'Info';
-        $header = ['Titre', 'Contenu', 'Date de création', 'Date d\'expiration', 'Auteur', 'Type', 'Modifier'];
+        $header = ['Titre', 'Contenu', 'Date de création', 'Date d\'expiration', 'Auteur', 'Département', 'Type', 'Modifier'];
         $dataList = [];
         $row = $begin;
         $imgExtension = ['jpg', 'jpeg', 'gif', 'png', 'svg'];
@@ -355,7 +374,7 @@ class InformationController extends Controller
             } else if ($information->getType() === 'tab') {
                 $type = 'Table Excel';
             }
-            $dataList[] = [$row, $this->view->buildCheckbox($name, $information->getId()), $information->getTitle(), $content, $information->getCreationDate(), $information->getExpirationDate(), $information->getAuthor()->getLogin(), $type, $this->view->buildLinkForModify(esc_url(get_permalink(get_page_by_title_V2('Modifier une information'))) . '?id=' . $information->getId())];
+            $dataList[] = [$row, $this->view->buildCheckbox($name, $information->getId()), $information->getTitle(), $content, $information->getCreationDate(), $information->getExpirationDate(), $information->getAuthor()->getLogin(), $deptModel->get($information->getIdDept()->getId()),$type, $this->view->buildLinkForModify(esc_url(get_permalink(get_page_by_title_V2('Modifier une information'))) . '?id=' . $information->getId())];
         }
 
         $submit = filter_input(INPUT_POST, 'delete');
@@ -407,7 +426,8 @@ class InformationController extends Controller
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      */
     public function informationMain() {
-        $informations = $this->model->getList();
+		$deptModel = new Department();
+		$informations = $this->model->getInformationDept($deptModel->getDepartmentUsers(get_current_user_id())->getId());
         $this->view->displayStartSlideshow();
         foreach ($informations as $information) {
             $endDate = date('Y-m-d', strtotime($information->getExpirationDate()));
@@ -483,58 +503,6 @@ class InformationController extends Controller
             }
             echo $this->view->displayEndDiv();
         }
-        $this->view->displayEndDiv();
-    }
-
-    /**
-     * Read an excel file
-     *
-     * @param $content
-     *
-     * @return array
-     * @throws \PhpOffice\PhpSpreadsheet\Exception
-     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
-     */
-    public function readSpreadSheet($content) {
-        $file = $_SERVER['DOCUMENT_ROOT'] . $content;
-
-        $extension = ucfirst(strtolower(end(explode(".", $file))));
-        $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($extension);
-        $reader->setReadDataOnly(true);
-        $spreadsheet = $reader->load($file);
-
-        $worksheet = $spreadsheet->getActiveSheet();
-        $highestRow = $worksheet->getHighestRow();
-
-        $contentList = array();
-        $content = "";
-        $mod = 0;
-        for ($i = 0; $i < $highestRow; ++$i) {
-            $mod = $i % 10;
-            if ($mod == 0) {
-                $content .= '<table class ="table table-bordered tablesize">';
-            }
-            foreach ($worksheet->getRowIterator($i + 1, 1) as $row) {
-                $content .= '<tr scope="row">';
-                $cellIterator = $row->getCellIterator();
-                $cellIterator->setIterateOnlyExistingCells(false);
-                foreach ($cellIterator as $cell) {
-                    $content .= '<td class="text-center">' .
-                        $cell->getValue() .
-                        '</td>';
-                }
-                $content .= '</tr>';
-            }
-            if ($mod == 9) {
-                $content .= '</table>';
-                array_push($contentList, $content);
-                $content = "";
-            }
-        }
-        if ($mod != 9 && $i > 0) {
-            $content .= '</table>';
-            array_push($contentList, $content);
-        }
-        return $contentList;
+		return $this->view->displayEndDiv();
     }
 }

@@ -171,6 +171,23 @@ class Department extends Model implements Entity, JsonSerializable
 	}
 
 	/**
+	 * @param int $userId The ID of the user whose associated department users are being retrieved.
+	 *
+	 * @return array The list of department data associated with the given user ID.
+	 */
+	public function getDepartmentUsers(int $userId) {
+		$request = $this->getDatabase()->prepare("SELECT dept_id, name FROM ecran_department
+                     									WHERE dept_id IN (SELECT dept_id FROM ecran_user_department
+                     									                  WHERE user_id = :userId)");
+
+		$request->bindValue(':userId', $userId, PDO::PARAM_INT);
+
+		$request->execute();
+
+		return $this->setEntityList($request->fetchAll(PDO::FETCH_ASSOC));
+	}
+
+	/**
 	 * @return int
 	 */
 	public function getId(): int {
