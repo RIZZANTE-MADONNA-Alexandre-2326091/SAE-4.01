@@ -203,6 +203,25 @@ class UserView extends View
         return '<p>Veuillez choisir un emploi du temps.</p>';
     }
 
+	/**
+	 * Display the welcome page
+	 *
+	 * @return string
+	 */
+	public function displayHome() {
+		return '
+        <div class="row">
+            <div class="col-6 mx-auto col-md-6 order-md-1">
+                <img src="' . TV_PLUG_PATH . '/public/img/background.png" alt="Logo Amu" class="img-fluid mb-3 mb-md-0">
+            </div>
+            <div class="col-md-6 order-md-2 text-center text-md-left pr-md-5">
+                <h1 class="mb-3 bd-text-purple-bright">' . get_bloginfo("name") . '</h1>
+                <p class="lead">Bienvenue sur le site de l\'écran connecté !</p>
+                <p class="lead mb-4">Accédez à votre emploi du temps tant en recevant diverses informations de la part de votre département.</p>
+            </div>
+        </div>';
+	}
+
     /**
      * Display a message for the modification of the password
      */
