@@ -64,7 +64,17 @@ class User extends Model implements Entity, JsonSerializable
             'user_email' => $this->getEmail(),
             'role' => $this->getRole()
         );
+
         $id = wp_insert_user($userData);
+
+	    // Add to table ecran_dept_user
+	    $database = $this->getDatabase();
+
+	    $request = $database->prepare('INSERT INTO ecran_dept_user (dept_id, user_id) VALUES (:dept_id, :user_id)');
+	    $request->bindValue(':dept_id', $this->getDeptId(), PDO::PARAM_INT);
+	    $request->bindParam(':user_id', $id, PDO::PARAM_INT);
+
+	    $request->execute();
 
         // To review
         if ($this->getRole() == 'television') {
@@ -78,15 +88,7 @@ class User extends Model implements Entity, JsonSerializable
                 $request->execute();
             }
         }
-		if ($this->getRole() == 'television' || $this->getRole() == 'secretaire' || $this->getRole() == 'technicien') {
-		    $database = $this->getDatabase();
 
-		    $request = $database->prepare('INSERT INTO ecran_dept_user (dept_id, user_id) VALUES (:dept_id, :user_id)');
-		    $request->bindValue(':dept_id', $this->getDeptId(), PDO::PARAM_INT);
-		    $request->bindParam(':user_id', $id, PDO::PARAM_INT);
-
-		    $request->execute();
-	    }
         return $id;
     }
 
@@ -99,28 +101,23 @@ class User extends Model implements Entity, JsonSerializable
 
         $request->execute();
 
-        if ($this->getRole() === 'enseignant' || $this->getRole() === 'directeuretude') {
+        $request = $database->prepare('DELETE FROM ecran_code_user WHERE user_id = :id');
 
-            $this->getCodes()[0]->update();
+        $request->bindValue(':id', $this->getId(), PDO::PARAM_INT);
 
-        } else {
-            $request = $database->prepare('DELETE FROM ecran_code_user WHERE user_id = :id');
+        $request->execute();
 
-            $request->bindValue(':id', $this->getId(), PDO::PARAM_INT);
+        foreach ($this->getCodes() as $code) {
+            if ($code instanceof CodeAde && !is_null($code->getId())) {
+                $request = $database->prepare('INSERT INTO ecran_code_user (user_id, code_ade_id) VALUES (:userId, :codeAdeId)');
 
-            $request->execute();
+                $request->bindValue(':userId', $this->getId(), PDO::PARAM_INT);
+                $request->bindValue(':codeAdeId', $code->getId(), PDO::PARAM_INT);
 
-            foreach ($this->getCodes() as $code) {
-                if ($code instanceof CodeAde && !is_null($code->getId())) {
-                    $request = $database->prepare('INSERT INTO ecran_code_user (user_id, code_ade_id) VALUES (:userId, :codeAdeId)');
-
-                    $request->bindValue(':userId', $this->getId(), PDO::PARAM_INT);
-                    $request->bindValue(':codeAdeId', $code->getId(), PDO::PARAM_INT);
-
-                    $request->execute();
-                }
+                $request->execute();
             }
         }
+
         return $request->rowCount();
     }
 
@@ -153,7 +150,7 @@ class User extends Model implements Entity, JsonSerializable
      * @return User | false
      */
     public function get($id) {
-        $request = $this->getDatabase()->prepare('SELECT ID, user_login, user_pass, user_email FROM wp_users
+        $request = $this->getDatabase()->prepare('SELECT ID, user_login, user_pass, user_email, dept_id FROM wp_users
                                              			LEFT JOIN ecran_dept_user deptUs ON deptUs.user_id = wp_users.ID
                                              			WHERE ID = :id LIMIT 1');
 
@@ -198,7 +195,7 @@ class User extends Model implements Entity, JsonSerializable
         $request = $this->getDatabase()->prepare('SELECT ID, user_login, user_pass, user_email, deptUs.dept_id  FROM wp_users user
 														JOIN wp_usermeta meta ON user.ID = meta.user_id
 														JOIN ecran_dept_user deptUs ON user.ID = deptUs.user_id
-														WHERE meta.meta_value =:role ORDER BY user.user_login LIMIT 1000');
+														AND meta.meta_value =:role ORDER BY user.user_login LIMIT 1000');
 
         $size = strlen($role);
         $role = 'a:1:{s:' . $size . ':"' . $role . '";b:1;}';
@@ -215,7 +212,8 @@ class User extends Model implements Entity, JsonSerializable
      */
     public function getMyCodes($users) {
         foreach ($users as $user) {
-            $request = $this->getDatabase()->prepare('SELECT code.id, type, title, code FROM ecran_code_ade code, ecran_code_user user WHERE user.user_id = :id AND user.code_ade_id = code.id ORDER BY code.id LIMIT 100');
+            $request = $this->getDatabase()->prepare('SELECT code.id, type, title, code FROM ecran_code_ade code, ecran_code_user user
+                                  							WHERE user.user_id = :id AND user.code_ade_id = code.id ORDER BY code.id LIMIT 100');
 
             $id = $user->getId();
 
@@ -245,7 +243,7 @@ class User extends Model implements Entity, JsonSerializable
      * @return array|mixed
      */
     public function checkUser($login, $email) {
-        $request = $this->getDatabase()->prepare('SELECT ID, user_login, user_pass, user_email FROM wp_users
+        $request = $this->getDatabase()->prepare('SELECT ID, user_login, user_pass, user_email, dept_id FROM wp_users
                                              	 JOIN ecran_dept_user deptUs ON wp_users.ID = deptUs.user_id
                                              	 WHERE user_login = :login OR user_email = :email LIMIT 2');
 
@@ -272,7 +270,12 @@ class User extends Model implements Entity, JsonSerializable
         return $this->setEntityList($request->fetchAll());
     }
 
-    public function createCode($code) {
+	/**
+	 * @param string $code The code to be inserted into the database.
+	 *
+	 * @return void
+	 */
+	public function createCode($code) {
         $request = $this->getDatabase()->prepare('INSERT INTO ecran_code_delete_account (user_id, code) VALUES (:user_id, :code)');
 
         $request->bindValue(':user_id', $this->getId(), PDO::PARAM_INT);
@@ -281,7 +284,14 @@ class User extends Model implements Entity, JsonSerializable
         $request->execute();
     }
 
-    public function updateCode($code) {
+	/**
+	 * Updates the code associated with the currently authenticated user.
+	 *
+	 * @param string $code The new code to be updated.
+	 *
+	 * @return void
+	 */
+	public function updateCode($code) {
         $request = $this->getDatabase()->prepare('UPDATE ecran_code_delete_account SET code = :code WHERE user_id = :id');
 
         $request->bindValue(':id', $this->getId(), PDO::PARAM_INT);
@@ -324,9 +334,11 @@ class User extends Model implements Entity, JsonSerializable
         $entity->setPassword($data['user_pass']);
         $entity->setEmail($data['user_email']);
         $entity->setRole(get_user_by('ID', $data['ID'])->roles[0]);
-	    $entity->setDeptId($data['dept_id']);
+	    $entity->setDeptId($data['dept_id']) ? : 0;
 
-        $request = $this->getDatabase()->prepare('SELECT id, title, code, type FROM ecran_code_ade JOIN ecran_code_user ON ecran_code_ade.id = ecran_code_user.code_ade_id WHERE ecran_code_user.user_id = :id');
+        $request = $this->getDatabase()->prepare('SELECT id, title, code, type FROM ecran_code_ade
+    													JOIN ecran_code_user ON ecran_code_ade.id = ecran_code_user.code_ade_id
+                             							WHERE ecran_code_user.user_id = :id');
 
         $request->bindValue(':id', $data['ID']);
 
@@ -338,24 +350,6 @@ class User extends Model implements Entity, JsonSerializable
 
         $entity->setCodes($codes);
 
-        if (function_exists('get_user_by')) {
-            $user_info = get_user_by('id', $entity->getId());
-            if (in_array('etudiant', $user_info->roles)) {
-                $codesSort = ['', '', ''];
-                foreach ($entity->getCodes() as $code) {
-                    if ($code instanceof CodeAde) {
-                        if ($code->getType() === 'year') {
-                            $codesSort[0] = $code;
-                        } else if ($code->getType() === 'group') {
-                            $codesSort[1] = $code;
-                        } else {
-                            $codesSort[2] = $code;
-                        }
-                    }
-                }
-                $entity->setCodes($codesSort);
-            }
-        }
         return $entity;
     }
 

@@ -175,7 +175,7 @@ class Department extends Model implements Entity, JsonSerializable
 	 *
 	 * @return array The list of department data associated with the given user ID.
 	 */
-	public function getDepartmentUsers(int $userId) {
+	public function getUserInDept(int $userId) {
 		$request = $this->getDatabase()->prepare("SELECT dept_id, name FROM ecran_department
                      									WHERE dept_id IN (SELECT dept_id FROM ecran_user_department
                      									                  WHERE user_id = :userId)");

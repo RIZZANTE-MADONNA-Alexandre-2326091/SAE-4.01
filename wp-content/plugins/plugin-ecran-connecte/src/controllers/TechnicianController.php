@@ -46,7 +46,7 @@ class TechnicianController extends UserController implements Schedule
 
 	    $deptModel = new Department();
 	    $isAdmin = in_array('administrator', $currentUser->roles);
-	    $currentDept = $isAdmin ? -1 : $deptModel->getDepartmentUsers($currentUser->ID)->getId();
+	    $currentDept = $isAdmin ? -1 : $deptModel->getUserInDept($currentUser->ID)->getId();
 
         if (isset($action)) {
 
@@ -93,7 +93,7 @@ class TechnicianController extends UserController implements Schedule
 	    $deptModel = new Department();
 	    $userDeptList = array();
 	    foreach ($users as $user) {
-		    $userDeptList[] = $deptModel->getDepartmentUsers($user->getDeptId());
+		    $userDeptList[] = $deptModel->getUserInDept($user->getDeptId())->getName();
 	    }
 
         return $this->view->displayAllTechnicians($users, $userDeptList);

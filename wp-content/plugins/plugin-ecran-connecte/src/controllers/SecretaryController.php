@@ -53,7 +53,7 @@ class SecretaryController extends UserController
 
 	    $deptModel = new Department();
 	    $isAdmin = in_array('administrator', $currentUser->roles);
-	    $currentDept = $isAdmin ? -1 : $deptModel->getDepartmentUsers($currentUser->ID)->getId();
+	    $currentDept = $isAdmin ? -1 : $deptModel->getUserInDept($currentUser->ID)->getId();
 
         if (isset($action)) {
 
@@ -98,7 +98,7 @@ class SecretaryController extends UserController
 		$deptModel = new Department();
 		$userDeptList = array();
 		foreach ($users as $user) {
-			$userDeptList[] = $deptModel->getDepartmentUsers($user->getDeptId());
+			$userDeptList[] = $deptModel->getUserInDept($user->getDeptId()->getName());
 		}
 
         return $this->view->displayAllSecretary($users, $userDeptList);

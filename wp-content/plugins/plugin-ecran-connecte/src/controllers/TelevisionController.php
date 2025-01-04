@@ -49,7 +49,7 @@ class TelevisionController extends UserController implements Schedule
 
 	    $deptModel = new Department();
 		$isAdmin = in_array('administrator', $currentUser->roles);
-		$currentDept = $isAdmin ? null : $deptModel->getDepartmentUsers($currentUser->ID)->getId();
+		$currentDept = $isAdmin ? null : $deptModel->getUserInDept($currentUser->ID)->getId();
 
         if (isset($action)) {
 
@@ -57,7 +57,7 @@ class TelevisionController extends UserController implements Schedule
             $password = filter_input(INPUT_POST, 'pwdTv');
             $passwordConfirm = filter_input(INPUT_POST, 'pwdConfirmTv');
 	        $deptId = $isAdmin ? null : filter_input(INPUT_POST, 'deptTv');
-			$codes = filter_input(INPUT_POST, 'selectTv');
+			$codes = filter_input(INPUT_POST, 'selectTv',FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
 
             if (is_string($login) && strlen($login) >= 4 && strlen($login) <= 25 &&
                 is_string($password) && strlen($password) >= 8 && strlen($password) <= 25 &&
@@ -116,7 +116,7 @@ class TelevisionController extends UserController implements Schedule
         $action = filter_input(INPUT_POST, 'modifValidate');
 
         if (isset($action)) {
-	        $codes = filter_input(INPUT_POST, 'selectTv');
+	        $codes = filter_input(INPUT_POST, 'selectTv', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
 
             $codesAde = array();
             foreach ($codes as $code) {
@@ -152,7 +152,7 @@ class TelevisionController extends UserController implements Schedule
 	    $deptModel = new Department();
 	    $userDeptList = array();
 	    foreach ($users as $user) {
-		    $userDeptList[] = $deptModel->getDepartmentUsers($user->getDeptId());
+		    $userDeptList[] = $deptModel->getUserInDept($user->getDeptId())->getName();
 	    }
 
         return $this->view->displayAllTv($users, $userDeptList[]);

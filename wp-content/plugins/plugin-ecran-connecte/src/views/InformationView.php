@@ -26,7 +26,7 @@ class InformationView extends View
      *
      * @return string
      */
-    public function displayFormText($departments, $isAdmin, $currentDept, $title = null, $content = null, $endDate = null, $type = "createText") {
+    public function displayFormText($departments, $isAdmin = false, $currentDept = null, $title = null, $content = null, $endDate = null, $type = "createText") {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
 		$disabled = $isAdmin ? '' : 'disabled';
 
@@ -69,7 +69,7 @@ class InformationView extends View
      *
      * @return string
      */
-    public function displayFormImg($departments, $isAdmin, $currentDept, $title = null, $content = null, $endDate = null, $type = "createImg") {
+    public function displayFormImg($departments, $isAdmin = false, $currentDept = null, $title = null, $content = null, $endDate = null, $type = "createImg") {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
 	    $disabled = $isAdmin ? '' : 'disabled';
 
@@ -122,7 +122,7 @@ class InformationView extends View
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      */
-    public function displayFormTab($departments, $isAdmin, $currentDept, $title = null, $content = null, $endDate = null, $type = "createTab") {
+    public function displayFormTab($departments, $isAdmin = false, $currentDept = null, $title = null, $content = null, $endDate = null, $type = "createTab") {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
 	    $disabled = $isAdmin ? '' : 'disabled';
 
@@ -177,7 +177,7 @@ class InformationView extends View
      *
      * @return string
      */
-    public function displayFormPDF($departments, $isAdmin, $currentDept, $title = null, $content = null, $endDate = null, $type = "createPDF") {
+    public function displayFormPDF($departments, $isAdmin = false, $currentDept = null, $title = null, $content = null, $endDate = null, $type = "createPDF") {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
 	    $disabled = $isAdmin ? '' : 'disabled';
 
@@ -227,7 +227,7 @@ class InformationView extends View
      *
      * @return string
      */
-    public function displayFormEvent($departments, $isAdmin, $currentDept, $endDate = null, $type = "createEvent") {
+    public function displayFormEvent($departments, $isAdmin = false, $currentDept = null, $endDate = null, $type = "createEvent") {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
 	    $disabled = $isAdmin ? '' : 'disabled';
 
@@ -293,22 +293,22 @@ class InformationView extends View
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      */
-    public function displayModifyInformationForm($title, $content, $endDate, $type, $departments, $isAdmin, $currentDept) {
-        if ($type == "text") {
-            return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormText($title, $content, $endDate, 'submit');
+    public function displayModifyInformationForm($title, $content, $endDate, $type, $departments, $isAdmin = false, $currentDept = null) {
+		if ($type == "text") {
+            return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormText($departments, $isAdmin, $currentDept, $title, $content, $endDate, 'submit');
         } elseif ($type == "img") {
-            return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormImg($title, $content, $endDate, 'submit');
+            return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormImg($departments, $isAdmin, $currentDept,$title, $content, $endDate, 'submit');
         } elseif ($type == "tab") {
-            return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormTab($title, $content, $endDate, 'submit');
+            return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormTab($departments, $isAdmin, $currentDept,$title, $content, $endDate, 'submit');
         } elseif ($type == "pdf") {
-            return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormPDF($title, $content, $endDate, 'submit');
+            return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormPDF($departments, $isAdmin, $currentDept,$title, $content, $endDate, 'submit');
         } elseif ($type == "event") {
             $extension = explode('.', $content);
             $extension = $extension[1];
             if ($extension == "pdf") {
-                return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormPDF($title, $content, $endDate, 'submit');
+                return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormPDF($departments, $isAdmin, $currentDept,$title, $content, $endDate, 'submit');
             } else {
-                return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormImg($title, $content, $endDate, 'submit');
+                return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormImg($departments, $isAdmin, $currentDept,$title, $content, $endDate, 'submit');
             }
         } else {
             return $this->noInformation();

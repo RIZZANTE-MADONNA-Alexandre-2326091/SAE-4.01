@@ -15,7 +15,7 @@ class UserView extends View
      *
      * @return string
      */
-    protected function displayBaseForm($name, $departements, $isAdmin, $currentDept) {
+    protected function displayBaseForm($name, $departments, $isAdmin, $currentDept) {
 	    $disabled = $isAdmin ? '' : 'disabled';
 
 		return '
@@ -32,7 +32,7 @@ class UserView extends View
                 <div class="form-group">
                 	<label for="dept' . $name . '">Département</label>
                 	<select name="deptId' . $name . '" class="form-control" ' . $disabled . '>
-                		'. $this->displayAllDept($departements, $currentDept) .'
+                		'. $this->displayAllDept($departments, $currentDept) .'
                 	</select>
 				</div>
                 <div class="form-group">
@@ -110,7 +110,28 @@ class UserView extends View
         </form>';
     }
 
-    /**
+
+	/**
+	 * Generates an HTML string for the unsubscribe page.
+	 *
+	 * @return string The HTML content of the unsubscribe page containing a message and the unsubscribe code.
+	 */
+	public function displayUnsubscribe() {
+		return ' <!DOCTYPE html>
+                             <html lang="fr">
+                             	<head>
+                               		<title>Désnscription à la télé-connecté</title>
+                              	</head>
+                              	<body>
+                               		<p>Bonjour, vous avez décidé de vous désinscrire sur le site de la Télé Connecté</p>
+                               		<p> Votre code de désinscription est : ' . $code . '.</p>
+                               		<p> Pour vous désinscrire, rendez-vous sur le site : <a href="' . home_url() . '/mon-compte/"> Tv Connectée.</p>
+                              	</body>
+                             </html>';
+	}
+
+
+	/**
      * Display a form to change our own codes
      *
      * @param $codes        CodeAde[]
@@ -180,25 +201,6 @@ class UserView extends View
      */
     public function displaySelectSchedule() {
         return '<p>Veuillez choisir un emploi du temps.</p>';
-    }
-
-    /**
-     * Display the welcome page
-     *
-     * @return string
-     */
-    public function displayHome() {
-        return '
-        <div class="row">
-            <div class="col-6 mx-auto col-md-6 order-md-1">
-                <img src="' . TV_PLUG_PATH . '/public/img/background.png" alt="Logo Amu" class="img-fluid mb-3 mb-md-0">
-            </div>
-            <div class="col-md-6 order-md-2 text-center text-md-left pr-md-5">
-                <h1 class="mb-3 bd-text-purple-bright">' . get_bloginfo("name") . '</h1>
-                <p class="lead">Bienvenue sur le site de l\'écran connecté !</p>
-                <p class="lead mb-4">Accédez à votre emploi du temps tant en recevant diverses informations de la part de votre département.</p>
-            </div>
-        </div>';
     }
 
     /**

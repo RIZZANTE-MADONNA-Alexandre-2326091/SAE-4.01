@@ -89,17 +89,7 @@ class UserController extends Controller
                 //Build Mail
                 $to = $current_user->user_email;
                 $subject = "Désinscription à la télé-connecté";
-                $message = ' <!DOCTYPE html>
-                             <html lang="fr">
-                             	<head>
-                               		<title>Désnscription à la télé-connecté</title>
-                              	</head>
-                              	<body>
-                               		<p>Bonjour, vous avez décidé de vous désinscrire sur le site de la Télé Connecté</p>
-                               		<p> Votre code de désinscription est : ' . $code . '.</p>
-                               		<p> Pour vous désinscrire, rendez-vous sur le site : <a href="' . home_url() . '/mon-compte/"> Tv Connectée.</p>
-                              	</body>
-                             </html>';
+                $message = $this->view->displayUnsubscribe();
 
                 $headers = array('Content-Type: text/html; charset=UTF-8');
 
@@ -140,15 +130,9 @@ class UserController extends Controller
             $string .= $this->view->displayTitleSelect('pass', 'Modifier mon mot de passe', true);
         }
 
-        $string .= $this->view->displayTitleSelect('delete', 'Supprimer mon compte') .
-            $this->view->displayEndOfTitle();
+        $string .= $this->view->displayTitleSelect('delete', 'Supprimer mon compte') . $this->view->displayEndOfTitle();
 
-        if (in_array('etudiant', $current_user->roles)) {
-            $string .= $this->view->displayContentSelect('code', $this->modifyCodes(), true) .
-                $this->view->displayContentSelect('pass', $this->modifyPwd());
-        } else {
-            $string .= $this->view->displayContentSelect('pass', $this->modifyPwd(), true);
-        }
+		$string .= $this->view->displayContentSelect('pass', $this->modifyPwd(), true);
 
         $string .= $this->view->displayContentSelect('delete', $this->deleteAccount()) . $this->view->displayEndDiv();
 

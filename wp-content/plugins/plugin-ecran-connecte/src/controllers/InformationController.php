@@ -47,8 +47,7 @@ class InformationController extends Controller
 
 		$deptModel = new Department();
 		$isAdmin = in_array('administrator', $current_user->roles);
-
-		$currentDept = $isAdmin ? null : $deptModel->getDepartmentUsers($current_user->ID)->getId();
+		$currentDept = $isAdmin ? null : $deptModel->getUserInDept($current_user->ID)->getId();
 
 		$departments = $deptModel->getAll();
 
@@ -79,7 +78,7 @@ class InformationController extends Controller
         $information->setCreationDate($creationDate);
         $information->setExpirationDate($endDate);
         $information->setAdminId(null);
-		$information->setIdDept($idDept);
+		$information->setIdDept($idDept ? : 0);
 
         if (isset($actionText)) {   // If the information is a text
             $information->setContent($content);
@@ -181,11 +180,12 @@ class InformationController extends Controller
 		$deptModel = new Department();
 		$departments = $deptModel->getAll();
 		$isAdmin = in_array('administrator', $current_user->roles);
-		$currentDept = $isAdmin ? null : $deptModel->getDepartmentUsers($current_user->ID)->getId();
+		$currentDept = $isAdmin ? null : $deptModel->getUserInDept($current_user->ID)->getId();
 
         $information = $this->model->get($id);
 
-        if (!(in_array('administrator', $current_user->roles) || in_array('secretaire', $current_user->roles) || $information->getAuthor()->getId() == $current_user->ID)) {
+        if (!(in_array('administrator', $current_user->roles) || in_array('secretaire', $current_user->roles)
+              || $information->getAuthor()->getId() == $current_user->ID)) {
             return $this->view->noInformation();
         }
 
@@ -308,7 +308,14 @@ class InformationController extends Controller
         wp_delete_file($source);
     }
 
-    public function displayAll() {
+	/**
+	 * Retrieve and display a paginated list of all available information entries.
+	 * The method handles user roles for restricted access, formats the data for display, and provides
+	 * functionality for deleting selected entries.
+	 *
+	 * @return string The constructed HTML content for rendering the information list and pagination.
+	 */
+	public function displayAll() {
         $numberAllEntity = $this->model->countAll();
         $url = $this->getPartOfUrl();
         $number = filter_input(INPUT_GET, 'number');
@@ -331,7 +338,7 @@ class InformationController extends Controller
         if (in_array('administrator', $current_user->roles)) {
             $informationList = $this->model->getList($begin, $number);
         } else {
-            $informationList = $this->model->getInformationDept($deptModel->getDepartmentUsers($current_user->ID)->getId());
+            $informationList = $this->model->getInformationDept($deptModel->getUserInDept($current_user->ID)->getId());
         }
 
 
@@ -383,7 +390,8 @@ class InformationController extends Controller
                 $checked_values = $_REQUEST['checkboxStatusInfo'];
                 foreach ($checked_values as $id) {
                     $entity = $this->model->get($id);
-                    if (in_array('administrator', $current_user->roles) || in_array('secretaire', $current_user->roles) || $entity->getAuthor()->getId() == $current_user->ID) {
+                    if (in_array('administrator', $current_user->roles) || in_array('secretaire', $current_user->roles)
+                        || $entity->getAuthor()->getId() == $current_user->ID) {
                         $type = $entity->getType();
                         $types = ["img", "pdf", "tab", "event"];
                         if (in_array($type, $types)) {
@@ -427,7 +435,7 @@ class InformationController extends Controller
      */
     public function informationMain() {
 		$deptModel = new Department();
-		$informations = $this->model->getInformationDept($deptModel->getDepartmentUsers(get_current_user_id())->getId());
+		$informations = $this->model->getInformationDept($deptModel->getUserInDept(get_current_user_id())->getId());
         $this->view->displayStartSlideshow();
         foreach ($informations as $information) {
             $endDate = date('Y-m-d', strtotime($information->getExpirationDate()));
@@ -448,10 +456,16 @@ class InformationController extends Controller
                 $this->view->displaySlide($information->getTitle(), $information->getContent(), $information->getType(), $adminSite);
             }
         }
-        $this->view->displayEndDiv();
+        echo $this->view->displayEndDiv();
     }
 
-    public function registerNewInformation() {
+	/**
+	 * Synchronize and register new information from the admin website
+	 * Updates, inserts, or deletes information based on admin site data
+	 *
+	 * @return void
+	 */
+	public function registerNewInformation() {
         $informationList = $this->model->getFromAdminWebsite();
         $myInformationList = $this->model->getAdminWebsiteInformation();
         foreach ($myInformationList as $information) {
@@ -497,7 +511,6 @@ class InformationController extends Controller
             if ($extension == "pdf") {
                 echo '
 				<div class="canvas_pdf" id="' . $event->getContent() . '"></div>';
-                //echo do_shortcode('[pdf-embedder url="'.$event->getContent().'"]');
             } else {
                 echo '<img src="' . TV_UPLOAD_PATH . $event->getContent() . '" alt="' . $event->getTitle() . '">';
             }

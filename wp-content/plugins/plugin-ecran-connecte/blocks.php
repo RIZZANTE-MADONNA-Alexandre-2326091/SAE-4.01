@@ -425,9 +425,6 @@ function schedule_render_callback()
         } else if (in_array("administrator", $current_user->roles) || in_array("secretaire", $current_user->roles)) {
             $controller = new SecretaryController();
             return $controller->displayMySchedule();
-        } else {
-            $user = new UserView();
-            return $user->displayHome();
         }
     }
 }
