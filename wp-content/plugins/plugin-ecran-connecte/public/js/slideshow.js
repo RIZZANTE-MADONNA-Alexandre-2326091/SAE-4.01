@@ -14,14 +14,20 @@ let firstScriptTag = document.getElementsByTagName('script')[0];
 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
 /**
- * Lien URL vers YouTube
+ * Lecteur de vidéo YouTube shorts
  * */
-let urlYoutube = "https://www.youtube.com/";
+let playersh;
 
 /**
- *
- * */
-let player;
+ * Lecteur de vidéo YouTube classique
+*/
+let playerw;
+
+/**
+ * Temps en ms durant laquelle une information est affichée (par défaut 10s).
+ * @defaultValue 10000
+ */
+let timeout = 10000;
 
 /**
  * Savoir si une vidéo YouTube est terminée
@@ -61,7 +67,6 @@ function scheduleSlideshow()
  */
 function displayOrHide(slides, slideIndex)
 {
-    let timeout = 10000;
     if(slides.length > 0) {
         if(slides.length > 1) {
             for (let i = 0; i < slides.length; ++i) {
@@ -182,14 +187,32 @@ function displayOrHide(slides, slideIndex)
                     // If it's a YouTube short video
                     if (slides[slideIndex].childNodes[i].className === 'videosh') {
                         console.log("--Lecture vidéo Youtube short");
-                        console.log(slides[slideIndex].childNodes[i]);
+                        const listeVideosShortsYouTube = document.querySelectorAll(".videosh");
+                        for(let indexVideoShortYouTube = 0; indexVideoShortYouTube < listeVideosShortsYouTube.length; ++indexVideoShortYouTube) {
+                            if (listeVideosShortsYouTube[indexVideoShortYouTube] === slides[slideIndex].childNodes[i]) {
+                                listeVideosShortsYouTube[indexVideoShortYouTube].id = "videoshID";
+                            }
+                            else {
+                                listeVideosShortsYouTube[indexVideoShortYouTube].id = "";
+                            }
+                        }
+                        console.log(listeVideosShortsYouTube);
 
                         // TODO
                     }
                     // If it's a YouTube normal video
                     else if (slides[slideIndex].childNodes[i].className === 'videow') {
                         console.log("--Lecture vidéo Youtube classique");
-                        console.log(slides[slideIndex].childNodes[i]);
+                        const listeVideosClassiqueYouTube = document.querySelectorAll(".videow");
+                        for(let indexVideoClassiqueYouTube = 0; indexVideoClassiqueYouTube < listeVideosClassiqueYouTube.length; ++indexVideoClassiqueYouTube) {
+                            if (listeVideosClassiqueYouTube[indexVideoClassiqueYouTube] === slides[slideIndex].childNodes[i]) {
+                                listeVideosClassiqueYouTube[indexVideoClassiqueYouTube].id = "videowID";
+                            }
+                            else {
+                                listeVideosClassiqueYouTube[indexVideoClassiqueYouTube].id = "";
+                            }
+                        }
+                        console.log(listeVideosClassiqueYouTube);
 
                         // TODO
                     }
@@ -197,43 +220,59 @@ function displayOrHide(slides, slideIndex)
                     else if (slides[slideIndex].childNodes[i].className === 'localCvideo') {
                         console.log("--Lecture vidéo locale classique");
                         const listeVideosClassiqueLocal = document.querySelectorAll(".localCvideo");
+
+                        //Chargement de toutes les vidéos de même classe HTML
                         for (let indexVideoClassiqueLocal = 0; indexVideoClassiqueLocal < listeVideosClassiqueLocal.length; ++indexVideoClassiqueLocal) {
                             let videoClassiqueLocal = listeVideosClassiqueLocal[indexVideoClassiqueLocal];
+
+                            //Si la vidéo correspond à celle affichée
                             if (listeVideosClassiqueLocal[indexVideoClassiqueLocal] === slides[slideIndex].childNodes[i]) {
                                 timeout = videoClassiqueLocal.duration * 1000;
                             }
+
                             console.log("timeout = " + timeout + "\tduration = " + videoClassiqueLocal.duration);
                             console.log(videoClassiqueLocal);
+
+                            //Chargement et lecture de la vidéo
                             videoClassiqueLocal.load();
                             videoClassiqueLocal.currentTime = 0;
                             videoClassiqueLocal.play();
+
+                            //Évènement la vidéo est terminée
                             videoClassiqueLocal.onended = () => {
                                 videoClassiqueLocal.pause();
                                 videoClassiqueLocal.currentTime = 0;
                             }
                         }
-                        // TODO
                     }
                     // If it's a local short video
                     else if (slides[slideIndex].childNodes[i].className === 'localSvideo') {
                         console.log("--Lecture vidéo locale short");
                         const listeVideosShortLocal = document.querySelectorAll(".localSvideo");
+
+                        //Chargement de toutes les vidéos de même classe HTML
                         for (let indexVideoShortLocal = 0; indexVideoShortLocal < listeVideosShortLocal.length; ++indexVideoShortLocal) {
                             let videoShortLocal = listeVideosShortLocal[indexVideoShortLocal];
+
+                            //Si la vidéo correspond à celle affichée
                             if (listeVideosShortLocal[indexVideoShortLocal] === slides[slideIndex].childNodes[i]) {
                                 timeout = videoShortLocal.duration * 1000;
                             }
+
                             console.log("timeout = " + timeout + "\tduration = " + videoShortLocal.duration);
                             console.log(videoShortLocal);
+
+                            //Chargement de la vidéo
                             videoShortLocal.load();
                             videoShortLocal.currentTime = 0;
                             videoShortLocal.play();
+
+                            //Évènement la vidéo est terminée
                             videoShortLocal.onended = () => {
                                 videoShortLocal.pause();
                                 videoShortLocal.currentTime = 0;
                             }
                         }
-                        // TODO
                     }
                 }
                 if (count === 0) {
@@ -255,45 +294,44 @@ function displayOrHide(slides, slideIndex)
 }
 
 
-//TODO fonctions API Youtube et HTMLMediaElement
+//TODO fonctions API Youtube
+/**
+ * Fonction qui démarre l'API et attribue les valeurs aux lecteurs de vidéos.
+ * */
 function onYouTubeIframeAPIReady() {
     console.log("API Youtube démarée");
-    player = new YT.Player('videosh', {
+    playersh = new YT.Player('videoshID', {
         events: {
             'onReady': onPlayerReady,
             'onStateChange': onPlayerStateChange,
         }
     });
-}
-
-function onPlayerReady(event) {
-    const slides = document.getElementsByClassName("myInfoSlides");
-    for (let i = 0; i < slides.length; ++i) {
-        if (slides[i].childNodes && slides[i] !== undefined) {
-            for (let j = 0; j < slides[i].childNodes.length; ++j) {
-                event.target.setPlaybackQuality("default");
-                if ((slides[i].childNodes[j].className === 'videosh' || slides[i].childNodes[j].className === 'videosh')
-                    && slides[i].style.display === "block") {
-                    console.log("Vidéo YT lancée");
-                    event.target.seekTo(0);
-                    event.target.playVideo();
-                } else if ((slides[i].childNodes[j].className === 'videosh' || slides[i].childNodes[j].className === 'videosh')
-                    && slides[i].style.display === "none") {
-                    console.log("Vidéo YT arrêté");
-                    stopVideo();
-                }
-            }
+    playerw = new YT.Player('videowID', {
+        events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange,
         }
-    }
+    })
 }
 
-function onPlayerStateChange(event) {
-    if (event.data === YT.PlayerState.PLAYING && !done) {
-        setTimeout(stopVideo, event.target.getDuration());
-        console.log("Vidéo YT terminée");
-        done = true;
-    }
+/**
+ * Fonction évènementielle qui s'active lors de l'évènement onReady: s'active lorsque le lecteur concerné est chargé.
+ * */
+function onPlayerReady(event) {
+    event.target.setPlaybackQuality("defaut");
+    event.target.seekTo(0);
+    event.target.playVideo();
+    console.log("Vidéo YT lancée");
+    timeout = event.target.getDuration();
+    console.log("timeout = " + timeout);
 }
-function stopVideo() {
-    player.stopVideo();
+
+/**
+ * Fonction évènementielle qui s'active lors de l'évènement onStateChange: se déclenche lorsque l'état du lecteur concerné change.
+ * */
+function onPlayerStateChange(event) {
+    if (event.data === YT.PlayerState.ENDED) {
+        console.log("Vidéo YT terminée");
+        event.target.stopVideo();
+    }
 }
