@@ -117,17 +117,18 @@ class UserView extends View
 	 * @return string The HTML content of the unsubscribe page containing a message and the unsubscribe code.
 	 */
 	public function displayUnsubscribe() {
-		return ' <!DOCTYPE html>
-                             <html lang="fr">
-                             	<head>
-                               		<title>Désnscription à la télé-connecté</title>
-                              	</head>
-                              	<body>
-                               		<p>Bonjour, vous avez décidé de vous désinscrire sur le site de la Télé Connecté</p>
-                               		<p> Votre code de désinscription est : ' . $code . '.</p>
-                               		<p> Pour vous désinscrire, rendez-vous sur le site : <a href="' . home_url() . '/mon-compte/"> Tv Connectée.</p>
-                              	</body>
-                             </html>';
+		return ' 
+ 		<!DOCTYPE html>
+             <html lang="fr">
+                <head>
+                    <title>Désnscription à la télé-connecté</title>
+                </head>
+                <body>
+                    <p>Bonjour, vous avez décidé de vous désinscrire sur le site de la Télé Connecté</p>
+                    <p> Votre code de désinscription est : ' . $code . '.</p>
+                    <p> Pour vous désinscrire, rendez-vous sur le site : <a href="' . home_url() . '/mon-compte/"> Tv Connectée.</p>
+                </body>
+             </html>';
 	}
 
 
