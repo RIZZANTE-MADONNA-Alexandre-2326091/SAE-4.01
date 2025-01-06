@@ -17,7 +17,7 @@
     padding: 15px 20px;
     text-align: center;
     width: 300px;
-    height: 150px;
+    height: 160px;
 }
 
 .Time {
@@ -27,7 +27,7 @@
 }
 
 .Date {
-    font-size: 1vw;
+    font-size: 1.2vw;
     margin: -15px 0 0;
     text-transform: lowercase;
 }
@@ -46,7 +46,7 @@
 
 #weather, #wind {
     width: 170px;
-    height: 150px;
+    height: 160px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -54,20 +54,28 @@
 }
 
 #weather {
-    background-color: #6ec1e4;
-    color: #ffffff;
+    background-color: #ddccff;
+    color: #8d00d4;
 }
 
 #wind {
-    background-color: #ffcc66;
-    color: #333333;
+    background-color: #8d00d4;
+    color: #ddccff;
 }
 
 /* Images */
-#weather img, #wind img {
+#weather img {
     width: 80px;
     height: 80px;
     object-fit: scale-down;
+    filter: brightness(0) saturate(100%) invert(16%) sepia(96%) saturate(3810%) hue-rotate(277deg) brightness(82%) contrast(125%);
+}
+
+#wind img {
+    width: 80px;
+    height: 80px;
+    object-fit: scale-down;
+    filter: brightness(0) saturate(100%) invert(81%) sepia(69%) saturate(621%) hue-rotate(189deg) brightness(102%) contrast(103%);
 }
 
 /* Texte */
@@ -86,11 +94,7 @@
 
     .TimeDate {
         width: 80%;
-        height: auto;
-    }
-
-    .Time, .Date {
-        font-size: 4vw;
+        height: 130px;
     }
 
     .Weather {
@@ -122,8 +126,12 @@
         height: auto; /* Hauteur automatique */
     }
 
-    .Time, .Date {
-        font-size: 5vw;
+    .Time {
+        font-size: 8vw;
+    }
+
+    .Date {
+        font-size: 3vw;
     }
 
     .Weather {

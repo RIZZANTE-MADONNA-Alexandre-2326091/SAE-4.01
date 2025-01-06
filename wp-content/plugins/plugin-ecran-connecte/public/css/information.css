@@ -3,7 +3,7 @@
 }
 
 .img-thumbnail {
-    max-height: 70vh;
+    max-height: 62vh;
 }
 
 /*
@@ -29,15 +29,15 @@
 */
 
 .videosh, .localSvideo {
-    height: 70vh;
+    height: 62vh;
     width: 75%;
 }
 
 .videow, .localCvideo {
     height: 92vh;
     width: 65vw;
-    margin-left: -320%;
-    margin-top: -7%;
+    margin-left: -315%;
+    margin-top: -25%;
 }
 
 @media only screen and (max-width: 1000px) {

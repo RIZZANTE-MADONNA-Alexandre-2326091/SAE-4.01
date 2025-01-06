@@ -505,7 +505,7 @@ class InformationView extends View
         }
         else if ($type == 'text')
         {
-            echo '<p class="lead">' . $content . '</p>';
+            echo '<div class="text-info">' . $content . '</div>';
         }
 		else if ($type == 'YTvideosh')
 		{
