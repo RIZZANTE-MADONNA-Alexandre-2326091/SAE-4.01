@@ -72,15 +72,6 @@ class ICSView extends View
                                                     $string .= $this->getContent($event);
                                                 }
                                             }
-                                        } elseif (in_array('enseignant', $current_user->roles) || in_array('directeuretude', $current_user->roles)
-                                            || in_array('etudiant', $current_user->roles)) {
-                                            if ($current_study > 9) {
-                                                break;
-                                            }
-                                            if ($this->getContent($event)) {
-                                                ++$current_study;
-                                                $string .= $this->getContent($event, $day);
-                                            }
                                         } else {
                                             if ($current_study > 9) {
                                                 break;

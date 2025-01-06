@@ -60,51 +60,7 @@ class User extends Model implements Entity, JsonSerializable
             'role' => $this->getRole()
         );
         $id = wp_insert_user($userData);
-        /*
-        $id = wp_create_user($this->getLogin(), $this->getPassword(), $this->getEmail());
-	    $user = new WP_User($id);
-	    $user->add_role($this->getRole());
-        */
-        /*
-        $request = $this->getDatabase()->prepare('INSERT INTO wp_users (user_login, user_pass, user_nicename, user_email, user_url, user_registered, user_activation_key, user_status, display_name) VALUES (:login, :password, :name, :email, :url, NOW(), :key, :status, :display_name)');
 
-        $nul = " ";
-        $zero = "0";
-
-        $request->bindValue(':login', $this->getLogin(), PDO::PARAM_STR);
-        $request->bindValue(':password', $this->getPassword(), PDO::PARAM_STR);
-        $request->bindValue(':name', $this->getLogin(), PDO::PARAM_STR);
-        $request->bindValue(':email', $this->getEmail(), PDO::PARAM_STR);
-        $request->bindParam(':url', $nul);
-        $request->bindParam(':key', $nul);
-        $request->bindParam(':status', $zero, PDO::PARAM_INT);
-        $request->bindValue(':display_name', $this->getLogin(), PDO::PARAM_STR);
-
-        $request->execute();
-
-        $id = $this->getDatabase()->lastInsertId();
-
-        $capabilities = 'wp_capabilities';
-        $role = 'a:1:{s:'.strlen($this->getRole()).':"'.$this->getRole().'";b:1;}';
-
-        $request = $this->getDatabase()->prepare('INSERT INTO wp_usermeta(user_id, meta_key, meta_value) VALUES (:id, :capabilities, :role)');
-
-        $request->bindParam(':id', $id, PDO::PARAM_INT);
-        $request->bindParam(':capabilities', $capabilities, PDO::PARAM_STR);
-        $request->bindParam(':role', $role, PDO::PARAM_STR);
-
-        $request->execute();
-
-        $level = "wp_user_level";
-
-        $request = $this->getDatabase()->prepare('INSERT INTO wp_usermeta(user_id, meta_key, meta_value) VALUES (:id, :level, :value)');
-
-        $request->bindParam(':id', $id, PDO::PARAM_INT);
-        $request->bindParam(':level', $level, PDO::PARAM_STR);
-        $request->bindParam(':value', $zero, PDO::PARAM_STR);
-
-        $request->execute();
-        */
         // To review
         if ($this->getRole() == 'television') {
             foreach ($this->getCodes() as $code) {
@@ -116,22 +72,6 @@ class User extends Model implements Entity, JsonSerializable
 
                 $request->execute();
             }
-        } else if ($this->getRole() == 'enseignant' || $this->getRole() == 'directeuretude') {
-
-            $codeAde = new CodeAde();
-
-            $codeAde->setTitle($this->getLogin());
-            $codeAde->setCode($this->getCodes());
-            $codeAde->setType('teacher');
-
-            $idCode = $codeAde->insert();
-
-            $request = $this->getDatabase()->prepare('INSERT INTO ecran_code_user (user_id, code_ade_id) VALUES (:userId, :codeAdeId)');
-
-            $request->bindParam(':userId', $id, PDO::PARAM_INT);
-            $request->bindValue(':codeAdeId', $idCode, PDO::PARAM_INT);
-
-            $request->execute();
         }
         return $id;
     }
