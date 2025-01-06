@@ -4,6 +4,7 @@ namespace Models;
 
 use JsonSerializable;
 use PDO;
+use PDOException;
 
 /**
  * Class Location
@@ -42,15 +43,35 @@ class Location extends Model implements Entity, JsonSerializable {
 	 */
 	public function insert(): string {
 		$database = $this->getDatabase();
-		$request  = $database->prepare( "INSERT INTO ecran_location (longitude, latitude, user_id) VALUES (:longitude, :latitude, :id_user)" );
 
-		$request->bindValue( ':longitude', $this->getLongitude(), PDO::PARAM_INT );
-		$request->bindValue( ':latitude', $this->getLatitude(), PDO::PARAM_INT );
-		$request->bindValue( ':user_id', $this->getIdUser(), PDO::PARAM_INT );
+		try {
+			$database->beginTransaction();
 
-		$request->execute();
+			$request = $database->prepare(
+				"INSERT INTO ecran_location (longitude, latitude, user_id)
+                VALUES (:longitude, :latitude, :id_user)
+                ON DUPLICATE KEY UPDATE 
+                    longitude = :longitude, 
+                    latitude = :latitude;"
+			);
 
-		return $database->lastInsertId();
+			$request->bindValue(':longitude', $this->getLongitude());
+			$request->bindValue(':latitude', $this->getLatitude());
+			$request->bindValue(':id_user', $this->getIdUser());
+
+			$request->execute();
+
+			// Valider la transaction
+			$lastId = $database->lastInsertId();
+			$database->commit();
+
+			return $lastId;
+
+		} catch (PDOException $e) {
+			$database->rollBack(); // Annule la transaction en cas d'erreur
+			error_log('Error during INSERT: ' . $e->getMessage());
+			throw $e;
+		}
 	}
 
 	/**
@@ -62,9 +83,10 @@ class Location extends Model implements Entity, JsonSerializable {
 		$request = $this->getDatabase()->prepare( "UPDATE ecran_location SET longitude = :longitude, latitude = :latitude,
                           user_id = :user_id WHERE id = :id" );
 
-		$request->bindValue( ':longitude', $this->getLongitude(), PDO::PARAM_INT );
-		$request->bindValue( ':latitude', $this->getLatitude(), PDO::PARAM_INT );
-		$request->bindValue( ':user_id', $this->getIdUser(), PDO::PARAM_INT );
+		$request->bindValue( ':longitude', $this->getLongitude());
+		$request->bindValue( ':latitude', $this->getLatitude());
+		$request->bindValue( ':user_id', $this->getIdUser());
+		$request->bindValue( ':id', $this->getId(), PDO::PARAM_INT );
 
 		$request->execute();
 
@@ -94,7 +116,7 @@ class Location extends Model implements Entity, JsonSerializable {
 	 * @return array|false The entity data as an associative array if found, or false if no matching entity was found.
 	 */
 	public function get( $id ): Location|false {
-		$request = $this->getDatabase()->prepare( "SELECT id, longitude, latitude, id_user FROM ecran_location WHERE id = :id LIMIT 1" );
+		$request = $this->getDatabase()->prepare( "SELECT id, longitude, latitude, user_id FROM ecran_location WHERE id = :id LIMIT 1" );
 
 		$request->bindParam( ':id', $id, PDO::PARAM_INT );
 
@@ -116,7 +138,7 @@ class Location extends Model implements Entity, JsonSerializable {
 	 * @return array The list of entities fetched from the database.
 	 */
 	public function getList( int $begin = 0, int $numberElement = 25 ): array {
-		$request = $this->getDatabase()->prepare( "SELECT id, longitude, latitude, id_user  FROM ecran_department ORDER BY id ASC LIMIT :begin, :numberElement" );
+		$request = $this->getDatabase()->prepare( "SELECT id, longitude, latitude, user_id  FROM ecran_location ORDER BY id ASC LIMIT :begin, :numberElement" );
 
 		$request->bindValue( ':begin', $begin, PDO::PARAM_INT );
 		$request->bindValue( ':numberElement', $numberElement, PDO::PARAM_INT );
@@ -205,7 +227,7 @@ class Location extends Model implements Entity, JsonSerializable {
 		$entity->setId( $data['id'] );
 		$entity->setLongitude( $data['longitude'] );
 		$entity->setLatitude( $data['latitude'] );
-		$entity->setIdUser( $data['id_user'] );
+		$entity->setIdUser( $data['user_id'] );
 
 		return $entity;
 	}
@@ -213,8 +235,9 @@ class Location extends Model implements Entity, JsonSerializable {
 	/**
 	 * @param $dataList
 	 *
+	 * @return Location[]
 	 */
-	public function setEntityList( $dataList ) {
+	public function setEntityList( $dataList ): array {
 		$listEntity = array();
 		foreach ( $dataList as $data ) {
 			$listEntity[] = $this->setEntity( $data );
@@ -233,11 +256,11 @@ class Location extends Model implements Entity, JsonSerializable {
 	 * @return Location|false Returns a Location entity if the location exists, or false otherwise.
 	 */
 	public function checkIfLocationExists($longitude, $latitude, $id_user ): Location|false{
-		$request = $this->getDatabase()->prepare( "SELECT id, longitude, latitude, id_user FROM ecran_department
-                                        WHERE longitude = :longitude AND latitude = :latitude AND id_user = :id_user" );
+		$request = $this->getDatabase()->prepare( "SELECT id, longitude, latitude, user_id FROM ecran_location
+                                        WHERE longitude = :longitude AND latitude = :latitude AND user_id = :id_user" );
 
-		$request->bindValue( ':longitude', $longitude, PDO::PARAM_INT );
-		$request->bindValue( ':latitude', $latitude, PDO::PARAM_INT );
+		$request->bindValue( ':longitude', $longitude);
+		$request->bindValue( ':latitude', $latitude );
 		$request->bindValue( ':id_user', $id_user, PDO::PARAM_INT );
 
 		$request->execute();
@@ -257,17 +280,17 @@ class Location extends Model implements Entity, JsonSerializable {
 	 * @return Location|false Returns a Location object if the user ID exists, or false otherwise.
 	 */
 	public function checkIfUserIdExists($userId):Location|false{
-		$request = $this->getDatabase()->prepare( "SELECT id, longitude, latitude, id_user FROM ecran_location WHERE id_user = :id_user LIMIT 1" );
+		$request = $this->getDatabase()->prepare( "SELECT id, longitude, latitude, user_id FROM ecran_location WHERE user_id = :id_user LIMIT 1" );
 
-    	$request->bindValue( ':id_user', $userId, PDO::PARAM_INT );
+		$request->bindValue( ':id_user', $userId, PDO::PARAM_INT );
 
-    	$request->execute();
+		$request->execute();
 
-    	if ( $request->rowCount() > 0 ) {
-    		return $this->setEntity( $request->fetch( PDO::FETCH_ASSOC ) );
-    	}
+		if ( $request->rowCount() > 0 ) {
+			return $this->setEntity( $request->fetch( PDO::FETCH_ASSOC ) );
+		}
 
-    	return false;
+		return false;
 	}
 
 	/**

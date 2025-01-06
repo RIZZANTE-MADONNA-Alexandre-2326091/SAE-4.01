@@ -12,19 +12,33 @@ use Models\Location;
  * @return void
  */
 function injectLocationValues():void {
-	$model = new Location();
 
-	if($user = $model->checkIfUserIdExists(get_current_user_id())) {
-		$longitude = $model->getLongitude();
-		$latitude = $model->getLatitude();
-	}else{
-		$longitude = 5.4510;
-		$latitude = 43.5156;
+	$currentUserId = get_current_user_id();
+
+	if (!$currentUserId) {
+		error_log('Aucun utilisateur actif');
+		return;
 	}
 
-	wp_localize_script( 'weather_script_ecran', 'weatherValues', array(
-		'longitude' => $longitude,
-		'latitude' => $latitude
+	$model = new Location();
+	$user = $model->checkIfUserIdExists($currentUserId);
+
+	if ($user !== false) {
+		$longitude = $user->getLongitude();
+		$latitude = $user->getLatitude();
+		error_log("Coordonnées trouvées pour l'utilisateur {$currentUserId} : {$longitude}, {$latitude}");
+	} else {
+		$longitude = 5.4510;
+		$latitude = 43.5156;
+		error_log("Aucune localisation trouvée pour l'utilisateur {$currentUserId}, coordonnées par défaut utilisées.");
+	}
+
+	wp_enqueue_script('weather_script_ecran', TV_PLUG_PATH . 'public/js/weather.js', array('jquery'), '1.0', true);
+	wp_enqueue_script('searchLocationTV_script_ecran', TV_PLUG_PATH . 'public/js/searchLocationTV.js', array( 'jquery' ), '1.0', true);
+
+	wp_localize_script('weather_script_ecran', 'weatherValues', array(
+		'long' => $longitude,
+		'lat' => $latitude
 	));
 }
 
@@ -38,42 +52,59 @@ add_action('wp_enqueue_scripts', 'injectLocationValues');
 function handleWeatherAjaxData(): void {
 	check_ajax_referer('locationNonce', 'nonce');
 
-	if (isset($_POST['longitude']) && isset($_POST['latitude'])) {
-		$longitude = sanitize_text_field( $_POST['longitude'] );
-		$latitude  = sanitize_text_field( $_POST['latitude'] );
-		$id_user = sanitize_text_field( $_POST['currentUserId'] );
+	$longitude = isset($_POST['longitude']) ? floatval($_POST['longitude']) : null;
+	$latitude = isset($_POST['latitude']) ? floatval($_POST['latitude']) : null;
+	$id_user = get_current_user_id();
 
-		$location = new Location();
-
-		$location->setLongitude( $longitude );
-		$location->setLatitude( $latitude );
-		$location->setIdUser( $id_user );
-
-		$location->insert();
-
-		wp_send_json_success( array(
-			'message'   => 'Nouvelle position ajoutée avec succès dans la base de données',
-			'longitude' => $longitude,
-			'latitude'  => $latitude,
-		) );
-	} else {
+	if ( $longitude === null || $latitude === null) {
 		wp_send_json_error(array( 'message' => 'Données manquantes ou invalides pour ajouter la position' ), 400 );
+	}
+
+	$location = new Location();
+
+	$location->setLongitude( $longitude );
+	$location->setLatitude( $latitude );
+	$location->setIdUser( $id_user );
+
+//	$location->insert();
+//
+//	wp_send_json_success( array(
+//		'message'   => 'Nouvelle position ajoutée avec succès dans la base de données',
+//		'currentUserId' => $id_user,
+//		'longitude' => $longitude,
+//		'latitude'  => $latitude
+//	));
+
+	try {
+		// Insère les données dans la base de données
+		$insertedId = $location->insert();
+
+		wp_send_json_success([
+			'message' => 'User location data saved successfully',
+			'id' => $insertedId,
+			'longitude' => $longitude,
+			'latitude' => $latitude
+		]);
+	} catch (Exception $e) {
+		wp_send_json_error(['message' => 'Error while saving data: ' . $e->getMessage()]);
 	}
 }
 
 add_action( 'wp_ajax_handleWeatherAjaxData', 'handleWeatherAjaxData' );
+add_action('wp_ajax_nopriv_handleWeatherAjaxData', 'handleWeatherAjaxData');
 
 /**
  * Loads location AJAX script if the user has no associated location.
  *
  * @return void
  */
-function loadLocAjaxIfUserHasNoLoc(){
+function loadLocAjaxIfUserHasNoLoc(): void{
 	$model = new Location();
 
 	if(is_user_logged_in() && is_front_page() &&
-	   !$model->checkIfUserIdExists(get_current_user_id()) || true){
-		wp_enqueue_script( 'searchLocationTV_script_ecran', TV_PLUG_PATH . 'public/js/searchLocationTV.js', array( 'jquery' ), '1.0', true );
+	   !$model->checkIfUserIdExists(get_current_user_id())){
+
+		add_action('wp_enqueue_scripts', 'locationScript');
 
 		wp_localize_script( 'searchLocationTV_script_ecran', 'locationValues', array(
 			'ajaxUrl' => admin_url('admin-ajax.php'),

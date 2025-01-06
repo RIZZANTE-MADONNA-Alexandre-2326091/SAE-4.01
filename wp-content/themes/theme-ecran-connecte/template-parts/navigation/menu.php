@@ -34,6 +34,12 @@ if (function_exists('downloadFileICS_func')) {
     $page = get_page_by_title_V2('Gestion codes ADE');
     $linkCode = get_permalink($page->ID);
 
+	$page = get_page_by_title_V2('Créer un département');
+	$linkAddUser = get_permalink($page->ID);
+
+	$page = get_page_by_title_V2('Gestion des départements');
+	$linkManageUser = get_permalink($page->ID);
+
     $page = get_page_by_title_V2('Mon compte');
     $linkAccount = get_permalink($page->ID);
 
@@ -66,7 +72,7 @@ if (function_exists('downloadFileICS_func')) {
                         </div>
                     </li>
                 <?php }
-                if (in_array('secretaire', $current_user->roles) || in_array('administrator', $current_user->roles) || in_array('enseignant', $current_user->roles) || in_array('directeuretude', $current_user->roles)) { ?>
+                if (in_array('secretaire', $current_user->roles) || in_array('administrator', $current_user->roles)) { ?>
                     <li class="menu-item_dropdown menu-item">
                         <button class="dropbtn">Alertes
                             <i class="fa fa-caret-down"></i>
@@ -76,7 +82,7 @@ if (function_exists('downloadFileICS_func')) {
                             <a href="<?php echo $linkManageAlert; ?>">Gestion des alertes</a>
                         </div>
                     </li>
-                    <?php if (in_array('secretaire', $current_user->roles) || in_array('administrator', $current_user->roles) || in_array('directeuretude', $current_user->roles)) { ?>
+                    <?php if (in_array('secretaire', $current_user->roles) || in_array('administrator', $current_user->roles)) { ?>
                         <li class="menu-item_dropdown menu-item">
                             <button class="dropbtn">Informations
                                 <i class="fa fa-caret-down"></i>

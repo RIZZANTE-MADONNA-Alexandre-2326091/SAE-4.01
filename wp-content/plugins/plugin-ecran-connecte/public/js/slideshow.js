@@ -5,6 +5,36 @@ let totalPage = null; // Nombre de pages
 let endPage = false;
 let stop = false;
 
+/**
+ * Ce bloc de 4 lignes sert à lancer de manière asynchrone l'IFrame Player API d'après la documentation officielle de [Youtube Iframe API](https://developers.google.com/youtube/iframe_api_reference?hl=fr)
+ * */
+let tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+let firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+/**
+ * Lecteur de vidéo YouTube shorts
+ * */
+let playersh;
+
+/**
+ * Lecteur de vidéo YouTube classique
+*/
+let playerw;
+
+/**
+ * Temps en ms durant laquelle une information est affichée (par défaut 10s).
+ * @defaultValue 10000
+ */
+let timeout = 10000;
+
+/**
+ * Savoir si une vidéo YouTube est terminée
+ * @defaultValue false
+ * */
+let done = false;
+
 infoSlideShow();
 scheduleSlideshow();
 
@@ -32,6 +62,8 @@ function scheduleSlideshow()
 
 /**
  * Display a slideshow
+ * @param slides Les slides (informations) qui défileront dans la partie "Information"
+ * @param slideIndex index de la slide dans la liste {@linkcode slides}, c'est-à-dire le numéro de l'information
  */
 function displayOrHide(slides, slideIndex)
 {
@@ -56,10 +88,11 @@ function displayOrHide(slides, slideIndex)
             // Check child
             if(slides[slideIndex].childNodes) {
                 var count = 0;
-                // Try to find if it's a PDF
+                // Try to find if it's a PDF or a video
                 for(let i = 0; i < slides[slideIndex].childNodes.length; ++i) {
-                    // If is a PDF
-                    if(slides[slideIndex].childNodes[i].className === 'canvas_pdf') {
+                    console.log("Affichage slide index " + i + ": " + (slides[slideIndex].childNodes[i].className));
+                    // If is a PDF or a video
+                    if (slides[slideIndex].childNodes[i].className === 'canvas_pdf') {
 
                         console.log("--Lecture de PDF");
 
@@ -70,7 +103,7 @@ function displayOrHide(slides, slideIndex)
                         pdfUrl = urlUpload + pdfLink;
 
                         let loadingTask = pdfjsLib.getDocument(pdfUrl);
-                        loadingTask.promise.then(function(pdf) {
+                        loadingTask.promise.then(function (pdf) {
 
                             totalPage = pdf.numPages;
                             ++numPage;
@@ -78,30 +111,30 @@ function displayOrHide(slides, slideIndex)
                             let div = document.getElementById(pdfLink);
                             let scale = 1.5;
 
-                            if(stop === false) {
-                                if(document.getElementById('the-canvas-' + pdfLink + '-page' + (numPage-1)) != null) {
-                                    console.log('----Supression page n°'+ (numPage-1));
-                                    document.getElementById('the-canvas-' + pdfLink + '-page' + (numPage-1)).remove();
+                            if (stop === false) {
+                                if (document.getElementById('the-canvas-' + pdfLink + '-page' + (numPage - 1)) != null) {
+                                    console.log('----Supression page n°' + (numPage - 1));
+                                    document.getElementById('the-canvas-' + pdfLink + '-page' + (numPage - 1)).remove();
                                 }
                             }
 
-                            if(totalPage >= numPage && stop === false) {
-                                pdf.getPage(numPage).then(function(page) {
+                            if (totalPage >= numPage && stop === false) {
+                                pdf.getPage(numPage).then(function (page) {
 
                                     console.log(slides.length);
                                     console.log(totalPage);
-                                    if(slides.length === 1 && totalPage === 1 || totalPage === null && slides.length === 1) {
+                                    if (slides.length === 1 && totalPage === 1 || totalPage === null && slides.length === 1) {
                                         stop = true;
                                     }
 
                                     console.log(stop);
 
-                                    console.log("---Page du PDF n°"+numPage);
+                                    console.log("---Page du PDF n°" + numPage);
 
-                                    let viewport = page.getViewport({ scale: scale, });
+                                    let viewport = page.getViewport({scale: scale,});
 
                                     $('<canvas >', {
-                                        id: 'the-canvas-'+ pdfLink + '-page' + numPage,
+                                        id: 'the-canvas-' + pdfLink + '-page' + numPage,
                                     }).appendTo(div).fadeOut(0).fadeIn(2000);
 
                                     let canvas = document.getElementById('the-canvas-' + pdfLink + '-page' + numPage);
@@ -115,7 +148,7 @@ function displayOrHide(slides, slideIndex)
                                     };
 
                                     // Give the CSS to the canvas
-                                    if(slides === document.getElementsByClassName("mySlides")) {
+                                    if (slides === document.getElementsByClassName("mySlides")) {
                                         canvas.style.maxHeight = "99vh";
                                         canvas.style.maxWidth = "100%";
                                         canvas.style.height = "99vh";
@@ -130,10 +163,10 @@ function displayOrHide(slides, slideIndex)
                                     page.render(renderContext);
                                 });
 
-                                if(numPage === totalPage) {
+                                if (numPage === totalPage) {
                                     // Reinitialise variables
-                                    if(stop === false) {
-                                        if(document.getElementById('the-canvas-' + pdfLink + '-page' + (totalPage)) != null) {
+                                    if (stop === false) {
+                                        if (document.getElementById('the-canvas-' + pdfLink + '-page' + (totalPage)) != null) {
                                             document.getElementById('the-canvas-' + pdfLink + '-page' + (totalPage)).remove();
                                         }
                                     }
@@ -147,8 +180,102 @@ function displayOrHide(slides, slideIndex)
                             }
                         });
                     }
+                    /*
+                    * Si c'est une vidéo,
+                    * ⇒ différents traitements en fonction du type de la vidéo
+                    * */
+                    // If it's a YouTube short video
+                    if (slides[slideIndex].childNodes[i].className === 'videosh') {
+                        console.log("--Lecture vidéo Youtube short");
+                        const listeVideosShortsYouTube = document.querySelectorAll(".videosh");
+                        for(let indexVideoShortYouTube = 0; indexVideoShortYouTube < listeVideosShortsYouTube.length; ++indexVideoShortYouTube) {
+                            if (listeVideosShortsYouTube[indexVideoShortYouTube] === slides[slideIndex].childNodes[i]) {
+                                listeVideosShortsYouTube[indexVideoShortYouTube].id = "videoshID";
+                            }
+                            else {
+                                listeVideosShortsYouTube[indexVideoShortYouTube].id = "";
+                            }
+                        }
+                        console.log(listeVideosShortsYouTube);
+
+                        // TODO
+                    }
+                    // If it's a YouTube normal video
+                    else if (slides[slideIndex].childNodes[i].className === 'videow') {
+                        console.log("--Lecture vidéo Youtube classique");
+                        const listeVideosClassiqueYouTube = document.querySelectorAll(".videow");
+                        for(let indexVideoClassiqueYouTube = 0; indexVideoClassiqueYouTube < listeVideosClassiqueYouTube.length; ++indexVideoClassiqueYouTube) {
+                            if (listeVideosClassiqueYouTube[indexVideoClassiqueYouTube] === slides[slideIndex].childNodes[i]) {
+                                listeVideosClassiqueYouTube[indexVideoClassiqueYouTube].id = "videowID";
+                            }
+                            else {
+                                listeVideosClassiqueYouTube[indexVideoClassiqueYouTube].id = "";
+                            }
+                        }
+                        console.log(listeVideosClassiqueYouTube);
+
+                        // TODO
+                    }
+                    // If it's a local normal video
+                    else if (slides[slideIndex].childNodes[i].className === 'localCvideo') {
+                        console.log("--Lecture vidéo locale classique");
+                        const listeVideosClassiqueLocal = document.querySelectorAll(".localCvideo");
+
+                        //Chargement de toutes les vidéos de même classe HTML
+                        for (let indexVideoClassiqueLocal = 0; indexVideoClassiqueLocal < listeVideosClassiqueLocal.length; ++indexVideoClassiqueLocal) {
+                            let videoClassiqueLocal = listeVideosClassiqueLocal[indexVideoClassiqueLocal];
+
+                            //Si la vidéo correspond à celle affichée
+                            if (listeVideosClassiqueLocal[indexVideoClassiqueLocal] === slides[slideIndex].childNodes[i]) {
+                                timeout = videoClassiqueLocal.duration * 1000;
+                            }
+
+                            console.log("timeout = " + timeout + "\tduration = " + videoClassiqueLocal.duration);
+                            console.log(videoClassiqueLocal);
+
+                            //Chargement et lecture de la vidéo
+                            videoClassiqueLocal.load();
+                            videoClassiqueLocal.currentTime = 0;
+                            videoClassiqueLocal.play();
+
+                            //Évènement la vidéo est terminée
+                            videoClassiqueLocal.onended = () => {
+                                videoClassiqueLocal.pause();
+                                videoClassiqueLocal.currentTime = 0;
+                            }
+                        }
+                    }
+                    // If it's a local short video
+                    else if (slides[slideIndex].childNodes[i].className === 'localSvideo') {
+                        console.log("--Lecture vidéo locale short");
+                        const listeVideosShortLocal = document.querySelectorAll(".localSvideo");
+
+                        //Chargement de toutes les vidéos de même classe HTML
+                        for (let indexVideoShortLocal = 0; indexVideoShortLocal < listeVideosShortLocal.length; ++indexVideoShortLocal) {
+                            let videoShortLocal = listeVideosShortLocal[indexVideoShortLocal];
+
+                            //Si la vidéo correspond à celle affichée
+                            if (listeVideosShortLocal[indexVideoShortLocal] === slides[slideIndex].childNodes[i]) {
+                                timeout = videoShortLocal.duration * 1000;
+                            }
+
+                            console.log("timeout = " + timeout + "\tduration = " + videoShortLocal.duration);
+                            console.log(videoShortLocal);
+
+                            //Chargement de la vidéo
+                            videoShortLocal.load();
+                            videoShortLocal.currentTime = 0;
+                            videoShortLocal.play();
+
+                            //Évènement la vidéo est terminée
+                            videoShortLocal.onended = () => {
+                                videoShortLocal.pause();
+                                videoShortLocal.currentTime = 0;
+                            }
+                        }
+                    }
                 }
-                if(count === 0) {
+                if (count === 0) {
                     console.log("--Lecture image");
                     // Go to the next slide
                     ++slideIndex;
@@ -157,10 +284,54 @@ function displayOrHide(slides, slideIndex)
                 // Go to the next slide
                 ++slideIndex;
             }
+            console.log("Slide " + slideIndex + " sur " + slides.length);
         }
     }
 
-     if(slides.length !== 1 || totalPage !== 1) {
-        setTimeout(function(){displayOrHide(slides, slideIndex)} , 10000);
+    if(slides.length !== 1 || totalPage !== 1) {
+        setTimeout(function(){displayOrHide(slides, slideIndex)} , timeout);
+    }
+}
+
+
+//TODO fonctions API Youtube
+/**
+ * Fonction qui démarre l'API et attribue les valeurs aux lecteurs de vidéos.
+ * */
+function onYouTubeIframeAPIReady() {
+    console.log("API Youtube démarée");
+    playersh = new YT.Player('videoshID', {
+        events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange,
+        }
+    });
+    playerw = new YT.Player('videowID', {
+        events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange,
+        }
+    })
+}
+
+/**
+ * Fonction évènementielle qui s'active lors de l'évènement onReady: s'active lorsque le lecteur concerné est chargé.
+ * */
+function onPlayerReady(event) {
+    event.target.setPlaybackQuality("defaut");
+    event.target.seekTo(0);
+    event.target.playVideo();
+    console.log("Vidéo YT lancée");
+    timeout = event.target.getDuration();
+    console.log("timeout = " + timeout);
+}
+
+/**
+ * Fonction évènementielle qui s'active lors de l'évènement onStateChange: se déclenche lorsque l'état du lecteur concerné change.
+ * */
+function onPlayerStateChange(event) {
+    if (event.data === YT.PlayerState.ENDED) {
+        console.log("Vidéo YT terminée");
+        event.target.stopVideo();
     }
 }

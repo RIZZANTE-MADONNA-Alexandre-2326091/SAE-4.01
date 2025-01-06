@@ -45,7 +45,7 @@ class StudentView extends UserView
      * @return string
      */
     public function displayAllStudent($users) {
-        $page = get_page_by_title_V2('Modifier un utilisateur');
+        $page = get_page_by_title('Modifier un utilisateur');
         $linkManageUser = get_permalink($page->ID);
 
         $title = 'Étudiants';
@@ -85,11 +85,11 @@ class StudentView extends UserView
      * @return string
      */
     public function displayModifyStudent($user, $years, $groups, $halfGroups) {
-        $page = get_page_by_title_V2('Gestion des utilisateurs');
+        $page = get_page_by_title('Gestion des utilisateurs');
         $linkManageUser = get_permalink($page->ID);
 
         $form = '
-        <a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des utilisateurs'))) . '">< Retour</a>
+        <a href="' . esc_url(get_permalink(get_page_by_title('Gestion des utilisateurs'))) . '">< Retour</a>
         <h2>' . $user->getLogin() . '</h2>
          <form method="post">
             <div class="form-group">

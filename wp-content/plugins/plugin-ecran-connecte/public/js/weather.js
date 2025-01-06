@@ -1,15 +1,35 @@
 var meteoRequest = new XMLHttpRequest();
-var longitude = weatherValues.longitude;
-var latitude = weatherValues.latitude;
-var url = "https://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&lang=fr&APPID=ae546c64c1c36e47123b3d512efa723e";
+var startUrl = "https://api.openweathermap.org/data/2.5/weather?lat=";
+var url;
+var endUrl = "&lang=fr&APPID=ae546c64c1c36e47123b3d512efa723e";
+
+function success(pos){
+    var crd = pos.coords;
+
+    var longitude = crd.longitude;
+    var latitude = crd.latitude;
+
+    url = startUrl + latitude + "&lon=" + longitude + endUrl;
+
+    meteoRequest.open('GET', url, true);
+    meteoRequest.setRequestHeader('Accept', 'application/json');
+    meteoRequest.send();
+
+
+}
+
+function error(err) {
+    console.warn(`ERROR(${err.code}): ${err.message}`);
+}
+
 
 /**
  * Display the weather
  */
 function refreshWeather() {
-    meteoRequest.open('GET', url, true);
-    meteoRequest.setRequestHeader('Accept', 'application/json');
-    meteoRequest.send();
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(success, error);
+    }
 }
 
 meteoRequest.onload = function () {
@@ -19,23 +39,41 @@ meteoRequest.onload = function () {
     if (document.getElementById('Weather') !== null) {
         var div = document.getElementById('Weather');
         div.innerHTML = "";
+
+        // Bloc météo
         var weather = document.createElement("DIV");
-        weather.innerHTML = temp + "<span class=\"degree\">°C</span>";
         weather.id = "weather";
+        weather.className = "weather-box"; // Ajout d'une classe pour styliser
+
         var imgTemp = document.createElement("IMG");
         imgTemp.id = "icon";
         imgTemp.src = "/wp-content/plugins/plugin-ecran-connecte/public/img/" + getIcon(json) + ".png";
         imgTemp.alt = getAlt(json);
-        weather.appendChild(imgTemp);
+
+        var tempText = document.createElement("DIV");
+        tempText.className = "weather-text";
+        tempText.innerHTML = temp + "<span class=\"degree\">°C</span>";
+
+        weather.appendChild(imgTemp); // Icone en premier
+        weather.appendChild(tempText); // Texte en dessous
+        div.appendChild(weather); // Ajout au conteneur principal
+
+        // Bloc vent
         var wind = document.createElement("DIV");
-        wind.innerHTML = vent + "<span class=\"kmh\">km/h</span>";
         wind.id = "wind";
+        wind.className = "wind-box"; // Ajout d'une classe pour styliser
+
         var imgVent = document.createElement("IMG");
         imgVent.src = "/wp-content/plugins/plugin-ecran-connecte/public/img/wind.png";
-        imgVent.alt = "Img du vent";
-        wind.appendChild(imgVent);
-        div.appendChild(weather);
-        div.appendChild(wind);
+        imgVent.alt = "Icône du vent";
+
+        var windText = document.createElement("DIV");
+        windText.className = "wind-text";
+        windText.innerHTML = vent + "<span class=\"kmh\">km/h</span>";
+
+        wind.appendChild(imgVent); // Icone en premier
+        wind.appendChild(windText); // Texte en dessous
+        div.appendChild(wind); // Ajout au conteneur principal
         setTimeout(refreshWeather, 900000);
     }
 };

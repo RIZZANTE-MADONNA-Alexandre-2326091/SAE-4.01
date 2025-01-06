@@ -3,8 +3,6 @@
 namespace Views;
 
 use Models\Department;
-use Utils\PublicationManagement;
-use function Utils\get_page_by_title_V2;
 
 /**
  * Class DepartmentView
@@ -26,8 +24,7 @@ class DepartmentView extends View
                     <input class="form-control" type="text" name="deptName" placeholder="280 caractères maximum" required="">
                 </div>
                 <button type="submit" class="btn button_ecran" id="valid" name="submit">Créer</button>
-            </form>';
-            //$this->contextDisplayAll();
+            </form>' . $this->displayContextCreate();
     }
 
 	/**
@@ -64,31 +61,13 @@ class DepartmentView extends View
             </form>';
     }
 
-	/**
-	 * Display all departments.
-	 *
-	 * @param array $departments
-	 *
-	 * @return string
-	 */
-	public function displayAllDept($departments): string {
-		$page = get_page_by_title_V2('Modifier un département');
-		$linkManageDept = get_permalink($page->ID);
 
-		$title = 'Départements';
-		$name = 'Dept';
-		$header = ['Nom', 'Modifier'];
-
-		$row = array();
-		$count = 1;
-
-		foreach ($departments as $dept) {
-			$row[] = [$count, $this->buildCheckbox($name, $dept->getId()),
-				$dept->getName(), $this->buildLinkForModify($linkManageDept . '?id=' . $dept->getId())];
-			++$count;
-		}
-
-		return $this->displayAll($name, $title, $header, $row);
+	private function displayContextCreate() {
+		return '<hr class="half-rule">
+		<div>
+			<h2>Les départements</h2>
+			<p class="lead">Vous pouvez créer les différents départements présents au sein de l\'IUT.</p>
+		</div>';
 	}
 
 	/**
@@ -130,18 +109,21 @@ class DepartmentView extends View
      *
      * @return string
      */
-    public function displayDepartmentsList($departments): string {
-		$page = get_page_by_title_V2('Modifier un département');
-	    $linkManageDept = get_permalink($page->ID);
+   public function displayAllDept($departments): string {
+	   $page = get_page_by_title_V2('Modifier un département');
+	   $linkManageDept = get_permalink($page->ID);
 
 	    $title = 'Départements';
 	    $name = 'Dept';
-	    $header = ['Nom du département', "Modifier"];
-
-	    $row = array();
-	    $count = 0;
+	    $header = ['Nom', 'Modifier'];
+	    $row = [];
+	    $count = 1;
 	    foreach ($departments as $dept) {
-		    $row[] = [$count, $this->buildCheckbox($name, $dept->getId()), $this->buildLinkForModify($linkManageDept . '?id='. $dept->getId())];
+		    $row[] = [ $count,
+			    $this->buildCheckbox($name, $dept->getId()),
+			    htmlspecialchars($dept->getName()),
+			    $this->buildLinkForModify($linkManageDept . '?id=' . $dept->getId())
+		    ];
 		    ++$count;
 		}
 

@@ -11,7 +11,7 @@
         category: 'common',
 
         edit: function() {
-            return "Modifie l\'information sélectionnée";
+            return "Modifie l\'information sélectionné";
         },
         save: function() {
             return "test";

@@ -29,7 +29,6 @@ define('TV_ICSFILE_PATH', '/wp-content/uploads/fileICS/');
 require __DIR__ . '/autoload.php';
 require_once __DIR__ . '/vendor/autoload.php';
 
-include 'ajax-location-methods.php';
 include 'config.php';
 include 'blocks.php';
 
