@@ -250,13 +250,13 @@ class Location extends Model implements Entity, JsonSerializable {
 	 *
 	 * @return Location|false Returns a Location entity if the location exists, or false otherwise.
 	 */
-	public function checkIfLocationExists($longitude, $latitude, $id_user ): Location|false{
+	public function checkIfLocationExists(): Location|false{
 		$request = $this->getDatabase()->prepare( "SELECT id, longitude, latitude, user_id FROM ecran_location
                                         WHERE longitude = :longitude AND latitude = :latitude AND user_id = :id_user" );
 
-		$request->bindValue( ':longitude', $longitude);
-		$request->bindValue( ':latitude', $latitude );
-		$request->bindValue( ':id_user', $id_user, PDO::PARAM_INT );
+		$request->bindValue( ':longitude', $this->getLongitude());
+		$request->bindValue( ':latitude', $this->getLatitude() );
+		$request->bindValue( ':id_user', $this->getIdUser(), PDO::PARAM_INT );
 
 		$request->execute();
 

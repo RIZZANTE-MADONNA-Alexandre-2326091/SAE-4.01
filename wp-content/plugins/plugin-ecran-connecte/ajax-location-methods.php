@@ -66,7 +66,7 @@ function handleWeatherAjaxData(): void {
 	$location->setLatitude( $latitude );
 	$location->setIdUser( $id_user );
 
-	if(!checkIfLocationExists($longitude, $latitude, $id_user)){
+	if($location->checkIfLocationExists() == false){
 		try {
 			// Insère les données dans la base de données
 			$insertedId = $location->insert();
@@ -81,10 +81,16 @@ function handleWeatherAjaxData(): void {
 			wp_send_json_error(['message' => 'Error while saving data: ' . $e->getMessage()]);
 		}
 	} else {
+		$id = $location->getId();
 		$location->update();
+
+		wp_send_json_success([
+			'message' => 'User location data saved successfully',
+			'id' => $id,
+			'longitude' => $longitude,
+			'latitude' => $latitude
+		]);
 	}
-
-
 }
 
 add_action( 'wp_ajax_handleWeatherAjaxData', 'handleWeatherAjaxData' );
