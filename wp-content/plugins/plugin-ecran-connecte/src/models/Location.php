@@ -49,11 +49,7 @@ class Location extends Model implements Entity, JsonSerializable {
 
 			$request = $database->prepare(
 				"INSERT INTO ecran_location (longitude, latitude, user_id)
-                VALUES (:longitude, :latitude, :id_user)
-                ON DUPLICATE KEY UPDATE 
-                    longitude = :longitude, 
-                    latitude = :latitude;"
-			);
+                VALUES (:longitude, :latitude, :id_user)");
 
 			$request->bindValue(':longitude', $this->getLongitude());
 			$request->bindValue(':latitude', $this->getLatitude());
@@ -80,13 +76,12 @@ class Location extends Model implements Entity, JsonSerializable {
 	 * @return int
 	 */
 	public function update(): int {
-		$request = $this->getDatabase()->prepare( "UPDATE ecran_location SET longitude = :longitude, latitude = :latitude,
-                          user_id = :user_id WHERE id = :id" );
+		$request = $this->getDatabase()->prepare( "UPDATE ecran_location SET longitude = :longitude, latitude = :latitude
+                           								 WHERE user_id = :user_id" );
 
 		$request->bindValue( ':longitude', $this->getLongitude());
 		$request->bindValue( ':latitude', $this->getLatitude());
-		$request->bindValue( ':user_id', $this->getIdUser());
-		$request->bindValue( ':id', $this->getId(), PDO::PARAM_INT );
+		$request->bindValue( ':user_id', $this->getIdUser(), PDO::PARAM_INT);
 
 		$request->execute();
 
