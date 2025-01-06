@@ -39,7 +39,7 @@ if((in_array('etudiant', $current_user->roles) || in_array('television', $curren
 
     <?php else: ?>
     <footer class="footer_ecran">
-        <p class="text-center">© 2021-2024 — Aix-Marseille Université</p>
+        <p class="text-center">© 2021-2025 - Aix-Marseille Université</p>
     </footer>
     <?php endif; ?>
 <?php wp_footer(); ?>

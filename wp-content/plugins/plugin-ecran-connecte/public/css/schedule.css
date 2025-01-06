@@ -1,0 +1,84 @@
+/**
+CSS de l'emploi du temps
+ */
+
+@font-face {
+    font-family: 'AMUMonumentGrotesk';
+    font-style: normal;
+    font-weight: 400;
+    src: local('AMUMonumentGrotesk-Regular'), url('/wp-content/themes/theme-ecran-connecte/assets/font/AMUMonumentGrotesk-Regular.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'AMUMonumentGrotesk';
+    font-style: italic;
+    font-weight: 400;
+    src: local('AMUMonumentGrotesk-RegularItalic'), url('/wp-content/themes/theme-ecran-connecte/assets/font/AMUMonumentGrotesk-RegularItalic.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'AMUMonumentGrotesk';
+    font-style: normal;
+    font-weight: 500;
+    src: local('AMUMonumentGrotesk-Medium'), url('/wp-content/themes/theme-ecran-connecte/assets/font/AMUMonumentGrotesk-Medium.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'AMUMonumentGrotesk';
+    font-style: italic;
+    font-weight: 500;
+    src: local('AMUMonumentGrotesk-MediumItalic'), url('/wp-content/themes/theme-ecran-connecte/assets/font/AMUMonumentGrotesk-MediumItalicc.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'AMUMonumentGrotesk';
+    font-style: normal;
+    font-weight: 700;
+    src: local('AMUMonumentGrotesk-Bold'), url('/wp-content/themes/theme-ecran-connecte/assets/font/AMUMonumentGrotesk-Bold.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'AMUMonumentGrotesk';
+    font-style: italic;
+    font-weight: 700;
+    src: local('AMUMonumentGrotesk-BoldItalic'), url('/wp-content/themes/theme-ecran-connecte/assets/font/AMUMonumentGrotesk-BoldItalic.woff') format('woff');
+}
+
+.shedule_tech{
+    width: 50%;
+}
+
+.tv-schedule {
+    width: 100%;
+}
+
+/* TABLE */
+.errorNotRegister {
+    font-weight: bold;
+    color: white;
+    background-color: red;
+}
+
+/* SLIDESHOW */
+.slideshow-container {
+    position: relative;
+    margin: auto;
+}
+
+.mySlides {
+    display: block;
+}
+
+.headerTab {
+    background-color: #660099;
+}
+
+@media (max-width: 1200px) {
+    .shedule_tech{
+        width: 100%;
+    }
+}
+
+.firstSelect {
+    max-width: 70%;
+}
