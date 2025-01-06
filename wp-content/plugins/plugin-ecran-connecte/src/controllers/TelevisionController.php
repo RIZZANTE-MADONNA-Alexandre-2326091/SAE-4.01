@@ -152,10 +152,10 @@ class TelevisionController extends UserController implements Schedule
 	    $deptModel = new Department();
 	    $userDeptList = array();
 	    foreach ($users as $user) {
-		    $userDeptList[] = $deptModel->getUserInDept($user->getDeptId())->getName();
+		    $userDeptList[] = $deptModel->getUserInDept($user->getId())->getName();
 	    }
 
-        return $this->view->displayAllTv($users, $userDeptList[]);
+        return $this->view->displayAllTv($users, $userDeptList);
     }
 
     /**

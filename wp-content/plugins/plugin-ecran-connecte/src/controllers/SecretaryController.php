@@ -90,6 +90,7 @@ class SecretaryController extends UserController
 
     /**
      * Display all secretary
+     *
      * @return string
      */
     public function displayAllSecretary() {
@@ -98,7 +99,7 @@ class SecretaryController extends UserController
 		$deptModel = new Department();
 		$userDeptList = array();
 		foreach ($users as $user) {
-			$userDeptList[] = $deptModel->getUserInDept($user->getDeptId()->getName());
+			$userDeptList[] = $deptModel->getUserInDept($user->getId())->getName();
 		}
 
         return $this->view->displayAllSecretary($users, $userDeptList);

@@ -93,7 +93,7 @@ class TechnicianController extends UserController implements Schedule
 	    $deptModel = new Department();
 	    $userDeptList = array();
 	    foreach ($users as $user) {
-		    $userDeptList[] = $deptModel->getUserInDept($user->getDeptId())->getName();
+		    $userDeptList[] = $deptModel->getUserInDept($user->getId())->getName();
 	    }
 
         return $this->view->displayAllTechnicians($users, $userDeptList);
