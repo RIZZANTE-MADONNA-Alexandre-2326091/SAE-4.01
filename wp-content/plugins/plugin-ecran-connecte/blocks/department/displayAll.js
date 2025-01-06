@@ -5,13 +5,13 @@
 {
     var el = element.createElement;
 
-    blocks.registerBlockType('tvconnecteeamu/modify-information', {
-        title: 'Modifier l\'information',
+    wp.blocks.registerBlockType('tvconnecteeamu/manage-department', {
+        title: 'Affiche les départements',
         icon: 'smiley',
         category: 'common',
 
         edit: function() {
-            return "Modifie l\'information sélectionnée";
+            return "Affiche tous les départements";
         },
         save: function() {
             return "test";

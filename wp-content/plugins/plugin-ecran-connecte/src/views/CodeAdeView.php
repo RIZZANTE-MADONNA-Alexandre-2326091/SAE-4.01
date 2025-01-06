@@ -58,11 +58,11 @@ class CodeAdeView extends View
      * @return string
      */
     public function displayModifyCode($title, $type, $code) {
-        $page = get_page_by_title('Gestion des codes ADE');
+        $page = get_page_by_title_V2('Gestion des codes ADE');
         $linkManageCode = get_permalink($page->ID);
 
         return '
-        <a href="' . esc_url(get_permalink(get_page_by_title('Gestion des codes ADE'))) . '">< Retour</a>
+        <a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des codes ADE'))) . '">< Retour</a>
          <form method="post">
          	<div class="form-group">
             	<label for="title">Titre</label>
@@ -123,7 +123,7 @@ class CodeAdeView extends View
     }
 
     /**
-     * Display all informations of a code ade
+     * Display all information of a code ade
      *
      * @param $years        CodeAde[]
      * @param $groups       CodeAde[]
@@ -132,7 +132,7 @@ class CodeAdeView extends View
      * @return          string
      */
     public function displayAllCode($years, $groups, $halfGroups) {
-        $page = get_page_by_title('Modifier un code ADE');
+        $page = get_page_by_title_V2('Modifier un code ADE');
         $linkManageCodeAde = get_permalink($page->ID);
 
         $title = 'Codes Ade';
@@ -172,7 +172,7 @@ class CodeAdeView extends View
      * Display a success message for the modification of a code ADE
      */
     public function successModification() {
-        $page = get_page_by_title('Gestion des codes ADE');
+        $page = get_page_by_title_V2('Gestion des codes ADE');
         $linkManageCode = get_permalink($page->ID);
         $this->buildModal('Modification du code ADE', '<p>Le code ADE a bien été modifié</p>', $linkManageCode);
     }
@@ -202,7 +202,7 @@ class CodeAdeView extends View
      * Display an message if there is nothing
      */
     public function errorNobody() {
-        $page = get_page_by_title('Gestion des codes ADE');
+        $page = get_page_by_title_V2('Gestion des codes ADE');
         $linkManageCode = get_permalink($page->ID);
         echo '<p>Il n\'y a rien par ici</p><a href="' . $linkManageCode . '">Retour</a>';
     }

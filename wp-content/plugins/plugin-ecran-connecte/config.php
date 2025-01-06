@@ -78,27 +78,28 @@ function loadScriptsEcran()
     wp_enqueue_style('weather_ecran', TV_PLUG_PATH . 'public/css/weather.css', array(), '1.0');
 
     // SCRIPT
-    wp_enqueue_script('addCheckBox_script_ecran', TV_PLUG_PATH . 'public/js/addAllCheckBox.js', array('jquery'), '1.0', true);
-    wp_enqueue_script('addCodeAlert_script_ecran', TV_PLUG_PATH . 'public/js/addOrDeleteAlertCode.js', array('jquery'), '1.0', true);
-    wp_enqueue_script('addCodeTv_script_ecran', TV_PLUG_PATH . 'public/js/addOrDeleteTvCode.js', array('jquery'), '1.0', true);
-    wp_enqueue_script('alertTicker_script_ecran', TV_PLUG_PATH . 'public/js/alertTicker.js', array('jquery'), '', true);
-    wp_enqueue_script('confPass_script_ecran', TV_PLUG_PATH . 'public/js/confirmPass.js', array('jquery'), '1.0', true);
-    wp_enqueue_script('oneSignal_script_ecran', TV_PLUG_PATH . 'public/js/oneSignalPush.js', array('jquery'), '', true);
-    wp_add_inline_script('oneSignal_script_ecran', 'const ONESIGNAL_APP_ID = \'' . ONESIGNAL_APP_ID . '\';', 'before');
-    wp_enqueue_script('scroll_script_ecran', TV_PLUG_PATH . 'public/js/scroll.js', array('plugin-jquerymin', 'plugin-jqueryEzTic', 'plugin-jqueryEzMinTic', 'plugin-JqueryEzMin'), '', true);
-    wp_enqueue_script('search_script_ecran', TV_PLUG_PATH . 'public/js/search.js', array('jquery'), '1.0', true);
-    wp_enqueue_script('slideshow_script_ecran', TV_PLUG_PATH . 'public/js/slideshow.js', array('jquery'), '2.0', true);
-    wp_enqueue_script('sortTable_script_ecran', TV_PLUG_PATH . 'public/js/sortTable.js', array('jquery'), '1.0', true);
-    wp_enqueue_script('weather_script_ecran', TV_PLUG_PATH . 'public/js/weather.js', array('jquery'), '1.0', true);
-    wp_enqueue_script('weatherTime_script_ecran', TV_PLUG_PATH . 'public/js/weather_and_time.js', array('jquery'), '1.0', true);
+	wp_enqueue_script('addCheckBox_script_ecran', TV_PLUG_PATH . 'public/js/addAllCheckBox.js', array('jquery'), '1.0', true);
+	wp_enqueue_script('addCodeAlert_script_ecran', TV_PLUG_PATH . 'public/js/addOrDeleteAlertCode.js', array('jquery'), '1.0', true);
+	wp_enqueue_script('addCodeTv_script_ecran', TV_PLUG_PATH . 'public/js/addOrDeleteTvCode.js', array('jquery'), '1.0', true);
+	wp_enqueue_script('alertTicker_script_ecran', TV_PLUG_PATH . 'public/js/alertTicker.js', array('jquery'), '', true);
+	wp_enqueue_script('confPass_script_ecran', TV_PLUG_PATH . 'public/js/confirmPass.js', array('jquery'), '1.0', true);
+	wp_enqueue_script('oneSignal_script_ecran', TV_PLUG_PATH . 'public/js/oneSignalPush.js', array('jquery'), '', true);
+	wp_add_inline_script('oneSignal_script_ecran', 'const ONESIGNAL_APP_ID = \'' . ONESIGNAL_APP_ID . '\';', 'before');
+	wp_enqueue_script('scroll_script_ecran', TV_PLUG_PATH . 'public/js/scroll.js', array('plugin-jquerymin', 'plugin-jqueryEzTic', 'plugin-jqueryEzMinTic', 'plugin-JqueryEzMin'), '', true);
+	wp_enqueue_script('search_script_ecran', TV_PLUG_PATH . 'public/js/search.js', array('jquery'), '1.0', true);
+	wp_enqueue_script('slideshow_script_ecran', TV_PLUG_PATH . 'public/js/slideshow.js', array('jquery'), '2.0', true);
+	wp_enqueue_script('sortTable_script_ecran', TV_PLUG_PATH . 'public/js/sortTable.js', array('jquery'), '1.0', true);
+	wp_enqueue_script('weatherTime_script_ecran', TV_PLUG_PATH . 'public/js/weather_and_time.js', array('jquery'), '1.0', true);
 }
 
 add_action('wp_enqueue_scripts', 'loadScriptsEcran');
 
 /**
- * Create tables in the database (Alert & Information)
+ * Create tables in the database (Alert & Information).
+ *
+ * @return void
  */
-function installDatabaseEcran()
+function installDatabaseEcran(): void
 {
     global $wpdb;
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -180,7 +181,7 @@ function installDatabaseEcran()
 
     $table_name = 'ecran_code_delete_account';
 
-    $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+	$query = "CREATE TABLE IF NOT EXISTS $table_name (
 			id INT(10) NOT NULL AUTO_INCREMENT,
 			user_id BIGINT(20) UNSIGNED NOT NULL,
 			code VARCHAR(40) NOT NULL,
@@ -188,7 +189,44 @@ function installDatabaseEcran()
 			FOREIGN KEY (user_id) REFERENCES wp_users(ID) ON DELETE CASCADE
 		) $charset_collate;";
 
-    dbDelta($sql);
+    dbDelta($query);
+
+	$table_name = 'ecran_department';
+
+	$sql = "CREATE TABLE IF NOT EXISTS $table_name (
+			dept_id INT(10) NOT NULL AUTO_INCREMENT,
+			name VARCHAR(40) NOT NULL,
+			PRIMARY KEY (dept_id)
+		) $charset_collate;";
+
+	dbDelta($sql);
+
+	$table_name = 'ecran_dept_user';
+
+	$sql = "CREATE TABLE IF NOT EXISTS $table_name (
+            id INT(10) NOT NULL AUTO_INCREMENT,
+			dept_id INT(10) NOT NULL,
+			user_id BIGINT(20) UNSIGNED NOT NULL ,
+			PRIMARY KEY (id, dept_id, user_id),
+			FOREIGN KEY (dept_id) REFERENCES ecran_department(dept_id) ON DELETE CASCADE,
+			FOREIGN KEY (user_id) REFERENCES wp_users(ID) ON DELETE CASCADE
+		) $charset_collate;";
+
+	dbDelta($sql);
+
+	$table_name = 'ecran_location';
+
+	$sql = "CREATE TABLE IF NOT EXISTS $table_name(
+    		id INT(10) NOT NULL AUTO_INCREMENT,
+    		longitude FLOAT NOT NULL,
+    		latitude FLOAT NOT NULL,
+    		user_id BIGINT(20) UNSIGNED NOT NULL,
+    		PRIMARY KEY (id),
+        	UNIQUE KEY unique_user (user_id),    		
+	        FOREIGN KEY (user_id) REFERENCES wp_users(ID) ON DELETE CASCADE
+    	) $charset_collate;";
+
+	dbDelta($sql);
 }
 
 add_action('plugins_loaded', 'installDatabaseEcran');
@@ -219,26 +257,6 @@ $result = add_role(
 );
 
 $result = add_role(
-    'etudiant',
-    __('Etudiant'),
-    array(
-        'read' => true,  // true allows this capability
-        'edit_posts' => true,
-        'delete_posts' => false, // Use false to explicitly deny
-    )
-);
-
-$result = add_role(
-    'enseignant',
-    __('Enseignant'),
-    array(
-        'read' => true,  // true allows this capability
-        'edit_posts' => true,
-        'delete_posts' => false, // Use false to explicitly deny
-    )
-);
-
-$result = add_role(
     'technicien',
     __('Technicien'),
     array(
@@ -248,15 +266,6 @@ $result = add_role(
     )
 );
 
-$result = add_role(
-    'directeuretude',
-    __('Directeur etude'),
-    array(
-        'read' => true,  // true allows this capability
-        'edit_posts' => true,
-        'delete_posts' => false, // Use false to explicitly deny
-    )
-);
 $result = add_role(
     'informationposter',
     __('informationPoster'),
@@ -282,3 +291,5 @@ add_action('rest_api_init', function () {
     $controller = new ProfileRestController();
     $controller->register_routes();
 });
+
+
