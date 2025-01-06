@@ -505,19 +505,19 @@ class InformationView extends View
         }
         else if ($type == 'text')
         {
-            echo '<p class="lead">' . $content . '</p>';
+            echo '<div class="text-info">' . $content . '</div>';
         }
 		else if ($type == 'YTvideosh')
 		{
 			$link = substr_replace($content,'embed',24,6);
-			echo '<iframe id="" class="videosh" src="' . $link . '?autoplay=1&loop=1&playlist=' . substr($link,30) . '&mute=1&controls=0&disablekb=1&showinfo=0&enablejsapi=1"
+			echo '<iframe id="" class="videosh" src="' . $link . '?loop=1&playlist=' . substr($link,30) . '&mute=1&controls=0&disablekb=1&showinfo=0&enablejsapi=1"
 				  title="YouTube short player" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
 				  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';
 		}
 		else if ($type == 'YTvideow')
 		{
 			$link = substr_replace($content,'embed/',24,8);
-			echo '<iframe id="" class="videow" src="' . $link . '?autoplay=1&loop=1&playlist=' . substr($link,30) . '&mute=1&controls=0&disablekb=1&showinfo=0&enablejsapi=1"
+			echo '<iframe id="" class="videow" src="' . $link . '?loop=1&playlist=' . substr($link,30) . '&mute=1&controls=0&disablekb=1&showinfo=0&enablejsapi=1"
 				  title="YouTube video player" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
 				  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';
 		}

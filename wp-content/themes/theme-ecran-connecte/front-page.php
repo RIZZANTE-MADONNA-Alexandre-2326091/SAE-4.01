@@ -5,6 +5,7 @@
         if(in_array('etudiant', $current_user->roles) || in_array('television', $current_user->roles)) : ?>
         <div class="row">
             <div class="container order-md-2 text-center text-md-left pr-md-5">
+                <p class="welcome-text">Bienvenue</p>
 			<!-- <div class="container col-md-7 order-md-2 text-center text-md-left pr-md-5"> -->
         <?php else: ?>
         <div class="container">

@@ -1,0 +1,62 @@
+.button_ecran, .delete_button_ecran, .button_ecran:hover, .delete_button_ecran:hover, .active_ecran .page-link {
+    color: white;
+}
+
+.bg-light {
+    background-color: transparent!important;
+}
+
+.border-white {
+    border: none!important;
+}
+
+.button_ecran {
+    background-color: #660099;
+    border-radius: 10px;
+    margin-right: 1em;
+}
+
+.delete_button_ecran {
+    background-color: #8e2525;
+}
+
+.active_ecran .page-link {
+    background-color: #660099;
+}
+
+.dropdown-item {
+    color: white;
+}
+
+thead {
+    background-color: #660099;
+    color: white;
+}
+
+.form-control {
+    border-radius: 12px;
+}
+
+.nav-tabs {
+    border-bottom: transparent;
+    margin-top: 10px;
+}
+
+.nav-tabs .nav-link {
+    border-radius: 120px;
+    color: black;
+}
+
+.nav-tabs .nav-link:hover {
+    border-color: #660099;
+}
+
+.nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+    color: white;
+    background-color: #660099;
+    border: none;
+}
+
+.select_ecran {
+    width: 80%;
+}
