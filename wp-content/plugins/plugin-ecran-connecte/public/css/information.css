@@ -36,6 +36,7 @@
 .videow, .localCvideo {
     height: 92vh;
     width: 65vw;
+
     margin-left: -315%;
     margin-top: -25%;
 }

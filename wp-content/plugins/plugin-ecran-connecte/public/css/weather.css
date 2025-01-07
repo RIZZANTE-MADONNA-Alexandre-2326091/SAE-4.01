@@ -1,155 +1,115 @@
 /* General styles for box-sizing and font-weight */
 * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
+
+body {
+    font-family: 'AMUMonumentGrotesk', sans-serif;
+    background-color: #f3f3f3;
+    color: #333;
+    overflow-x: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
 
 .Infos {
-    display: flex;
-    align-items: center;
-    background-color: #5f33b4;
+    display: grid;
+    grid-template-columns: 1.5fr 1.5fr;
+    gap: 0;
+    width: 100%;
+    max-width: 100vw;
+    height: auto;
     color: #FFF;
-    height: 100%;
-    font-family: 'AMUMonumentGrotesk', sans-serif;
 }
 
+/* Section TimeDate */
 .TimeDate {
-    background-color: rgba(255, 255, 255, 0.1);
-    padding: 15px 20px;
-    text-align: center;
-    width: 300px;
-    height: 160px;
-}
-
-.Time {
-    font-size: 3.5vw;
-    font-weight: 500;
-    margin: 0;
-}
-
-.Date {
-    font-size: 1.2vw;
-    margin: -15px 0 0;
-    text-transform: lowercase;
-}
-
-
-.Weather .degree, .Weather .kmh {
-    font-size: 1.8vw;
-}
-
-#Weather {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: auto;
-}
-
-#weather, #wind {
-    width: 170px;
-    height: 160px;
+    background-color: #000c69;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    text-align: center;
+    line-height: 1;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+}
+
+/* Heure */
+.Time {
+    font-size: clamp(1.5rem, 5vw, 4.2rem);
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Date */
+.Date {
+    font-size: clamp(0.9rem, 2.5vw, 1.5rem);
+    margin: 0;
+    text-transform: lowercase;
+}
+
+.Weather {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: 100%;
+}
+
+#weather, #wind {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background-color: #fff;
+    height: 100%;
+    overflow: hidden;
 }
 
 #weather {
-    background-color: #ddccff;
-    color: #8d00d4;
+    background-color: #d4eeff;
+    color: #1c2eb5;
 }
 
 #wind {
-    background-color: #8d00d4;
-    color: #ddccff;
+    background-color: #1c2eb5;
+    color: #d4eeff;
 }
 
-/* Images */
+#weather img, #wind img {
+    width: 50%;
+    height: 50%;
+    object-fit: contain;
+    margin-bottom: 0.5rem;
+}
+
 #weather img {
-    width: 80px;
-    height: 80px;
-    object-fit: scale-down;
-    filter: brightness(0) saturate(100%) invert(16%) sepia(96%) saturate(3810%) hue-rotate(277deg) brightness(82%) contrast(125%);
+    filter: brightness(0) saturate(100%) invert(15%) sepia(97%) saturate(2897%) hue-rotate(233deg) brightness(88%) contrast(106%);
 }
 
 #wind img {
-    width: 80px;
-    height: 80px;
-    object-fit: scale-down;
-    filter: brightness(0) saturate(100%) invert(81%) sepia(69%) saturate(621%) hue-rotate(189deg) brightness(102%) contrast(103%);
+    filter: brightness(0) saturate(100%) invert(95%) sepia(83%) saturate(1504%) hue-rotate(176deg) brightness(103%) contrast(107%);
 }
 
-/* Texte */
+
 .weather-text, .wind-text {
-    font-size: 2.2em;
+    font-size: clamp(1rem, 2.5vw, 2rem);
     font-weight: bold;
-    text-align: center;
 }
 
 /* Responsive styles */
-@media only screen and (max-width: 1000px) {
-    /* Ajustements pour petits écrans */
-    .Infos {
-        padding: 5px;
+@media only screen and (max-width: 768px) {
+
+    .Weather {
+        grid-template-columns: 1fr;
     }
 
     .TimeDate {
-        width: 80%;
-        height: 130px;
-    }
-
-    .Weather {
-        font-size: 3vw;
-    }
-
-    /* Réduire la taille des icônes pour les petits écrans */
-    #weather img, #wind img {
-        width: 50px;
-        height: 50px;
-    }
-
-    /* Réduire la taille des textes dans les boxes */
-    .weather-text, .wind-text {
-        font-size: 1.8em;
-    }
-
-    /* Réduire la taille des boxes météo et vent */
-    #weather, #wind {
-        width: 120px;
-        height: 120px;
-    }
-}
-
-@media only screen and (max-width: 600px) {
-    /* Ajustements pour très petits écrans */
-    .TimeDate {
-        width: 90%;   /* La box de l'heure prend 90% de la largeur sur les très petits écrans */
-        height: auto; /* Hauteur automatique */
-    }
-
-    .Time {
-        font-size: 8vw;
-    }
-
-    .Date {
-        font-size: 3vw;
-    }
-
-    .Weather {
-        font-size: 4vw;
-    }
-
-    /* Réduire encore plus les icônes et textes */
-    #weather img, #wind img {
-        width: 40px;
-        height: 40px;
-    }
-
-    .weather-text, .wind-text {
-        font-size: 1.5em;
-    }
-
-    #weather, #wind {
-        width: 100px;
-        height: 100px;
+        grid-column: span 1;
     }
 }

@@ -23,6 +23,7 @@ body.login div#login h1 a {
     background-size: 120px 120px;
     background-repeat: no-repeat;
     padding-bottom: 60px;
+    filter: brightness(0) saturate(100%);
 }
 
 body.login div#login form#loginform {

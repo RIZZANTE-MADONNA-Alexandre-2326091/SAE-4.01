@@ -387,7 +387,7 @@ class InformationView extends View
 			<p class="lead">Les informations sont affichées dans un diaporama défilant les informations une par une sur la partie droite des téléviseurs.</p>
 			<div class="text-center">
 				<figure class="figure">
-					<img src="' . TV_PLUG_PATH . 'public/img/presentation.png" class="figure-img img-fluid rounded" alt="Représentation d\'un téléviseur">
+					<img src="' . TV_PLUG_PATH . 'public/img/presentation.png" class="figure-img rounded" alt="Représentation d\'un téléviseur">
 					<figcaption class="figure-caption">Représentation d\'un téléviseur</figcaption>
 				</figure>
 			</div>

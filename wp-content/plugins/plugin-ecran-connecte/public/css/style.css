@@ -2,6 +2,10 @@
     color: white;
 }
 
+.table td, .table th {
+    border: none;
+}
+
 .bg-light {
     background-color: transparent!important;
 }
@@ -11,7 +15,7 @@
 }
 
 .button_ecran {
-    background-color: #660099;
+    background-color: #1f63de;
     border-radius: 10px;
     margin-right: 1em;
 }
@@ -21,7 +25,7 @@
 }
 
 .active_ecran .page-link {
-    background-color: #660099;
+    background-color: #1f63de;
 }
 
 .dropdown-item {
@@ -29,7 +33,7 @@
 }
 
 thead {
-    background-color: #660099;
+    background-color: #1f63de;
     color: white;
 }
 
@@ -48,12 +52,12 @@ thead {
 }
 
 .nav-tabs .nav-link:hover {
-    border-color: #660099;
+    border-color: #1f63de;
 }
 
 .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
     color: white;
-    background-color: #660099;
+    background-color: #1f63de;
     border: none;
 }
 

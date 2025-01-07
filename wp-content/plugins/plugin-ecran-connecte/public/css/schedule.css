@@ -52,6 +52,7 @@ CSS de l'emploi du temps
     width: 100%;
 }
 
+
 /* TABLE */
 .errorNotRegister {
     font-weight: bold;
@@ -70,7 +71,7 @@ CSS de l'emploi du temps
 }
 
 .headerTab {
-    background-color: #660099;
+    background-color: #1f63de;
 }
 
 @media (max-width: 1200px) {

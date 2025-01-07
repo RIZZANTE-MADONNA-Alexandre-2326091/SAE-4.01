@@ -62,7 +62,7 @@ class AlertView extends View
 			<p class="lead">Les alertes sont affichées les une après les autres défilant à la chaîne en bas des téléviseurs.</p>
 			<div class="text-center">
 				<figure class="figure">
-					<img src="' . TV_PLUG_PATH . 'public/img/presentation.png" class="figure-img img-fluid rounded" alt="Représentation d\'un téléviseur">
+					<img src="' . TV_PLUG_PATH . 'public/img/presentation.png" class="figure-img rounded" alt="Représentation d\'un téléviseur">
 					<figcaption class="figure-caption">Représentation d\'un téléviseur</figcaption>
 				</figure>
 			</div>
