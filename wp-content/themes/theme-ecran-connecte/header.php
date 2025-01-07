@@ -98,7 +98,7 @@ if(in_array('television', $current_user->roles)) : ?>
             <?php else : ?>
                 <ul class="nav navbar-nav navbar-right">
                         <li class="nav-item active">
-                            <a class="nav-link" href="<?phFixp echo wp_login_url(get_home_url()); ?>">Connexion</a>
+                            <a class="nav-link" href="<?php echo wp_login_url(get_home_url()); ?>">Connexion</a>
                         </li>
                 </ul>
             <?php endif; ?>
