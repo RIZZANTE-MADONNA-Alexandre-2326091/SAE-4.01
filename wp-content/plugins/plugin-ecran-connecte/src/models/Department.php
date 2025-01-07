@@ -179,8 +179,8 @@ class Department extends Model implements Entity, JsonSerializable
 	 */
 	public function getUserInDept(int $userId) {
 		$request = $this->getDatabase()->prepare("SELECT ed.dept_id, name FROM ecran_department ed
-                        								JOIN ecran_dept_user eud ON eud.dept_id = ed.dept_id
-                     									WHERE eud.user_id = :userId");
+                        								JOIN ecran_dept_user edu ON edu.dept_id = ed.dept_id
+                     									WHERE edu.user_id = :userId");
 
 		$request->bindValue(':userId', $userId, PDO::PARAM_INT);
 

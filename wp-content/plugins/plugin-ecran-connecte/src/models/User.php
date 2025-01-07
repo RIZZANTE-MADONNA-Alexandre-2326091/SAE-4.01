@@ -184,19 +184,19 @@ class User extends Model implements Entity, JsonSerializable
         return [];
     }
 
-    /**
-     *
-     *
-     * @param $role     string
-     *
-     * @return array
-     */
+	/**
+	 * Retrieves a list of users filtered by their role.
+	 *
+	 * @param string $role The role to filter users by.
+	 *
+	 * @return User[]|void The list of users matching the specified role, or void if no users are found.
+	 */
     public function getUsersByRole($role) {
-        $request = $this->getDatabase()->prepare('SELECT ID, user_login, user_pass, user_email 
+        $request = $this->getDatabase()->prepare('SELECT wpu.ID, user_login, user_pass, user_email 
 														FROM wp_users wpu, wp_usermeta meta, ecran_dept_user edu
-														WHERE user.ID = meta.user_id AND edu.user_id = wpu.ID 
+														WHERE wpu.ID = meta.user_id AND edu.user_id = wpu.ID 
 														AND meta.meta_value =:role 
-														ORDER BY user.user_login LIMIT 1000');
+														ORDER BY wpu.user_login LIMIT 1000');
 
         $size = strlen($role);
         $role = 'a:1:{s:' . $size . ':"' . $role . '";b:1;}';
