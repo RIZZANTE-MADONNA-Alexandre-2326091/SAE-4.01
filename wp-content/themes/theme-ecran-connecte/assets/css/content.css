@@ -76,7 +76,6 @@ body {
 	max-width:65%;
     background-color: #cdeafc;
     border-radius: 5px;
-    height: 100vh;
     margin-bottom: 10px;
 }
 
@@ -110,7 +109,7 @@ a:hover {
 }
 
 .dropdown-item:hover {
-    background-color: #cc7af5;
+    background-color: #7ba4fa;
 }
 
 td {
