@@ -15,7 +15,7 @@ class UserView extends View
      *
      * @return string
      */
-    protected function displayBaseForm($name, $departments, $isAdmin, $currentDept) {
+    protected function displayBaseForm($name, $departments, $isAdmin = false, $currentDept = null) {
 	    $disabled = $isAdmin ? '' : 'disabled';
 
 		return '

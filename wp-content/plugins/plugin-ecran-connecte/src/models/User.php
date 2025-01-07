@@ -192,10 +192,11 @@ class User extends Model implements Entity, JsonSerializable
      * @return array
      */
     public function getUsersByRole($role) {
-        $request = $this->getDatabase()->prepare('SELECT ID, user_login, user_pass, user_email, deptUs.dept_id  FROM wp_users user
-														JOIN wp_usermeta meta ON user.ID = meta.user_id
-														JOIN ecran_dept_user deptUs ON user.ID = deptUs.user_id
-														AND meta.meta_value =:role ORDER BY user.user_login LIMIT 1000');
+        $request = $this->getDatabase()->prepare('SELECT ID, user_login, user_pass, user_email 
+														FROM wp_users wpu, wp_usermeta meta, ecran_dept_user edu
+														WHERE user.ID = meta.user_id AND edu.user_id = wpu.ID 
+														AND meta.meta_value =:role 
+														ORDER BY user.user_login LIMIT 1000');
 
         $size = strlen($role);
         $role = 'a:1:{s:' . $size . ':"' . $role . '";b:1;}';
