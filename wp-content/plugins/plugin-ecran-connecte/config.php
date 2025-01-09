@@ -232,6 +232,16 @@ add_action('plugins_loaded', 'installDatabaseEcran');
  */
 
 $result = add_role(
+	'adminDept',
+	__('Administrateur Departement'),
+	array(
+		'read' => true,  // true allows this capability
+		'edit_posts' => true,
+		'delete_posts' => true,
+	)
+);
+
+$result = add_role(
     'secretaire',
     __('Secretaire'),
     array(
