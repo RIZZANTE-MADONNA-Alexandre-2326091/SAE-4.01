@@ -57,14 +57,12 @@ class Location extends Model implements Entity, JsonSerializable {
 
 			$request->execute();
 
-			// Valider la transaction
 			$lastId = $database->lastInsertId();
 			$database->commit();
 
 			return $lastId;
 
 		} catch (PDOException $e) {
-			$database->rollBack(); // Annule la transaction en cas d'erreur
 			error_log('Error during INSERT: ' . $e->getMessage());
 			throw $e;
 		}
@@ -76,16 +74,26 @@ class Location extends Model implements Entity, JsonSerializable {
 	 * @return int
 	 */
 	public function update(): int {
-		$request = $this->getDatabase()->prepare( "UPDATE ecran_location SET longitude = :longitude, latitude = :latitude
-                           								 WHERE user_id = :user_id" );
+		try {
+			$request = $this->getDatabase()->prepare(
+				"UPDATE ecran_location SET longitude = :longitude, latitude = :latitude
+             WHERE user_id = :user_id AND (longitude != :longitude OR latitude != :latitude"
+			);
 
-		$request->bindValue( ':longitude', $this->getLongitude());
-		$request->bindValue( ':latitude', $this->getLatitude());
-		$request->bindValue( ':user_id', $this->getIdUser(), PDO::PARAM_INT);
+			$request->bindValue(':longitude', $this->getLongitude());
+			$request->bindValue(':latitude', $this->getLatitude());
+			$request->bindValue(':user_id', $this->getIdUser(), PDO::PARAM_INT);
 
-		$request->execute();
+			$request->execute();
 
-		return $request->rowCount();
+			$rowsAffected = $request->rowCount(); // Nombre de lignes affectées
+			error_log("Lignes affectées par la mise à jour : $rowsAffected");
+
+			return $rowsAffected;
+		} catch (PDOException $e) {
+			error_log('Erreur lors de la mise à jour : ' . $e->getMessage());
+			return 0;
+		}
 	}
 
 	/**
