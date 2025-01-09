@@ -5,10 +5,6 @@ namespace Controllers;
 use Models\User;
 use Views\SecretaryView;
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 /**
  * Class SecretaryController
  *
