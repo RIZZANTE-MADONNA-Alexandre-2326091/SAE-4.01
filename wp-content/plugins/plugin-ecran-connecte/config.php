@@ -261,14 +261,6 @@ $result = add_role(
     )
 );
 
-$result = add_role(
-    'informationposter',
-    __('informationPoster'),
-    array(
-        'read' => true,  // true allows this capability
-    )
-);
-
 /*
  * CREATE REST API ENDPOINTS
  */
