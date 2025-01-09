@@ -60,7 +60,7 @@ class TelevisionView extends UserView
      * @return string
      */
     public function displayAllTv($users) {
-        $page = get_page_by_title('Modifier un utilisateur');
+        $page = get_page_by_title_V2('Modifier un utilisateur');
         $linkManageUser = get_permalink($page->ID);
 
         $title = 'Televisions';
@@ -90,7 +90,7 @@ class TelevisionView extends UserView
     public function modifyForm($user, $years, $groups, $halfGroups) {
         $count = 0;
         $string = '
-        <a href="' . esc_url(get_permalink(get_page_by_title('Gestion des utilisateurs'))) . '">< Retour</a>
+        <a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des utilisateurs'))) . '">< Retour</a>
         <h2>' . $user->getLogin() . '</h2>
          <form method="post" id="registerTvForm">
             <label id="selectId1"> Emploi du temps</label>';
@@ -112,7 +112,7 @@ class TelevisionView extends UserView
             $string .= $this->buildSelectCode($years, $groups, $halfGroups, null, $count);
         }
 
-        $page = get_page_by_title('Gestion des utilisateurs');
+        $page = get_page_by_title_V2('Gestion des utilisateurs');
         $linkManageUser = get_permalink($page->ID);
         $string .= '
             <input type="button" class="btn button_ecran" id="addSchedule" onclick="addButtonTv()" value="Ajouter des emplois du temps">

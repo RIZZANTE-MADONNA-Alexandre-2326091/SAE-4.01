@@ -25,7 +25,7 @@ class ICSView extends View
     public function displaySchedule($ics_data, $title, $allDay) {
         $current_user = wp_get_current_user();
         if (isset($ics_data['events'])) {
-            $string = '<h1>' . $title . '</h1>';
+            $string = '<div class="class-title">' . $title . '</div>';
             $current_study = 0;
             foreach (array_keys((array)$ics_data['events']) as $year) {
                 for ($m = 1; $m <= 12; $m++) {
@@ -71,15 +71,6 @@ class ICSView extends View
                                                     ++$current_study;
                                                     $string .= $this->getContent($event);
                                                 }
-                                            }
-                                        } elseif (in_array('enseignant', $current_user->roles) || in_array('directeuretude', $current_user->roles)
-                                            || in_array('etudiant', $current_user->roles)) {
-                                            if ($current_study > 9) {
-                                                break;
-                                            }
-                                            if ($this->getContent($event)) {
-                                                ++$current_study;
-                                                $string .= $this->getContent($event, $day);
                                             }
                                         } else {
                                             if ($current_study > 9) {
@@ -247,9 +238,9 @@ class ICSView extends View
      */
     public function displayNoSchedule($title, $current_user) {
         if (get_theme_mod('ecran_connecte_schedule_msg', 'show') == 'show' && in_array('television', $current_user->roles)) {
-            return '<h1>' . $title . '</h1><p> Vous n\'avez pas cours !</p>';
+            return '<div class="class-title">' . $title . '</div><div class="courstext">Vous n\'avez pas cours !</div>';
         } else if (!in_array('television', $current_user->roles)) {
-            return '<h1>' . $title . '</h1><p> Vous n\'avez pas cours !</p>';
+            return '<div class="class-title">' . $title . '</div><div class="courstext">Vous n\'avez pas cours !</div>';
         } else {
             return false;
         }

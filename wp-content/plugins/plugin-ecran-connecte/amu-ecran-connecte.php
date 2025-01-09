@@ -29,6 +29,7 @@ define('TV_ICSFILE_PATH', '/wp-content/uploads/fileICS/');
 require __DIR__ . '/autoload.php';
 require_once __DIR__ . '/vendor/autoload.php';
 
+include 'ajax-location-methods.php';
 include 'config.php';
 include 'blocks.php';
 
@@ -57,14 +58,6 @@ function downloadFileICS_func()
     foreach ($codesAde as $codeAde) {
         $controllerAde->addFile($codeAde->getCode());
     }
-
-	/*
-    $information = new InformationController();
-    $information->registerNewInformation();
-
-    $alert = new AlertController();
-    $alert->registerNewAlert();
-	*/
 }
 
 add_action('downloadFileICS', 'downloadFileICS_func');

@@ -10,7 +10,7 @@
                     <h1 class="mb-3 bd-text-purple-bright"><?php bloginfo('name'); ?></h1>
                     <p class="lead">
                         Créez des informations pour toutes les télévisions connectées, les informations seront affichées sur chaque télévision en plus des informations déjà publiées.
-                        Les informations des télévisions peuvent contenir du texte, des images, des tableaux, des événements et même des vidéos.
+                        Les informations des télévisions peuvent contenir du texte, des images et même des pdf.
                     </p>
                     <p class="lead mb-4">
                         Vous pouvez faire de même avec les alertes des télévisions connectées.
@@ -20,28 +20,28 @@
                     </p>
                     <div class="row mx-n2">
                         <div class="col-md px-2">
-                            <a href="<?php echo esc_url(get_permalink(get_page_by_title('Créer une information'))); ?>" class="btn btn-lg button_presentation_ecran w-100 mb-3">Créer une information</a>
+                            <a href="<?php echo esc_url(get_permalink(get_page_by_title_V2('Créer une information'))); ?>" class="btn btn-lg button_presentation_ecran w-100 mb-3">Créer une information</a>
                         </div>
                         <div class="col-md px-2">
-                            <a href="<?php echo esc_url(get_permalink(get_page_by_title('Créer une alerte'))); ?>" class="btn btn-lg button_presentation_ecran w-100 mb-3">Créer une alerte</a>
+                            <a href="<?php echo esc_url(get_permalink(get_page_by_title_V2('Créer une alerte'))); ?>" class="btn btn-lg button_presentation_ecran w-100 mb-3">Créer une alerte</a>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="masthead-followup row m-0 border border-white">
-                <div class="col-md-6 p-3 p-md-5 bg-light border border-white">
+            <div class="masthead-followup row m-0">
+                <div class="col-md-6 p-3 p-md-5">
                     <h3><img src="<?php echo get_template_directory_uri(); ?>/assets/media/+.png" alt="Ajouter une information/alerte" class="logo">Ajouter</h3>
                     <p>Ajouter une information ou une alerte. Elles seront affichées le lendemain sur toutes les télévisions</p>
-                    <a href="<?php echo esc_url(get_permalink(get_page_by_title('Créer une information'))); ?>" class="btn btn-lg button_presentation_ecran w-100 mb-3">Créer une information</a>
+                    <a href="<?php echo esc_url(get_permalink(get_page_by_title_V2('Créer une information'))); ?>" class="btn btn-lg button_presentation_ecran w-100 mb-3">Créer une information</a>
                     <hr class="half-rule">
-                    <a href="<?php echo esc_url(get_permalink(get_page_by_title('Créer une alerte'))); ?>" class="btn btn-lg button_presentation_ecran w-100 mb-3">Créer une alerte</a>
+                    <a href="<?php echo esc_url(get_permalink(get_page_by_title_V2('Créer une alerte'))); ?>" class="btn btn-lg button_presentation_ecran w-100 mb-3">Créer une alerte</a>
                 </div>
-                <div class="col-md-6 p-3 p-md-5 bg-light border border-white">
+                <div class="col-md-6 p-3 p-md-5">
                     <h3><img src="<?php echo get_template_directory_uri(); ?>/assets/media/gestion.png" alt="voir les informations/alertes" class="logo">Gérer</h3>
                     <p>Voir toutes les informations et alertes déjà publiées. Vous pouvez les supprimer, les modifier ou bien seulement les regarder</p>
-                    <a href="<?php echo esc_url(get_permalink(get_page_by_title('Gestion des informations'))); ?>" class="btn btn-lg button_presentation_ecran w-100 mb-3">Voir mes informations</a>
+                    <a href="<?php echo esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))); ?>" class="btn btn-lg button_presentation_ecran w-100 mb-3">Voir mes informations</a>
                     <hr class="half-rule">
-                    <a href="<?php echo esc_url(get_permalink(get_page_by_title('Gestion des alertes'))); ?>" class="btn btn-lg button_presentation_ecran w-100 mb-3">Voir mes alertes</a>
+                    <a href="<?php echo esc_url(get_permalink(get_page_by_title_V2('Gestion des alertes'))); ?>" class="btn btn-lg button_presentation_ecran w-100 mb-3">Voir mes alertes</a>
                 </div>
             </div>
             <div class="row">
@@ -58,7 +58,7 @@
                     </p>
                     <div class="row mx-n2">
                         <div class="col-md px-2">
-                            <a href="<?php echo esc_url(get_permalink(get_page_by_title('Créer un utilisateur'))); ?>" class="btn btn-lg button_presentation_ecran w-100 mb-3">Créer un utilisateur</a>
+                            <a href="<?php echo esc_url(get_permalink(get_page_by_title_V2('Créer un utilisateur'))); ?>" class="btn btn-lg button_presentation_ecran w-100 mb-3">Créer un utilisateur</a>
                         </div>
                     </div>
                 </div>

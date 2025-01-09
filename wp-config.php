@@ -21,16 +21,16 @@
 
 // ** Database settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define( 'DB_NAME', 'saeecrantest_wordpress' );
+define( 'DB_NAME', 'saeecransconnectes_wordpress' );
 
 /** Database username */
-define( 'DB_USER', '379081_wordpres2' );
+define( 'DB_USER', '392322_wordpress' );
 
 /** Database password */
-define( 'DB_PASSWORD', 'Kd3ut81I59' );
+define( 'DB_PASSWORD', 'wordpress_pswd' );
 
 /** Database hostname */
-define( 'DB_HOST', 'mysql-saeecrantest.alwaysdata.net' );
+define( 'DB_HOST', 'mysql-saeecransconnectes.alwaysdata.net' );
 
 /** Database charset to use in creating database tables. */
 define( 'DB_CHARSET', 'utf8' );

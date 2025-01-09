@@ -13,13 +13,13 @@ function weather_register_widget() {
  */
 class WidgetWeather extends WP_Widget
 {
-	/**
-	 * WidgetWeather constructor.
-	 */
+    /**
+     * WidgetWeather constructor.
+     */
     public function __construct()
     {
         parent::__construct(
-            // widget ID
+        // widget ID
             'weather_widget',
             // widget name
             __('Weather widget', ' teleconnecteeamu_widget_domain'),
@@ -28,40 +28,38 @@ class WidgetWeather extends WP_Widget
         );
     }
 
-	/**
-	 * Function of the widget
-	 *
-	 * @param array $args
-	 * @param array $instance
-	 */
+    /**
+     * Function of the widget
+     *
+     * @param array $args
+     * @param array $instance
+     */
     public function widget($args, $instance)
     {
         if (is_user_logged_in()) {
             echo '
-            <aside class="Infos">
-                <p class="Time" id="Time">
-                </p>
-                <p class="Date" id="Date">
-                </p>
-                <p class="Weather" id="Weather">
-                </p>
-            </aside>';
+        <aside class="Infos">
+                <div class="TimeDate">
+                    <p class="Time" id="Time"></p>
+                    <p class="Date" id="Date"></p>
+                </div>
+            <p class="Weather" id="Weather"></p>
+        </aside>';
         }
-
     }
 
-	/**
-	 * @param array $instance
-	 *
-	 * @return string|void
-	 */
+    /**
+     * @param array $instance
+     *
+     * @return string|void
+     */
     public function form($instance)
     {
         if (isset($instance['title'])) {
-	        $title = $instance[ 'title' ];
+            $title = $instance[ 'title' ];
         }
         else {
-	        $title = __('Default Title', 'teleconnectee_widget_domain');
+            $title = __('Default Title', 'teleconnectee_widget_domain');
         }
 
         echo '
@@ -71,12 +69,12 @@ class WidgetWeather extends WP_Widget
         </p>';
     }
 
-	/**
-	 * @param array $new_instance
-	 * @param array $old_instance
-	 *
-	 * @return array
-	 */
+    /**
+     * @param array $new_instance
+     * @param array $old_instance
+     *
+     * @return array
+     */
     public function update($new_instance, $old_instance)
     {
         $instance = array();
