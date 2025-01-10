@@ -45,6 +45,11 @@ let slidesShow;
  * */
 let slidesVideos;
 
+/**
+ * URL pour l'API YouTube Iframe
+ * */
+let urlYoutube;
+
 infoSlideShow();
 scheduleSlideshow();
 
@@ -291,6 +296,17 @@ function displayOrHide(slides, slideIndex)
                             // Si la vidéo correspond à celle affichée, on associe un id pour l'API
                             if (listeVideosShortsYouTube[indexVideoShortYouTube] === slides[slideIndex].childNodes[i]) {
                                 listeVideosShortsYouTube[indexVideoShortYouTube].id = "videoshID";
+
+                                urlYoutube = listeVideosShortsYouTube[indexVideoShortYouTube].src;
+                                let lastElementIndex = 0;
+                                for (let i = 0; i < urlYoutube.length; ++i) {
+                                    if (urlYoutube.charAt(i) === "?") {
+                                        lastElementIndex = i;
+                                        break;
+                                    }
+                                }
+                                urlYoutube = urlYoutube.substring(30,lastElementIndex);
+                                onYouTubeIframeAPIReady();
                             }
                             // Sinon, elle n'a pas l'id
                             else {
@@ -312,6 +328,19 @@ function displayOrHide(slides, slideIndex)
                             // Si la vidéo correspond à celle affichée, on associe un id pour l'API
                             if (listeVideosClassiqueYouTube[indexVideoClassiqueYouTube] === slides[slideIndex].childNodes[i]) {
                                 listeVideosClassiqueYouTube[indexVideoClassiqueYouTube].id = "videowID";
+
+                                urlYoutube = listeVideosClassiqueYouTube[indexVideoClassiqueYouTube].src;
+                                let lastElementIndex = 0;
+                                for (let i = 0; i < urlYoutube.length; ++i) {
+                                    if (urlYoutube.charAt(i) === "?") {
+                                        lastElementIndex = i;
+                                        break;
+                                    }
+                                }
+                                console.log(urlYoutube);
+                                urlYoutube = urlYoutube.substring(30,lastElementIndex);
+                                console.log(urlYoutube);
+                                onYouTubeIframeAPIReady();
                             }
                             // Sinon, elle n'a pas l'id
                             else {
@@ -418,15 +447,14 @@ function onYouTubeIframeAPIReady() {
             'onReady': onPlayerReady,
             'onStateChange': onPlayerStateChange,
         }
-    })
+    });
 }
 
 /**
  * Fonction évènementielle qui s'active lors de l'évènement onReady: s'active lorsque le lecteur concerné est chargé.
  * */
 function onPlayerReady(event) {
-    event.target.setPlaybackQuality("default");
-    event.target.seekTo(0);
+    event.target.cueVideoById(urlYoutube, 0, "default");
 }
 
 /**
@@ -434,13 +462,10 @@ function onPlayerReady(event) {
  * */
 function onPlayerStateChange(event) {
     if (event.data === -1) {
+        event.target.pauseVideo();
         event.target.seekTo(0);
-        console.log("---Vidéo YT lancée");
         timeout = event.target.getDuration();
-        console.log("timeout onPlayerStateChange = " + timeout);
-    }
-    else if (event.data === YT.PlayerState.ENDED) {
-        console.log("---Vidéo YT terminée");
-        event.target.stopVideo();
+        console.log("timeout YT = " + (timeout + 1) * 1000);
+        event.target.playVideo();
     }
 }
