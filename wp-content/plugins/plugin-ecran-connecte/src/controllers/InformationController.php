@@ -512,7 +512,7 @@ class InformationController extends Controller
                 $content = URL_WEBSITE_VIEWER . TV_UPLOAD_PATH;
             }
 
-            if (in_array($information->getType(), ['img', 'pdf', 'event', 'tab', 'LocCvideo', 'LocSvideo']))
+            if (in_array($information->getType(), ['img', 'pdf', 'event', 'tab', 'LocCvideo', 'LocSvideo', 'YTvideow', 'YTvideosh']))
             {
                 if (in_array($contentExplode[1], $imgExtension))
                 {
@@ -540,6 +540,23 @@ class InformationController extends Controller
 									<p>Votre navigateur ne permet pas de lire les vidéos de format mp4 avec HTML5.</p>
 								</video>';
 				}
+                else if ($information->getType() === 'YTvideow')
+                {
+                    $link = substr_replace($information->getContent(),'embed/',24,8);
+                    $content = $information->getContent() . '<br><iframe class="previsualisationVideoClassique" src="' . $link .
+                        '?playlist=' . substr($link,30) . '&mute=1"
+				        title="YouTube video pr" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
+				        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';
+                }
+                else if ($information->getType() === 'YTvideosh')
+                {
+                    $link = substr_replace($information->getContent(),'embed',24,6);
+                    $content = $information->getContent() . '<br><iframe class="previsualisationVideoShort" src="' . $link .
+                        '?playlist=' . substr($link,30) . '&mute=1"
+				        title="YouTube video player" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
+				        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';
+                }
+
             }
             else
             {
@@ -583,7 +600,7 @@ class InformationController extends Controller
             {
 	            $type = 'Vidéo locale format "short"';
             }
-            $dataList[] = [$row, $this->view->buildCheckbox($name, $information->getId()), $information->getTitle(), $content, $information->getCreationDate(), $information->getExpirationDate(), $information->getAuthor()->getLogin(), $type, $this->view->buildLinkForModify(esc_url(get_permalink(get_page_by_title('Modifier une information'))) . '?id=' . $information->getId())];
+            $dataList[] = [$row, $this->view->buildCheckbox($name, $information->getId()), $information->getTitle(), $content, $information->getCreationDate(), $information->getExpirationDate(), $information->getAuthor()->getLogin(), $type, $this->view->buildLinkForModify(esc_url(get_permalink(get_page_by_title_V2('Modifier une information'))) . '?id=' . $information->getId())];
         }
 
         $submit = filter_input(INPUT_POST, 'delete');
@@ -613,7 +630,7 @@ class InformationController extends Controller
         {
             $returnString = $this->view->contextDisplayAll();
         }
-        return $returnString . $this->view->displayAll($name, 'Informations', $header, $dataList) . $this->view->pageNumber($maxPage, $pageNumber, esc_url(get_permalink(get_page_by_title('Gestion des informations'))), $number);
+        return $returnString . $this->view->displayAll($name, 'Informations', $header, $dataList) . $this->view->pageNumber($maxPage, $pageNumber, esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))), $number);
     }
 
 

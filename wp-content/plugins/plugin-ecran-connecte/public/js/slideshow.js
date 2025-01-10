@@ -35,8 +35,85 @@ let timeout = 10000;
  * */
 let done = false;
 
+/**
+ * Diaporama des informations
+ * */
+let slidesShow;
+
+/**
+ * Diaporama de vidéos format "classique"
+ * */
+let slidesVideos;
+
+/**
+ * URL pour l'API YouTube Iframe
+ * */
+let urlYoutube;
+
 infoSlideShow();
 scheduleSlideshow();
+
+
+/**
+ * Fonction
+ * @param slides Liste contenant les slides contenant les informations et auquel les vidéos de format classique sont supprimées
+ * @return Liste contenant les vidéos de format classique
+ * */
+function separeVideosIntoASlide(slides) {
+    let newSlides = [];
+    //Récupérer les éléments
+    const videoYT = document.querySelectorAll(".videow");
+    const videoC = document.querySelectorAll(".localCvideo");
+    const listeVideos = [];
+
+    // Enlever les informations qui ne sont pas des vidéos classiques
+    for (let i = 0; i < slides.length; ++i) {
+        if (slides[i].childNodes) {
+            for (let index = 0; index < slides[i].childNodes.length; ++index) {
+                //Séparer les vidéos YouTube classiques
+                for (let indexyt = 0; indexyt < videoYT.length; ++indexyt) {
+
+                    // Si c'est une vidéo
+                    if (videoYT[indexyt] === slides[i].childNodes[index]) {
+                        if (listeVideos.indexOf(slides[i]) === -1) {
+                            listeVideos.push(slides[i]);
+                        }
+                    }
+
+                    //Sinon, on ajoute dans la nouvelle liste des autres informations
+                    else {
+                        if (newSlides.indexOf(slides[i]) === -1 && !(
+                                slides[i].childNodes[1].className === 'localCvideo'
+                                || slides[i].childNodes[1].className === 'videow')) {
+                            newSlides.push(slides[i]);
+                        }
+                    }
+                }
+                //Séparer les vidéos locales classiques
+                for (let indexc = 0; indexc < videoC.length; ++indexc) {
+
+                    // Si c'est une vidéo
+                    if (videoC[indexc] === slides[i].childNodes[index]) {
+                        if (listeVideos.indexOf(slides[i]) === -1) {
+                            listeVideos.push(slides[i]);
+                        }
+                    }
+
+                    //Sinon, on ajoute dans la nouvelle liste des autres informations
+                    else {
+                        if (newSlides.indexOf(slides[i]) === -1 && !(
+                                slides[i].childNodes[1].className === 'localCvideo'
+                                || slides[i].childNodes[1].className === 'videow')) {
+                            newSlides.push(slides[i]);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    slidesVideos = listeVideos;
+    return newSlides;
+}
 
 /**
  * Begin a slideshow if there is some informations
@@ -44,8 +121,10 @@ scheduleSlideshow();
 function infoSlideShow()
 {
     if(document.getElementsByClassName("myInfoSlides").length > 0) {
+        slidesShow = document.getElementsByClassName("myInfoSlides");
+        slidesShow = separeVideosIntoASlide(slidesShow);
         console.log("-Début du diaporama");
-        displayOrHide(document.getElementsByClassName("myInfoSlides"), 0);
+        displayOrHide(slidesShow, 0);
     }
 }
 
@@ -60,6 +139,7 @@ function scheduleSlideshow()
     }
 }
 
+
 /**
  * Display a slideshow
  * @param slides Les slides (informations) qui défileront dans la partie "Information"
@@ -68,23 +148,44 @@ function scheduleSlideshow()
 function displayOrHide(slides, slideIndex)
 {
     if(slides.length > 0) {
+
         if(slides.length > 1) {
             for (let i = 0; i < slides.length; ++i) {
                 slides[i].style.display = "none";
             }
         }
+        if(slidesVideos.length > 1) {
+            for (let i = 0; i < slidesVideos.length; ++i) {
+                slidesVideos[i].style.display = "none";
+            }
+        }
 
         if(slideIndex === slides.length) {
+            if (slides.length === slidesVideos.length
+                && (slides[0].childNodes[1].className === "videow"
+                || slides[0].childNodes[1].className === "localCvideo")) {
+                // Fin du diaporama vidéos classiques
+                console.log("-Fin de l'affichage des vidéos.");
+                return displayOrHide(slidesShow, 0);
+            }
+            // Afficher le diaporama des vidéos classiques
+            else if (slidesVideos.length !== 0) {
+                console.log("-Fin du diaporama - On affiche les vidéos");
+                displayOrHide(slidesVideos, 0);
+            }
+            // Fin du diaporama des autres informations
             console.log("-Fin du diaporama - On recommence");
             slideIndex = 0;
+            return;
         }
 
         // Check if the slide exist
         if(slides[slideIndex] !== undefined) {
 
             console.log("--Slide n°"+ slideIndex);
-            // Display the slide
+            // Display the slide and reset timeout to its default value.
             slides[slideIndex].style.display = "block";
+            timeout = 10000;
             // Check child
             if(slides[slideIndex].childNodes) {
                 var count = 0;
@@ -188,10 +289,26 @@ function displayOrHide(slides, slideIndex)
                     if (slides[slideIndex].childNodes[i].className === 'videosh') {
                         console.log("--Lecture vidéo Youtube short");
                         const listeVideosShortsYouTube = document.querySelectorAll(".videosh");
+
+                        // Chargement de toutes les vidéos de même classe HTML
                         for(let indexVideoShortYouTube = 0; indexVideoShortYouTube < listeVideosShortsYouTube.length; ++indexVideoShortYouTube) {
+
+                            // Si la vidéo correspond à celle affichée, on associe un id pour l'API
                             if (listeVideosShortsYouTube[indexVideoShortYouTube] === slides[slideIndex].childNodes[i]) {
                                 listeVideosShortsYouTube[indexVideoShortYouTube].id = "videoshID";
+
+                                urlYoutube = listeVideosShortsYouTube[indexVideoShortYouTube].src;
+                                let lastElementIndex = 0;
+                                for (let i = 0; i < urlYoutube.length; ++i) {
+                                    if (urlYoutube.charAt(i) === "?") {
+                                        lastElementIndex = i;
+                                        break;
+                                    }
+                                }
+                                urlYoutube = urlYoutube.substring(30,lastElementIndex);
+                                onYouTubeIframeAPIReady();
                             }
+                            // Sinon, elle n'a pas l'id
                             else {
                                 listeVideosShortsYouTube[indexVideoShortYouTube].id = "";
                             }
@@ -204,10 +321,28 @@ function displayOrHide(slides, slideIndex)
                     else if (slides[slideIndex].childNodes[i].className === 'videow') {
                         console.log("--Lecture vidéo Youtube classique");
                         const listeVideosClassiqueYouTube = document.querySelectorAll(".videow");
+
+                        // Chargement de toutes les vidéos de même classe HTML
                         for(let indexVideoClassiqueYouTube = 0; indexVideoClassiqueYouTube < listeVideosClassiqueYouTube.length; ++indexVideoClassiqueYouTube) {
+
+                            // Si la vidéo correspond à celle affichée, on associe un id pour l'API
                             if (listeVideosClassiqueYouTube[indexVideoClassiqueYouTube] === slides[slideIndex].childNodes[i]) {
                                 listeVideosClassiqueYouTube[indexVideoClassiqueYouTube].id = "videowID";
+
+                                urlYoutube = listeVideosClassiqueYouTube[indexVideoClassiqueYouTube].src;
+                                let lastElementIndex = 0;
+                                for (let i = 0; i < urlYoutube.length; ++i) {
+                                    if (urlYoutube.charAt(i) === "?") {
+                                        lastElementIndex = i;
+                                        break;
+                                    }
+                                }
+                                console.log(urlYoutube);
+                                urlYoutube = urlYoutube.substring(30,lastElementIndex);
+                                console.log(urlYoutube);
+                                onYouTubeIframeAPIReady();
                             }
+                            // Sinon, elle n'a pas l'id
                             else {
                                 listeVideosClassiqueYouTube[indexVideoClassiqueYouTube].id = "";
                             }
@@ -299,39 +434,38 @@ function displayOrHide(slides, slideIndex)
  * Fonction qui démarre l'API et attribue les valeurs aux lecteurs de vidéos.
  * */
 function onYouTubeIframeAPIReady() {
-    console.log("API Youtube démarée");
+    console.log("---API Youtube démarrée");
     playersh = new YT.Player('videoshID', {
         events: {
             'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange,
+            'onStateChange': onPlayerStateChange
         }
     });
+
     playerw = new YT.Player('videowID', {
         events: {
             'onReady': onPlayerReady,
             'onStateChange': onPlayerStateChange,
         }
-    })
+    });
 }
 
 /**
  * Fonction évènementielle qui s'active lors de l'évènement onReady: s'active lorsque le lecteur concerné est chargé.
  * */
 function onPlayerReady(event) {
-    event.target.setPlaybackQuality("defaut");
-    event.target.seekTo(0);
-    event.target.playVideo();
-    console.log("Vidéo YT lancée");
-    timeout = event.target.getDuration();
-    console.log("timeout = " + timeout);
+    event.target.cueVideoById(urlYoutube, 0, "default");
 }
 
 /**
  * Fonction évènementielle qui s'active lors de l'évènement onStateChange: se déclenche lorsque l'état du lecteur concerné change.
  * */
 function onPlayerStateChange(event) {
-    if (event.data === YT.PlayerState.ENDED) {
-        console.log("Vidéo YT terminée");
-        event.target.stopVideo();
+    if (event.data === -1) {
+        event.target.pauseVideo();
+        event.target.seekTo(0);
+        timeout = event.target.getDuration();
+        console.log("timeout YT = " + (timeout + 1) * 1000);
+        event.target.playVideo();
     }
 }
