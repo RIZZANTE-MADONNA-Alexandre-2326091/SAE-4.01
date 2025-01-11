@@ -77,8 +77,7 @@ class Location extends Model implements Entity, JsonSerializable {
 		try {
 			$request = $this->getDatabase()->prepare(
 				"UPDATE ecran_location SET longitude = :longitude, latitude = :latitude
-             WHERE user_id = :user_id AND (longitude != :longitude OR latitude != :latitude"
-			);
+             WHERE user_id = :user_id");
 
 			$request->bindValue(':longitude', $this->getLongitude());
 			$request->bindValue(':latitude', $this->getLatitude());

@@ -111,7 +111,7 @@ class AlertView extends View
             }
         }
 
-        $form .= '<input type="button" id="plus" onclick="addButtonAlert()" class="btn button_ecran" value="+">
+	    $form .= '<input type="button" id="plus" onclick="addButtonAlert()" value="+">
                   <button type="submit" class="btn button_ecran" id="valider" name="submit">Valider</button>
                   <button type="submit" class="btn delete_button_ecran" id="supprimer" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette alerte ?\');">Supprimer</button>
                 </form>' . $this->contextModify();

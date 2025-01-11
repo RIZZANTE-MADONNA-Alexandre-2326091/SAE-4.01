@@ -422,7 +422,7 @@ function schedule_render_callback()
         } else if (in_array("technicien", $current_user->roles)) {
             $controller = new TechnicianController();
             return $controller->displayMySchedule();
-        } else if (in_array("administrator", $current_user->roles) || in_array("secretaire", $current_user->roles)) {
+        } else if (in_array("administrator", $current_user->roles) || in_array("adminDept", $current_user->roles) || in_array("secretaire", $current_user->roles)) {
             $controller = new SecretaryController();
             return $controller->displayMySchedule();
         } else {
@@ -643,38 +643,6 @@ function block_choose_account() {
     ));
 }
 add_action( 'init', 'block_choose_account' );
-
-/**
- * Function of the block
- *
- * @return string
- */
-function code_account_render_callback()
-{
-    $current_user = wp_get_current_user();
-    if(is_page() && in_array('etudiant', $current_user->roles)) {
-        $myAccount = new StudentController();
-        $myAccount->modifyCodes();
-    }
-}
-
-/**
- * Build a block
- */
-function block_code_account()
-{
-    wp_register_script(
-        'code_account-script',
-        plugins_url( 'block.js', __FILE__ ),
-        array( 'wp-blocks', 'wp-element', 'wp-data' )
-    );
-
-    register_block_type('tvconnecteeamu/code-account', array(
-        'editor_script' => 'code_account-script',
-        'render_callback' => 'code_account_render_callback'
-    ));
-}
-add_action( 'init', 'block_code_account' );
 
 /**
  * Function of the block
