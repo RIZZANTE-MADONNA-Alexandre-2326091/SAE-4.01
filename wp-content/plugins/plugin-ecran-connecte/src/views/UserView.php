@@ -103,19 +103,6 @@ class UserView extends View
         </form>';
     }
 
-	/**
-	 * Generates and returns an HTML string for a subscription button with a nonce input field.
-	 *
-	 * @return string The HTML string containing the subscription button and an associated nonce input field.
-	 */
-	public function displayButtonSubscription() {
-		$wpnonce = wp_create_nonce('wp_rest');
-
-		return '
-        <a href="#" id="my-notification-button" class="btn btn-danger">Recevoir des notifications</a></br>
-        <input id="wpnonce" type="hidden" value="' . $wpnonce . '" />';
-	}
-
     /**
      * Display a form to change our own codes
      *
