@@ -323,6 +323,18 @@ class User extends Model implements Entity, JsonSerializable
         return $result['code'];
     }
 
+	public function getDeptAdmin( int $id){
+		$request = $this->getDatabase()->prepare('SELECT dept_id FROM ecran_dept_user WHERE dept_id = :id LIMIT 1');
+
+		$request->bindValue(':id', $id, PDO::PARAM_INT);
+
+		$request->execute();
+
+		$result = $request->fetch();
+
+		return $result['dept_id'];
+	}
+
     /**
      * @inheritDoc
      */

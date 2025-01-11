@@ -66,7 +66,7 @@ class AdminDeptController extends UserController {
 				$this->model->setRole('adminDept');
 				$this->model->setDeptId($deptId);
 
-				if (!$this->checkDuplicateUser($this->model) && $this->model->insert()) {
+				if (!$this->checkDuplicateUser($this->model) && !$this->checkDuplicateIdDept($this->model) && $this->model->insert()) {
 					$this->view->displayInsertValidate();
 				} else {
 					$this->view->displayErrorInsertion();
@@ -95,5 +95,15 @@ class AdminDeptController extends UserController {
 		return $this->view->displayAllAdminDept($users, $userDeptList);
 	}
 
+
+	public function checkDuplicateIdDept(User $newUser) {
+		$dept = $this->model->getDeptAdmin($newUser->getDeptId());
+
+		if (sizeof($dept) > 0) {
+			return true;
+		}
+
+		return false;
+	}
 
 }
