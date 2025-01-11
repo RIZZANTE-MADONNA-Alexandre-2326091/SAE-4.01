@@ -72,7 +72,6 @@ class Controller
         // Check if local file exists
         for ($i = 0; $i <= 3; ++$i) {
             $file_path = $base_path . 'file' . $i . '/' . $code . '.ics';
-            // TODO: Demander a propos du filesize
             if (file_exists($file_path) && filesize($file_path) > 100)
                 return $file_path;
         }

@@ -48,4 +48,22 @@ class TechnicianView extends UserView
 
         return $this->displayAll($name, $title, $header, $row, $name);
     }
+
+	/**
+	 * Start a slideshow
+	 *
+	 * @return string
+	 */
+	public function displayStartSlide() {
+		return '<div id="slideshow-container" class="slideshow-container">';
+	}
+
+	/**
+	 * Separate all slide by this
+	 *
+	 * @return string
+	 */
+	public function displayMidSlide() {
+		return '<div class="mySlides">';
+	}
 }

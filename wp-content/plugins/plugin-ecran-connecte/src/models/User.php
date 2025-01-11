@@ -439,7 +439,7 @@ class User extends Model implements Entity, JsonSerializable
         $this->codes = $codes;
     }
 
-    public function jsonSerialize() {
+    public function jsonSerialize(): mixed {
         return array(
             'id' => $this->id,
             'name' => $this->login
