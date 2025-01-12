@@ -15,26 +15,26 @@ use Models\User;
 class TechnicianView extends UserView
 {
 
-    /**
-     * Display a creation form
-     *
-     * @return string
-     */
-    public function displayFormTechnician() {
+	/**
+	 * Displays the form for creating technician accounts.
+	 *
+	 * @return string The rendered output of the technician account creation form with a title, description, and base form elements.
+	 */
+    public function displayFormTechnician(): string {
         return '
         <h2>Compte technicien</h2>
         <p class="lead">Pour créer des techniciens, remplissez ce formulaire avec les valeurs demandées.</p>
         ' . $this->displayBaseForm('Tech');
     }
 
-    /**
-     * Display all technicians in a table
-     *
-     * @param $users    User[]
-     *
-     * @return string
-     */
-    public function displayAllTechnicians($users) {
+	/**
+	 * Displays a list of all technicians with their corresponding login information.
+	 *
+	 * @param array $users An array of user objects, where each object represents a technician and contains relevant data such as ID and login.
+	 *
+	 * @return string The rendered output of the technicians' data in a formatted display.
+	 */
+    public function displayAllTechnicians(array $users): string {
         $title = 'Techniciens';
         $name = 'Tech';
         $header = ['Login'];
@@ -50,20 +50,20 @@ class TechnicianView extends UserView
     }
 
 	/**
-	 * Start a slideshow
+	 * Display the starting container for a slideshow
 	 *
 	 * @return string
 	 */
-	public function displayStartSlide() {
+	public function displayStartSlide():string {
 		return '<div id="slideshow-container" class="slideshow-container">';
 	}
 
 	/**
-	 * Separate all slide by this
+	 * Display the mid-slide HTML content
 	 *
 	 * @return string
 	 */
-	public function displayMidSlide() {
+	public function displayMidSlide(): string {
 		return '<div class="mySlides">';
 	}
 }

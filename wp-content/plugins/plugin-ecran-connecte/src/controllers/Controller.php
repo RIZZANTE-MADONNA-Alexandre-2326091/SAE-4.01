@@ -14,12 +14,12 @@ use Exception;
 class Controller
 {
 
-    /**
-     * Explode the url by /
-     *
-     * @return array
-     */
-    public function getPartOfUrl() {
+	/**
+	 * Retrieve and clean parts of the URL from the request URI.
+	 *
+	 * @return array An array of non-empty segments from the request URI.
+	 */
+    public function getPartOfUrl(): array {
         $url = $_SERVER['REQUEST_URI'];
         $urlExplode = explode('/', $url);
         $cleanUrl = array();
@@ -31,26 +31,28 @@ class Controller
         return $cleanUrl;
     }
 
-    /**
-     * Write errors in a log file
-     *
-     * @param $event    string
-     */
-    public function addLogEvent($event) {
+	/**
+	 * Add an event to the log file
+	 *
+	 * @param string $event The log event description
+	 *
+	 * @return void
+	 */
+    public function addLogEvent(string $event): void {
         $time = date("D, d M Y H:i:s");
         $time = "[" . $time . "] ";
         $event = $time . $event . "\n";
         file_put_contents(ABSPATH . TV_PLUG_PATH . "fichier.log", $event, FILE_APPEND);
     }
 
-    /**
-     * Get the url to upload a ics file
-     *
-     * @param $code     int
-     *
-     * @return string
-     */
-    public function getUrl($code) {
+	/**
+	 * Generate a URL for an anonymous calendar based on the provided code.
+	 *
+	 * @param int $code The code representing the resource.
+	 *
+	 * @return string The generated URL for the calendar.
+	 */
+    public function getUrl(int $code): string {
         $str = strtotime("now");
         $str2 = strtotime(date("Y-m-d", strtotime('now')) . " +6 day");
         $start = date('Y-m-d', $str);
@@ -59,14 +61,14 @@ class Controller
         return $url;
     }
 
-    /**
-     * Get the path of a code
-     *
-     * @param $code     int
-     *
-     * @return string
-     */
-    public function getFilePath($code) {
+	/**
+	 * Retrieve the file path for a .ics file or download it if not available locally.
+	 *
+	 * @param int $code Code identifier for the file.
+	 *
+	 * @return string The file path of the specified .ics file.
+	 */
+    public function getFilePath(int $code): string {
         $base_path = ABSPATH . TV_ICSFILE_PATH;
 
         // Check if local file exists
@@ -81,12 +83,14 @@ class Controller
         return $base_path . "file0/" . $code . '.ics';
     }
 
-    /**
-     * Upload a ics file
-     *
-     * @param $code     int Code ADE
-     */
-    public function addFile($code) {
+	/**
+	 * Adds a file by retrieving its content from a provided URL and saving it locally.
+	 *
+	 * @param string $code Unique identifier used to fetch the file and create its path.
+	 *
+	 * @return void
+	 */
+    public function addFile(string $code): void {
         try {
             $path = ABSPATH . TV_ICSFILE_PATH . "file0/" . $code . '.ics';
             $url = $this->getUrl($code);
@@ -111,14 +115,14 @@ class Controller
         }
     }
 
-    /**
-     * Check if the input is a date
-     *
-     * @param $date
-     *
-     * @return bool
-     */
-    public function isRealDate($date) {
+	/**
+	 * Determines if a given string represents a valid calendar date.
+	 *
+	 * @param string $date The date string to validate, formatted as 'YYYY-MM-DD'.
+	 *
+	 * @return bool Returns true if the date is valid, false otherwise.
+	 */
+    public function isRealDate(string $date): bool {
         if (false === strtotime($date)) {
             return false;
         }

@@ -16,17 +16,17 @@ use Models\Information;
 class InformationView extends View
 {
 
-    /**
-     * Display a form to create an information with text
-     *
-     * @param $title    string
-     * @param $content  string
-     * @param $endDate  string
-     * @param $type     string
-     *
-     * @return string
-     */
-    public function displayFormText($title = null, $content = null, $endDate = null, $type = "createText") {
+	/**
+	 * Generates and returns a form for creating or managing text content with fields for title, content, and expiration date.
+	 *
+	 * @param string|null $title The pre-filled value for the title input field. Optional.
+	 * @param string|null $content The pre-filled value for the content textarea field. Optional.
+	 * @param string|null $endDate The pre-filled value for the expiration date input field. Optional.
+	 * @param string $type The type of action for the form, e.g., "createText" or "submit". Defaults to "createText".
+	 *
+	 * @return string The generated HTML form as a string.
+	 */
+    public function displayFormText(string $title = null, string $content = null, string $endDate = null, string $type = "createText"): string {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
 
         $form = '
@@ -52,17 +52,17 @@ class InformationView extends View
         return $form . '</form>';
     }
 
-    /**
-     * Display a form to create an information with an image
-     *
-     * @param $title    string
-     * @param $content  string
-     * @param $endDate  string
-     * @param $type     string
-     *
-     * @return string
-     */
-    public function displayFormImg($title = null, $content = null, $endDate = null, $type = "createImg") {
+	/**
+	 * Generates and displays a form for uploading an image with optional title and expiration date.
+	 *
+	 * @param string|null $title The title of the form or image, optional.
+	 * @param string|null $content The file name of the current image to display, optional.
+	 * @param string|null $endDate The pre-filled expiration date for the form, optional.
+	 * @param string $type The type of form submission (default is "createImg").
+	 *
+	 * @return string The generated HTML form as a string.
+	 */
+    public function displayFormImg(string $title = null, string $content = null, string $endDate = null, string $type = "createImg"): string {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
 
         $form = '<form method="post" enctype="multipart/form-data">
@@ -96,67 +96,17 @@ class InformationView extends View
         return $form . '</form>';
     }
 
-    /**
-     * Display a form to create an information with a table
-     *
-     * @param null $title
-     * @param null $content
-     * @param null $endDate
-     * @param string $type
-     *
-     * @return string
-     * @throws \PhpOffice\PhpSpreadsheet\Exception
-     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
-     */
-    public function displayFormTab($title = null, $content = null, $endDate = null, $type = "createTab") {
-        $dateMin = date('Y-m-d', strtotime("+1 day"));
-
-        $form = '<form method="post" enctype="multipart/form-data">
-						<div class="form-group">
-			                <label for="title">Titre <span class="text-muted">(Optionnel)</span></label>
-			                <input id="title" class="form-control" type="text" name="title" placeholder="Inserer un titre" maxlength="60" value="' . $title . '">
-			            </div>';
-
-        if ($content != null) {
-            $info = new InformationController();
-            $list = $info->readSpreadSheet(TV_UPLOAD_PATH . $content);
-            foreach ($list as $table) {
-                $form .= $table;
-            }
-        }
-
-        $form .= '
-			<div class="form-group">
-                <label for="contentFile">Ajout du fichier Xls (ou xlsx)</label>
-                <input class="form-control-file" id="contentFile" type="file" name="contentFile" />
-                <input type="hidden" name="MAX_FILE_SIZE" value="5000000" />
-                <small id="tabHelp" class="form-text text-muted">Nous vous conseillons de ne pas dépasser trois colonnes.</small>
-                <small id="tabHelp" class="form-text text-muted">Nous vous conseillons également de ne pas mettre trop de contenu dans une cellule.</small>
-            </div>
-            <div class="form-group">
-				<label for="expirationDate">Date d\'expiration</label>
-				<input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' . $dateMin . '" value="' . $endDate . '" required >
-			</div>
-			<button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
-
-        if ($type == 'submit') {
-            $form .= '<button type="submit" class="btn delete_button_ecran" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette information ?\');">Supprimer</button>';
-        }
-
-        return $form . '</form>';
-    }
-
-    /**
-     * Display a form to create an information with a PDF
-     *
-     * @param $title    string
-     * @param $content  string
-     * @param $endDate  string
-     * @param $type     string
-     *
-     * @return string
-     */
-    public function displayFormPDF($title = null, $content = null, $endDate = null, $type = "createPDF") {
+	/**
+	 * Builds and returns an HTML string for a form to create or manage a PDF.
+	 *
+	 * @param string|null $title The pre-filled title for the PDF form, optional.
+	 * @param string|null $content The file path or identifier for an existing PDF to include, optional.
+	 * @param string|null $endDate The pre-filled expiration date for the PDF form, optional.
+	 * @param string $type The form submission type, defaults to "createPDF". Use "submit" for management forms.
+	 *
+	 * @return string The assembled HTML string representing the PDF form.
+	 */
+    public function displayFormPDF(string $title = null, string $content = null, string $endDate = null, string $type = "createPDF"): string {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
 
         $form = '<form method="post" enctype="multipart/form-data">
@@ -191,15 +141,15 @@ class InformationView extends View
         return $form . '</form>';
     }
 
-    /**
-     * Display a form to create an event information with media or PDFs
-     *
-     * @param $endDate  string
-     * @param $type     string
-     *
-     * @return string
-     */
-    public function displayFormEvent($endDate = null, $type = "createEvent") {
+	/**
+	 * Generates and displays an HTML form for event management.
+	 *
+	 * @param string|null $endDate The default expiration date to prefill in the date input field. If null, no value is prefilled.
+	 * @param string $type The type of form action, either for creating or submitting the event.
+	 *
+	 * @return string The generated HTML form as a string.
+	 */
+    public function displayFormEvent(string $endDate = null, string $type = "createEvent"): string {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
         $form = '
 		<form method="post" enctype="multipart/form-data">
@@ -223,12 +173,12 @@ class InformationView extends View
         return $form;
     }
 
-    /**
-     * Explain how the information's display
-     *
-     * @return string
-     */
-    public function contextCreateInformation() {
+	/**
+	 * Generates and returns the HTML content for creating and presenting information about the system's functionality.
+	 *
+	 * @return string The HTML content that describes the process and presentation of information, including images and descriptive text.
+	 */
+    public function contextCreateInformation(): string {
         return '
 		<hr class="half-rule">
 		<div>
@@ -245,19 +195,17 @@ class InformationView extends View
 		</div>';
     }
 
-    /**
-     * Display a form to modify an information
-     *
-     * @param $title
-     * @param $content
-     * @param $endDate
-     * @param $type
-     *
-     * @return string
-     * @throws \PhpOffice\PhpSpreadsheet\Exception
-     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
-     */
-    public function displayModifyInformationForm($title, $content, $endDate, $type) {
+	/**
+	 * Display the form to modify information based on the specified type.
+	 *
+	 * @param string $title The title of the information to be modified.
+	 * @param string $content The content of the information to be modified.
+	 * @param string $endDate The expiration date of the information.
+	 * @param string $type The type of information to be modified (e.g., text, img, tab, pdf, event).
+	 *
+	 * @return string The HTML content of the form to be displayed for modification or a fallback message if no information is available.
+	 */
+    public function displayModifyInformationForm(string $title, string $content, string $endDate, string $type): string {
         if ($type == "text") {
             return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormText($title, $content, $endDate, 'submit');
         } elseif ($type == "img") {
@@ -279,22 +227,26 @@ class InformationView extends View
         }
     }
 
-    /**
-     * Display the begin of the slideshow
-     */
-    public function displayStartSlideshow() {
+	/**
+	 * Displays the start of a slideshow container.
+	 *
+	 * @return void
+	 */
+    public function displayStartSlideshow(): void {
         echo '<div class="slideshow-container">';
     }
 
-    /**
-     * Display a slide for the slideshow
-     *
-     * @param $title
-     * @param $content
-     * @param $type
-     * @param bool $adminSite
-     */
-    public function displaySlide($title, $content, $type, $adminSite = false) {
+	/**
+	 * Displays a slide with content depending on the specified type and other parameters.
+	 *
+	 * @param string $title The title of the slide; if titled "Sans titre", no title will be displayed.
+	 * @param string $content The content of the slide, could be text, image path, or special format data.
+	 * @param string $type The type of content; allowed types are 'pdf', 'event', 'img', 'text', or 'special'.
+	 * @param bool $adminSite Indicates whether the slide is displayed in an admin context, altering the content path accordingly. Default is false.
+	 *
+	 * @return void
+	 */
+    public function displaySlide(string $title, string $content, string $type, bool $adminSite = false): void {
         echo '<div class="myInfoSlides text-center">';
 
         // If the title is empty
@@ -334,7 +286,12 @@ class InformationView extends View
         echo '</div>';
     }
 
-    public function contextDisplayAll() {
+	/**
+	 * Generates and returns the HTML content for displaying all context information.
+	 *
+	 * @return string The generated HTML content for presenting all context-related information.
+	 */
+	public function contextDisplayAll(): string {
         return '
 		<div class="row">
 			<div class="col-6 mx-auto col-md-6 order-md-2">
@@ -351,7 +308,12 @@ class InformationView extends View
 		<hr class="half-rule">';
     }
 
-    public function noInformation() {
+	/**
+	 * Generate HTML content to indicate that no information was found and provide navigation links.
+	 *
+	 * @return string The HTML content displaying an error message and navigation options.
+	 */
+	public function noInformation(): string {
         return '
 		<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>
 		<div>
@@ -361,49 +323,64 @@ class InformationView extends View
 		</div>';
     }
 
-    /**
-     * Start the slideshow
-     */
-    public function displayStartSlideEvent() {
+	/**
+	 * Displays the start of a slideshow event by outputting the necessary container HTML.
+	 *
+	 * @return void
+	 */
+    public function displayStartSlideEvent(): void {
         echo '
             <div id="slideshow-container" class="slideshow-container">';
     }
 
-    /**
-     * Start a slide
-     */
-    public function displaySlideBegin() {
+	/**
+	 * Displays the beginning of a slide element for an event.
+	 *
+	 * @return void
+	 */
+    public function displaySlideBegin(): void {
         echo '
 			<div class="mySlides event-slide">';
     }
 
-    /**
-     * Display a modal to validate the creation of an information
-     */
-    public function displayCreateValidate() {
+	/**
+	 * Displays a confirmation modal following the successful addition of information.
+	 *
+	 * @return void
+	 */
+    public function displayCreateValidate(): void {
         $page = get_page_by_title_V2('Gestion des informations');
         $linkManageInfo = get_permalink($page->ID);
         $this->buildModal('Ajout d\'information validé', '<p class="alert alert-success"> L\'information a été ajoutée </p>', $linkManageInfo);
     }
 
-    /**
-     * Display a modal to validate the modification of an information
-     * Redirect to manage page
-     */
-    public function displayModifyValidate() {
+	/**
+	 * Displays a confirmation modal upon the successful modification of information.
+	 *
+	 * @return void
+	 */
+    public function displayModifyValidate(): void {
         $page = get_page_by_title_V2('Gestion des informations');
         $linkManageInfo = get_permalink($page->ID);
         $this->buildModal('Modification d\'information validée', '<p class="alert alert-success"> L\'information a été modifiée </p>', $linkManageInfo);
     }
 
-    /**
-     * Display a message if the insertion of the information doesn't work
-     */
-    public function displayErrorInsertionInfo() {
+	/**
+	 * Displays an error message indicating a failure during the insertion of information.
+	 *
+	 * @return void
+	 */
+    public function displayErrorInsertionInfo(): void {
         echo '<p>Il y a eu une erreur durant l\'insertion de l\'information</p>';
     }
 
-    public function informationNotAllowed() {
+	/**
+	 * Returns an HTML string indicating that the modification of a specific alert is not allowed.
+	 * Includes navigation links to manage and create information pages.
+	 *
+	 * @return string
+	 */
+	public function informationNotAllowed(): string {
         return '
 		<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>
 		<div>

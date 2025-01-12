@@ -19,12 +19,12 @@ class TelevisionController extends UserController implements Schedule
     /**
      * @var User
      */
-    private $model;
+    private User $model;
 
     /**
      * @var TelevisionView
      */
-    private $view;
+    private TelevisionView $view;
 
     /**
      * Constructor of TelevisionController
@@ -35,12 +35,16 @@ class TelevisionController extends UserController implements Schedule
         $this->view = new TelevisionView();
     }
 
-    /**
-     * Insert a television in the database
-     *
-     * @return string
-     */
-    public function insert() {
+	/**
+	 * Handles the insertion of a new television user and processes associated codes.
+	 *
+	 * Validates all input data including login, password and codes, and ensures the user does not already exist.
+	 * If validation passes, the new user is created, and a success message is displayed.
+	 * In case of any error, an appropriate error message is returned.
+	 *
+	 * @return string A response indicating the result of the action. Either 'error', renders a form, or displays a success/error message.
+	 */
+    public function insert(): string {
         $action = filter_input(INPUT_POST, 'createTv');
 
         $codeAde = new CodeAde();
@@ -90,14 +94,14 @@ class TelevisionController extends UserController implements Schedule
         return $this->view->displayFormTelevision($years, $groups, $halfGroups);
     }
 
-    /**
-     * Modify a television
-     *
-     * @param $user User
-     *
-     * @return string
-     */
-    public function modify($user) {
+	/**
+	 * Modify user data and handle the modification process
+	 *
+	 * @param user $user The user object that will be modified
+	 *
+	 * @return string The HTML content for the modification form or an error message
+	 */
+    public function modify(user $user): string {
         $page = get_page_by_title_V2('Gestion des utilisateurs');
         $linkManageUser = get_permalink($page->ID);
 
@@ -131,22 +135,24 @@ class TelevisionController extends UserController implements Schedule
         return $this->view->modifyForm($user, $years, $groups, $halfGroups);
     }
 
-    /**
-     * Display all televisions in a table
-     *
-     * @return string
-     */
-    public function displayAllTv() {
+	/**
+	 * Retrieves and displays all users with the role of 'television'.
+	 *
+	 * @return string The rendered view displaying all television users.
+	 */
+    public function displayAllTv(): string {
         $users = $this->model->getUsersByRole('television');
         return $this->view->displayAllTv($users);
     }
 
-    /**
-     * Display a list a schedule
-     *
-     * @return mixed|string
-     */
-    public function displayMySchedule() {
+	/**
+	 * Displays the current user's schedule based on their codes and theme settings.
+	 * Generates and formats the schedule dynamically based on the number of codes
+	 * and the selected scrolling option from the theme configuration.
+	 *
+     * @return string The rendered schedule, typically a string, or a default message if no schedule is available.
+	 */
+    public function displayMySchedule(): string {
         $current_user = wp_get_current_user();
         $user = $this->model->get($current_user->ID);
         $user = $this->model->getMycodes([$user])[0];

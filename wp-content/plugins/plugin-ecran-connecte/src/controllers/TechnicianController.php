@@ -7,11 +7,8 @@ use Models\User;
 use Views\TechnicianView;
 
 /**
- * Class TechnicianController
- *
- * Manage Technician (Create, update, delete, display, display schedule)
- *
- * @package Controllers
+ * Controller responsible for handling technician-related functionality and operations.
+ * Extends the UserController and implements the Schedule interface.
  */
 class TechnicianController extends UserController implements Schedule
 {
@@ -19,12 +16,12 @@ class TechnicianController extends UserController implements Schedule
     /**
      * @var User
      */
-    private $model;
+    private User $model;
 
     /**
      * @var TechnicianView
      */
-    private $view;
+    private TechnicianView $view;
 
     /**
      * Constructor of SecretaryController.
@@ -35,10 +32,23 @@ class TechnicianController extends UserController implements Schedule
         $this->view = new TechnicianView();
     }
 
-    /**
-     * Insert a technician in the database
-     */
-    public function insert() {
+	/**
+	 * Handles the insertion of a new technician entry based on user input from a POST request.
+	 *
+	 * Validates the input data such as login, password, password confirmation, and email.
+	 * Ensures the login length is between 4 and 25 characters, password length is between 8 and 25 characters,
+	 * and the passwords match. If the inputs are valid and the email format is correct,
+	 * the technician details are saved into the model.
+	 *
+	 * On successful insertion, displays a confirmation message.
+	 * Otherwise, displays an error message indicating the issue.
+	 *
+	 * If no technician creation action is detected in the POST request or if the
+	 * provided inputs are invalid, the method returns the technician creation form view.
+	 *
+	 * @return string The rendered view content, either the form or feedback messages.
+	 */
+    public function insert(): string {
         $action = filter_input(INPUT_POST, 'createTech');
 
         if (isset($action)) {
@@ -70,12 +80,13 @@ class TechnicianController extends UserController implements Schedule
         return $this->view->displayFormTechnician();
     }
 
-    /**
-     * Display all technicians in a table
-     *
-     * @return string
-     */
-    public function displayAllTechnician() {
+	/**
+	 * Displays all technicians by retrieving users with the role of 'technicien'
+	 * and passing them to the view for rendering.
+	 *
+	 * @return string The rendered view displaying all technicians.
+	 */
+    public function displayAllTechnician(): string {
         $users = $this->model->getUsersByRole('technicien');
         return $this->view->displayAllTechnicians($users);
     }
@@ -98,11 +109,17 @@ class TechnicianController extends UserController implements Schedule
 
 
 	/**
-	 * Display the schedule of all students
+	 * Displays the schedule for the current user based on their assigned codes.
 	 *
-	 * @return mixed|string
+	 * This method retrieves the current user's information and fetches their associated codes.
+	 * It processes the schedule data for multiple codes to display sorted and formatted schedules.
+	 * If there are multiple courses, they are sorted by time, room number, and floor number before being displayed.
+	 * If only one code is present, it simply displays the schedule for that code.
+	 * If no courses are scheduled, an appropriate message is returned.
+	 *
+	 * @return string The HTML string containing the formatted and sorted schedule or a message indicating no scheduled courses.
 	 */
-	public function displayMySchedule() {
+	public function displayMySchedule(): string {
 		$current_user = wp_get_current_user();
 		$user = $this->model->get( $current_user->ID );
 		$user = $this->model->getMycodes( [ $user ] )[0];
@@ -170,14 +187,15 @@ class TechnicianController extends UserController implements Schedule
 	}
 
 	/**
-	 * Parse schedule data to extract time, room, and floor details.
+	 * Parses the schedule data from an HTML formatted string and extracts specific details such as time, room number, and floor.
 	 *
-	 * @param string $schedule The content of the schedule for a specific code (HTML or other structure).
+	 * @param string $schedule The HTML formatted string containing the schedule information.
 	 *
-	 * @return array|null Returns an array with parsed data or null if parsing fails.
+	 * @return array|null Returns an associative array with the keys 'time' (timestamp), 'room' (int), 'floor' (int), and 'content' (string),
+	 *                    or null if the extraction fails.
 	 */
 	private
-	function parseScheduleData( $schedule ) {
+	function parseScheduleData(string $schedule ): array|null {
 		// Supposons que le planning `$schedule` contient un format HTML avec des balises spécifiques,
 		// par exemple <span class="time">08:00</span>, <span class="room">207</span>, etc.
 

@@ -11,12 +11,12 @@ namespace Views;
  */
 class HelpMapView extends View
 {
-    /**
-     * Displays the help map
-     *
-     * @return string
-     */
-    public function displayHelpMap() {
+	/**
+	 * Displays a help map in HTML format.
+	 *
+	 * @return string The help map content in HTML format.
+	 */
+    public function displayHelpMap(): string {
         return '<p>Hello, World!</p>';
     }
 }

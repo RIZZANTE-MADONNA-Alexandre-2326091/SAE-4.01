@@ -2,6 +2,7 @@
 
 namespace Controllers;
 
+use Exception;
 use Models\Information;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Views\InformationView;
@@ -19,12 +20,12 @@ class InformationController extends Controller
     /**
      * @var Information
      */
-    private $model;
+    private Information $model;
 
     /**
      * @var InformationView
      */
-    private $view;
+    private InformationView $view;
 
     /**
      * Constructor of InformationController
@@ -34,14 +35,15 @@ class InformationController extends Controller
         $this->view = new InformationView();
     }
 
-    /**
-     * Create information and add it into the database
-     *
-     * @return string
-     * @throws \PhpOffice\PhpSpreadsheet\Exception
-     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
-     */
-    public function create() {
+	/**
+	 * Handles the creation of information based on user input, including setting metadata,
+	 * uploading files, and managing different content types (text, images, tables, PDFs, events).
+	 * It also displays the corresponding forms and validation UI components.
+	 *
+	 * @return string A rendered HTML selector for information creation forms, including type and content options.
+	 * @throws Exception If an error occurs during file registration or database insertion.
+	 */
+    public function create(): string {
         $current_user = wp_get_current_user();
 
         // All forms
@@ -95,19 +97,6 @@ class InformationController extends Controller
                 $this->view->buildModal('Image non valide', '<p>Ce fichier est une image non valide, veuillez choisir une autre image</p>');
             }
         }
-        if (isset($actionTab)) { // If the information is a table
-            $type = "tab";
-            $information->setType($type);
-            $filename = $_FILES['contentFile']['name'];
-            $fileTmpName = $_FILES['contentFile']['tmp_name'];
-            $explodeName = explode('.', $filename);
-            $goodExtension = ['xls', 'xlsx', 'ods'];
-            if (in_array(end($explodeName), $goodExtension)) {
-                $this->registerFile($filename, $fileTmpName, $information);
-            } else {
-                $this->view->buildModal('Tableau non valide', '<p>Ce fichier est un tableau non valide, veuillez choisir un autre tableau</p>');
-            }
-        }
         if (isset($actionPDF)) {
             $type = "pdf";
             $information->setType($type);
@@ -140,27 +129,29 @@ class InformationController extends Controller
             $this->view->displayStartMultiSelect() .
             $this->view->displayTitleSelect('text', 'Texte', true) .
             $this->view->displayTitleSelect('image', 'Image') .
-            $this->view->displayTitleSelect('table', 'Tableau') .
             $this->view->displayTitleSelect('pdf', 'PDF') .
             $this->view->displayTitleSelect('event', 'Événement') .
             $this->view->displayEndOfTitle() .
             $this->view->displayContentSelect('text', $this->view->displayFormText(), true) .
             $this->view->displayContentSelect('image', $this->view->displayFormImg()) .
-            $this->view->displayContentSelect('table', $this->view->displayFormTab()) .
             $this->view->displayContentSelect('pdf', $this->view->displayFormPDF()) .
             $this->view->displayContentSelect('event', $this->view->displayFormEvent()) .
             $this->view->displayEndDiv() .
             $this->view->contextCreateInformation();
     }
 
-    /**
-     * Modify the information
-     *
-     * @return string
-     * @throws \PhpOffice\PhpSpreadsheet\Exception
-     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
-     */
-    public function modify() {
+	/**
+	 * Modify an information entry.
+	 *
+	 * This method retrieves, validates, and updates an information entry based on user input. It ensures
+	 * the user has the appropriate permissions and verifies file uploads (if applicable) for specific
+	 * content types such as images, PDFs, or spreadsheets.
+	 *
+	 * @return string Returns various views including the modification form, validation messages,
+	 *               or an error message based on the action and its outcome.
+	 * @throws Exception Throws exceptions for invalid file operations or unexpected errors.
+	 */
+    public function modify(): string {
         $id = $_GET['id'];
 
         if (empty($id) || is_numeric($id) && !$this->model->get($id)) {
@@ -212,15 +203,6 @@ class InformationController extends Controller
                         } else {
                             $this->view->buildModal('PDF non valide', '<p>Ce fichier est un PDF non valide, veuillez choisir un autre PDF</p>');
                         }
-                    } else if ($information->getType() == 'tab') {
-                        $explodeName = explode('.', $filename);
-                        $goodExtension = ['xls', 'xlsx', 'ods'];
-                        if (in_array(end($explodeName), $goodExtension)) {
-                            $this->deleteFile($information->getId());
-                            $this->registerFile($filename, $_FILES["contentFile"]['tmp_name'], $information);
-                        } else {
-                            $this->view->buildModal('Tableau non valide', '<p>Ce fichier est un tableau non valide, veuillez choisir un autre tableau</p>');
-                        }
                     }
                 }
             }
@@ -241,13 +223,17 @@ class InformationController extends Controller
     }
 
 
-    /**
-     * Upload a file in a directory and in the database
-     *
-     * @param $filename     string
-     * @param $tmpName      string
-     */
-    public function registerFile($filename, $tmpName, $entity) {
+	/**
+	 * Handles the registration and upload of a file, associates it with an entity,
+	 * and updates the entity with the file content information.
+	 *
+	 * @param string $filename The original name of the file being uploaded.
+	 * @param string $tmpName The temporary file path where the uploaded file is stored.
+	 * @param object $entity The entity object to which the file content is associated.
+	 *
+	 * @return void
+	 */
+    public function registerFile( string $filename, string $tmpName, object $entity): void {
         $id = 'temporary';
         $extension_upload = strtolower(substr(strrchr($filename, '.'), 1));
         $name = $_SERVER['DOCUMENT_ROOT'] . TV_UPLOAD_PATH . $id . '.' . $extension_upload;
@@ -282,116 +268,133 @@ class InformationController extends Controller
         }
     }
 
-    /**
-     * Delete the file who's link to the id
-     *
-     * @param $id int Code
-     */
-    public function deleteFile($id) {
+	/**
+	 * Deletes a file from the server based on the provided ID.
+	 *
+	 * @param int $id The unique identifier of the file to be deleted.
+	 *
+	 * @return void
+	 */
+    public function deleteFile(int $id): void {
         $this->model = $this->model->get($id);
         $source = $_SERVER['DOCUMENT_ROOT'] . TV_UPLOAD_PATH . $this->model->getContent();
         wp_delete_file($source);
     }
 
-    public function displayAll() {
-        $numberAllEntity = $this->model->countAll();
-        $url = $this->getPartOfUrl();
-        $number = filter_input(INPUT_GET, 'number');
-        $pageNumber = 1;
-        if (sizeof($url) >= 2 && is_numeric($url[1])) {
-            $pageNumber = $url[1];
-        }
-        if (isset($number) && !is_numeric($number) || empty($number)) {
-            $number = 25;
-        }
-        $begin = ($pageNumber - 1) * $number;
-        $maxPage = ceil($numberAllEntity / $number);
-        if ($maxPage <= $pageNumber && $maxPage >= 1) {
-            $pageNumber = $maxPage;
-        }
-        $current_user = wp_get_current_user();
-        if (in_array('administrator', $current_user->roles) || in_array('secretaire', $current_user->roles)) {
-            $informationList = $this->model->getList($begin, $number);
-        } else {
-            $informationList = $this->model->getAuthorListInformation($current_user->ID, $begin, $number);
-        }
+	/**
+	 * Displays all information in a paginated format.
+	 * Filters and formats the information based on user roles, types, and other criteria.
+	 * Allows deleting of selected items if the user has the appropriate permissions.
+	 *
+	 * @return string The rendered HTML content for the information display and pagination.
+	 */
+	public function displayAll(): string {
+		$numberAllEntity = $this->model->countAll();
+		$url             = $this->getPartOfUrl();
+		$number          = filter_input( INPUT_GET, 'number' );
+		$pageNumber      = 1;
+		if ( sizeof( $url ) >= 2 && is_numeric( $url[1] ) ) {
+			$pageNumber = $url[1];
+		}
+		if ( isset( $number ) && ! is_numeric( $number ) || empty( $number ) ) {
+			$number = 25;
+		}
+		$begin   = ( $pageNumber - 1 ) * $number;
+		$maxPage = ceil( $numberAllEntity / $number );
+		if ( $maxPage <= $pageNumber && $maxPage >= 1 ) {
+			$pageNumber = $maxPage;
+		}
+		$current_user = wp_get_current_user();
+		if ( in_array( 'administrator', $current_user->roles ) || in_array( 'secretaire', $current_user->roles ) ) {
+			$informationList = $this->model->getList( $begin, $number );
+		} else {
+			$informationList = $this->model->getAuthorListInformation( $current_user->ID, $begin, $number );
+		}
 
-        $name = 'Info';
-        $header = ['Titre', 'Contenu', 'Date de création', 'Date d\'expiration', 'Auteur', 'Type', 'Modifier'];
-        $dataList = [];
-        $row = $begin;
-        $imgExtension = ['jpg', 'jpeg', 'gif', 'png', 'svg'];
-        foreach ($informationList as $information) {
-            ++$row;
+		$name         = 'Info';
+		$header       = [ 'Titre', 'Contenu', 'Date de création', 'Date d\'expiration', 'Auteur', 'Type', 'Modifier' ];
+		$dataList     = [];
+		$row          = $begin;
+		$imgExtension = [ 'jpg', 'jpeg', 'gif', 'png', 'svg' ];
+		foreach ( $informationList as $information ) {
+			++ $row;
 
-            $contentExplode = explode('.', $information->getContent());
+			$contentExplode = explode( '.', $information->getContent() );
 
-            $content = TV_UPLOAD_PATH;
-            if (!is_null($information->getAdminId())) {
-                $content = URL_WEBSITE_VIEWER . TV_UPLOAD_PATH;
-            }
+			$content = TV_UPLOAD_PATH;
+			if ( ! is_null( $information->getAdminId() ) ) {
+				$content = URL_WEBSITE_VIEWER . TV_UPLOAD_PATH;
+			}
 
-            if (in_array($information->getType(), ['img', 'pdf', 'event', 'tab'])) {
-                if (in_array($contentExplode[1], $imgExtension)) {
-                    $content = '<img class="img-thumbnail img_table_ecran" src="' . $content . $information->getContent() . '" alt="' . $information->getTitle() . '">';
-                } else if ($contentExplode[1] === 'pdf') {
-                    $content = '[pdf-embedder url="' . TV_UPLOAD_PATH . $information->getContent() . '"]';
-                } else if ($information->getType() === 'tab') {
-                    $content = 'Tableau Excel';
-                }
-            } else {
-                $content = $information->getContent();
-            }
+			if ( in_array( $information->getType(), [ 'img', 'pdf', 'event' ] ) ) {
+				if ( in_array( $contentExplode[1], $imgExtension ) ) {
+					$content = '<img class="img-thumbnail img_table_ecran" src="' . $content . $information->getContent() . '" alt="' . $information->getTitle() . '">';
+				} else if ( $contentExplode[1] === 'pdf' ) {
+					$content = '[pdf-embedder url="' . TV_UPLOAD_PATH . $information->getContent() . '"]';
+				} else {
+					$content = $information->getContent();
+				}
 
-            $type = $information->getType();
-            if ($information->getType() === 'img') {
-                $type = 'Image';
-            } else if ($information->getType() === 'pdf') {
-                $type = 'PDF';
-            } else if ($information->getType() === 'event') {
-                $type = 'Événement';
-            } else if ($information->getType() === 'text') {
-                $type = 'Texte';
-            } else if ($information->getType() === 'tab') {
-                $type = 'Table Excel';
-            }
-            $dataList[] = [$row, $this->view->buildCheckbox($name, $information->getId()), $information->getTitle(), $content, $information->getCreationDate(), $information->getExpirationDate(), $information->getAuthor()->getLogin(), $type, $this->view->buildLinkForModify(esc_url(get_permalink(get_page_by_title_V2('Modifier une information'))) . '?id=' . $information->getId())];
-        }
+				$type = $information->getType();
+				if ( $information->getType() === 'img' ) {
+					$type = 'Image';
+				} else if ( $information->getType() === 'pdf' ) {
+					$type = 'PDF';
+				} else if ( $information->getType() === 'event' ) {
+					$type = 'Événement';
+				} else if ( $information->getType() === 'text' ) {
+					$type = 'Texte';
+				}
+				$dataList[] = [
+					$row,
+					$this->view->buildCheckbox( $name, $information->getId() ),
+					$information->getTitle(),
+					$content,
+					$information->getCreationDate(),
+					$information->getExpirationDate(),
+					$information->getAuthor()->getLogin(),
+					$type,
+					$this->view->buildLinkForModify( esc_url( get_permalink( get_page_by_title_V2( 'Modifier une information' ) ) ) . '?id=' . $information->getId() )
+				];
+			}
 
-        $submit = filter_input(INPUT_POST, 'delete');
-        if (isset($submit)) {
-            if (isset($_REQUEST['checkboxStatusInfo'])) {
-                $checked_values = $_REQUEST['checkboxStatusInfo'];
-                foreach ($checked_values as $id) {
-                    $entity = $this->model->get($id);
-                    if (in_array('administrator', $current_user->roles) || in_array('secretaire', $current_user->roles) || $entity->getAuthor()->getId() == $current_user->ID) {
-                        $type = $entity->getType();
-                        $types = ["img", "pdf", "tab", "event"];
-                        if (in_array($type, $types)) {
-                            $this->deleteFile($id);
-                        }
-                        $entity->delete();
-                    }
-                }
-                $this->view->refreshPage();
-            }
-        }
-        $returnString = "";
-        if ($pageNumber == 1) {
-            $returnString = $this->view->contextDisplayAll();
-        }
-        return $returnString . $this->view->displayAll($name, 'Informations', $header, $dataList) . $this->view->pageNumber($maxPage, $pageNumber, esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))), $number);
-    }
+			$submit = filter_input( INPUT_POST, 'delete' );
+			if ( isset( $submit ) ) {
+				if ( isset( $_REQUEST['checkboxStatusInfo'] ) ) {
+					$checked_values = $_REQUEST['checkboxStatusInfo'];
+					foreach ( $checked_values as $id ) {
+						$entity = $this->model->get( $id );
+						if ( in_array( 'administrator', $current_user->roles ) || in_array( 'adminDept', $current_user->roles ) || in_array( 'secretaire', $current_user->roles ) || $entity->getAuthor()->getId() == $current_user->ID ) {
+							$type  = $entity->getType();
+							$types = [ "img", "pdf", "event" ];
+							if ( in_array( $type, $types ) ) {
+								$this->deleteFile( $id );
+							}
+							$entity->delete();
+						}
+					}
+					$this->view->refreshPage();
+				}
+			}
+			$returnString = "";
+			if ( $pageNumber == 1 ) {
+				$returnString = $this->view->contextDisplayAll();
+			}
+		}
+
+		return $returnString . $this->view->displayAll( $name, 'Informations', $header, $dataList ) . $this->view->pageNumber( $maxPage, $pageNumber, esc_url( get_permalink( get_page_by_title_V2( 'Gestion des informations' ) ) ), $number );
+	}
 
 
-    /**
-     * Check if the end date is today or less
-     * And delete the file if the date is past
-     *
-     * @param $id
-     * @param $endDate
-     */
-    public function endDateCheckInfo($id, $endDate) {
+	/**
+	 * Check if the end date of an information has passed and performs deletion if necessary.
+	 *
+	 * @param int|string $id The unique identifier of the information.
+	 * @param string $endDate The expiration date of the information in 'Y-m-d' format.
+	 *
+	 * @return void
+	 */
+    public function endDateCheckInfo(int $id, int|string $endDate): void {
         if ($endDate <= date("Y-m-d")) {
             $information = $this->model->get($id);
             $this->deleteFile($id);
@@ -399,14 +402,14 @@ class InformationController extends Controller
         }
     }
 
-    /**
-     * Display a slideshow
-     * The slideshow display all the informations
-     *
-     * @throws \PhpOffice\PhpSpreadsheet\Exception
-     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
-     */
-    public function informationMain() {
+	/**
+	 * Handles the display of information slides by retrieving a list of information,
+	 * processing each item based on its type and expiration date, and displaying
+	 * the components in a slideshow format.
+	 *
+	 * @return void
+	 */
+    public function informationMain(): void {
         $informations = $this->model->getList();
         $this->view->displayStartSlideshow();
         foreach ($informations as $information) {
@@ -431,7 +434,16 @@ class InformationController extends Controller
         $this->view->displayEndDiv();
     }
 
-    public function registerNewInformation() {
+	/**
+	 * Synchronizes and updates the local information database with the information
+	 * retrieved from the admin website. Existing information is compared and updated
+	 * based on title, content, and expiration date. If an information entry no longer
+	 * exists on the admin site, it is deleted from the local database. New information
+	 * from the admin website is added to the local database if it doesn't already exist.
+	 *
+	 * @return void
+	 */
+	public function registerNewInformation(): void {
         $informationList = $this->model->getFromAdminWebsite();
         $myInformationList = $this->model->getAdminWebsiteInformation();
         foreach ($myInformationList as $information) {
@@ -464,10 +476,14 @@ class InformationController extends Controller
         }
     }
 
-    /**
-     *  Display a slideshow of event information in full screen
-     */
-    public function displayEvent() {
+	/**
+	 * Handles the display of event slides by retrieving a list of event information,
+	 * iterating through each event, and rendering content based on its type.
+	 * Supports displaying images or embedding PDFs dynamically in the slideshow.
+	 *
+	 * @return string
+	 */
+    public function displayEvent(): string {
         $events = $this->model->getListInformationEvent();
         $this->view->displayStartSlideEvent();
         foreach ($events as $event) {
@@ -481,25 +497,24 @@ class InformationController extends Controller
             } else {
                 echo '<img src="' . TV_UPLOAD_PATH . $event->getContent() . '" alt="' . $event->getTitle() . '">';
             }
-            echo $this->view->displayEndDiv();
         }
-        $this->view->displayEndDiv();
+        return $this->view->displayEndDiv();
     }
 
-    /**
-     * Read an excel file
-     *
-     * @param $content
-     *
-     * @return array
-     * @throws \PhpOffice\PhpSpreadsheet\Exception
-     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
-     */
-    public function readSpreadSheet($content) {
+	/**
+	 * Reads the content of a spreadsheet file and processes it into a formatted HTML table structure.
+	 * The content is divided into multiple tables, each containing a maximum of 10 rows.
+	 *
+	 * @param string $content The relative path to the spreadsheet file.
+	 *
+	 * @return array An array of HTML strings, where each string represents a table with 10 rows (or fewer).
+	 */
+    public function readSpreadSheet(string $content): array {
         $file = $_SERVER['DOCUMENT_ROOT'] . $content;
 
-        $extension = ucfirst(strtolower(end(explode(".", $file))));
-        $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($extension);
+	    $array     = explode( ".", $file );
+	    $extension = ucfirst(strtolower(end( $array )));
+        $reader    = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($extension);
         $reader->setReadDataOnly(true);
         $spreadsheet = $reader->load($file);
 

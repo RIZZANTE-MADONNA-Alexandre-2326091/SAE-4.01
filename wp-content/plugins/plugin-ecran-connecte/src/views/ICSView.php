@@ -14,15 +14,16 @@ use WP_User;
  */
 class ICSView extends View
 {
-    /**
-     * ADisplay the schedule
-     *
-     * @param $ics_data     array
-     * @param $title        string
-     *
-     * @return bool
-     */
-    public function displaySchedule($ics_data, $title, $allDay) {
+	/**
+	 * Displays a schedule based on provided ICS data, the title, and user roles.
+	 *
+	 * @param array $ics_data The ICS data containing events grouped by year, month, and day.
+	 * @param string $title The title to display for the schedule.
+	 * @param mixed $allDay Whether to display all-day events or filter by specific user roles.
+	 *
+	 * @return bool A boolean indicating whether the schedule was successfully displayed.
+	 */
+    public function displaySchedule(array $ics_data, string $title, mixed $allDay): bool {
         $current_user = wp_get_current_user();
         if (isset($ics_data['events'])) {
             $string = '<h1>' . $title . '</h1>';
@@ -113,14 +114,14 @@ class ICSView extends View
         return $string;
     }
 
-    /**
-     * Display the header
-     *
-     * @param $current_user     WP_User
-     *
-     * @return string
-     */
-    public function displayStartSchedule($current_user) {
+	/**
+	 * Display the header of the schedule table
+	 *
+	 * @param WP_User $current_user The current user object, used to determine roles and adjust the table columns.
+	 *
+	 * @return string The HTML string representing the start of the schedule table.
+	 */
+    public function displayStartSchedule(WP_User $current_user): string {
         $string = '<div class="table-responsive">
                    	<table class="table tabSchedule">
                     	<thead class="headerTab">
@@ -138,30 +139,30 @@ class ICSView extends View
         return $string;
     }
 
-    /**
-     * Give the date of the schedule
-     *
-     * @param $day
-     * @param $month
-     * @param $year
-     *
-     * @return string
-     */
-    public function giveDate($day, $month, $year) {
+	/**
+	 * Generate a formatted date string for the given day, month, and year
+	 *
+	 * @param int $day The day of the month
+	 * @param int $month The month of the year
+	 * @param int $year The year
+	 *
+	 * @return string The formatted date string
+	 */
+    public function giveDate(int $day,int $month,int $year): string {
         $day_of_week = $day + 1;
 
         return '<h2>' . date_i18n('l j F', mktime(0, 0, 0, $month, $day_of_week, $year)) . '</h2>';
     }
 
-    /**
-     * Give the content of an event
-     *
-     * @param $event
-     * @param int $day
-     *
-     * @return bool|string
-     */
-    public function getContent($event, $day = 0) {
+	/**
+	 * Retrieves content for a specific event based on the day and current time.
+	 *
+	 * @param array $event An associative array containing event details such as 'deb', 'fin', 'label', 'description', and 'location'.
+	 * @param int $day The day of the month to retrieve the content for. Defaults to the current day.
+	 *
+	 * @return bool|string Returns a formatted string containing the event's schedule information if successful, or false otherwise.
+	 */
+    public function getContent(array $event, int $day = 0): bool|string {
         if ($day == 0) {
             $day = date('j');
         }
@@ -194,15 +195,15 @@ class ICSView extends View
         return false;
     }
 
-    /**
-     * Create a line for the schedule
-     *
-     * @param $datas
-     * @param bool $active
-     *
-     * @return string
-     */
-    public function displayLineSchedule($datas, $active = false) {
+	/**
+	 * Display a single line of the schedule
+	 *
+	 * @param array $datas The data to be displayed in the table row.
+	 * @param bool $active Determines if the row should have an active styling.
+	 *
+	 * @return string The formatted HTML string representing the table row.
+	 */
+    public function displayLineSchedule(array $datas, bool $active = false): string {
         if ($active) {
             $string = '<tr class="table-success" scope="row">';
         } else {
@@ -215,28 +216,28 @@ class ICSView extends View
         return $string . '</tr>';
     }
 
-    /**
-     * Display the footer of the schedule
-     *
-     * @return string
-     */
+	/**
+	 * Closes the HTML structure initiated for a schedule display.
+	 *
+	 * @return string HTML structure containing the end tags for table body, table, and div.
+	 */
     public
-    function displayEndSchedule() {
+    function displayEndSchedule(): string {
         return '</tbody>
              </table>
           </div>';
     }
 
 
-    /**
-     * Display an message if there is no lesson
-     *
-     * @param $title            string
-     * @param $current_user     WP_User
-     *
-     * @return bool|string
-     */
-    public function displayNoSchedule($title, $current_user) {
+	/**
+	 * Displays a message indicating no scheduled courses or returns false based on conditions.
+	 *
+	 * @param string $title The title to display in the message.
+	 * @param WP_User $current_user The current user object containing user details and roles.
+	 *
+	 * @return bool|string HTML message indicating no schedule for users with specific roles or false if conditions are not met.
+	 */
+    public function displayNoSchedule(string $title, WP_User $current_user): bool|string {
         if (get_theme_mod('ecran_connecte_schedule_msg', 'show') == 'show' && in_array('television', $current_user->roles)) {
             return '<h1>' . $title . '</h1><p> Vous n\'avez pas cours !</p>';
         } else if (!in_array('television', $current_user->roles)) {

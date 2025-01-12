@@ -17,12 +17,12 @@ class DepartmentController extends Controller
 	/**
 	 * @var Department
 	 */
-	private $model;
+	private Department $model;
 
 	/**
 	 * @var DepartmentView
 	 */
-	private $view;
+	private DepartmentView $view;
 
 	/**
 	 * DepartmentController constructor.
@@ -33,9 +33,13 @@ class DepartmentController extends Controller
 	}
 
 	/**
-	 * Insert a department in the database.
+	 * Handle the insertion of a department entity after validating input data.
 	 *
-	 * @return string
+	 * Processes the form submission to add a new department. It checks
+	 * the input name for validity and ensures no duplicate names exist
+	 * before the entity is inserted into the database.
+	 *
+	 * @return string The form view for department creation.
 	 */
 	public function insert(): string{
 		$action = filter_input(INPUT_POST, 'submit');
@@ -62,7 +66,9 @@ class DepartmentController extends Controller
 	}
 
 	/**
-	 * Delete a department to the database.
+	 * Deletes one or more departments based on user input.
+	 *
+	 * @return void
 	 */
 	public function delete(): void{
 		$action = filter_input(INPUT_GET, 'deleteDepartment');
@@ -80,9 +86,10 @@ class DepartmentController extends Controller
 	}
 
 	/**
-	 * Modify a department.
+	 * Modify an existing department by updating its name.
+	 * Validates the input data, checks for duplicates, and performs an update if valid.
 	 *
-	 * @return string
+	 * @return string Returns the rendered view for the modification form or related view messages.
 	 */
 	public function modify(): string{
 
@@ -117,7 +124,7 @@ class DepartmentController extends Controller
 	}
 
 	/**
-	 * Display all departments in a table
+	 * Retrieve and display all departments.
 	 *
 	 * @return string
 	 */
@@ -128,11 +135,11 @@ class DepartmentController extends Controller
 	}
 
 	/**
-	 * Check if a name already exists in the database.
+	 * Checks if a department with the same name already exists.
 	 *
-	 * @param Department $department
+	 * @param Department $department The department object containing the name to check for duplication.
 	 *
-	 * @return bool
+	 * @return bool Returns true if a duplicate department name is found, otherwise false.
 	 */
 	public function checkDuplicateDept(Department $department): bool{
 		$departments = $this->model->getDepartmentName($department->getName());
