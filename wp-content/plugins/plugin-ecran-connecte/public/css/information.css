@@ -41,6 +41,34 @@
     margin-top: -25%;
 }
 
+.rss-feed {
+    list-style-type: none;
+    padding: 0;
+}
+
+.rss-feed li {
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.rss-feed a {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    text-decoration: none;
+}
+
+.rss-feed a:hover {
+    text-decoration: underline;
+}
+
+.rss-description {
+    color: white;
+    margin-top: 5px;
+    font-size: 14px;
+}
+
 @media only screen and (max-width: 1000px) {
     .videosh, .localSvideo {
         height: 65vh;
