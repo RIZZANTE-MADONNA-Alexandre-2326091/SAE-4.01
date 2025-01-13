@@ -270,7 +270,7 @@ class View
     public function displayErrorDouble(array $doubles): void {
         $content = "";
         foreach ($doubles as $double) {
-            $content .= '<p class="alert alert-danger">' . $double . ' a rencontré un problème lors de l\'enregistrement, vérifié son login et son email !</p>';
+            $content .= '<p class="alert alert-danger">' . $double . ' a rencontré un problème lors de l\'enregistrement, veuillez vérifiez son login et son email !</p>';
         }
         $this->buildModal('Erreur durant l\'inscription', $content);
     }

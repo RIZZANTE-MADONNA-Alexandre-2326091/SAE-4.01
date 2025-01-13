@@ -26,7 +26,7 @@ class ICSView extends View
     public function displaySchedule(array $ics_data, string $title, mixed $allDay): bool {
         $current_user = wp_get_current_user();
         if (isset($ics_data['events'])) {
-            $string = '<h1>' . $title . '</h1>';
+            $string = '<div class="class-title">' . $title . '</div>';
             $current_study = 0;
             foreach (array_keys((array)$ics_data['events']) as $year) {
                 for ($m = 1; $m <= 12; $m++) {
@@ -239,9 +239,9 @@ class ICSView extends View
 	 */
     public function displayNoSchedule(string $title, WP_User $current_user): bool|string {
         if (get_theme_mod('ecran_connecte_schedule_msg', 'show') == 'show' && in_array('television', $current_user->roles)) {
-            return '<h1>' . $title . '</h1><p> Vous n\'avez pas cours !</p>';
+            return '<div class="class-title">' . $title . '</div><div class="courstext">Vous n\'avez pas cours !</div>';
         } else if (!in_array('television', $current_user->roles)) {
-            return '<h1>' . $title . '</h1><p> Vous n\'avez pas cours !</p>';
+            return '<div class="class-title">' . $title . '</div><div class="courstext">Vous n\'avez pas cours !</div>';
         } else {
             return false;
         }

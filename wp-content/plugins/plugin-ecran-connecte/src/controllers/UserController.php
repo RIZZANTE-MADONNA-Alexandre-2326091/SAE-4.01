@@ -72,65 +72,71 @@ class UserController extends Controller
 	 * @return string
 	 */
     public function deleteAccount(): string {
-        $action = filter_input(INPUT_POST, 'deleteMyAccount');
-        $actionDelete = filter_input(INPUT_POST, 'deleteAccount');
-        $current_user = wp_get_current_user();
-        $user = $this->model->get($current_user->ID);
-        if (isset($action)) {
-            $password = filter_input(INPUT_POST, 'verifPwd');
-            if (wp_check_password($password, $current_user->user_pass)) {
-
-                $code = wp_generate_password();
-                if (!empty($user->getCodeDeleteAccount())) {
-                    $user->updateCode($code);
-                } else {
-                    $user->createCode($code);
-                }
-
-                //Build Mail
-                $to = $current_user->user_email;
-                $subject = "Désinscription à la télé-connecté";
-                $message = ' <!DOCTYPE html>
-                             <html lang="fr">
-                             	<head>
-                               		<title>Désnscription à la télé-connecté</title>
-                              	</head>
-                              	<body>
-                               		<p>Bonjour, vous avez décidé de vous désinscrire sur le site de la Télé Connecté</p>
-                               		<p> Votre code de désinscription est : ' . $code . '.</p>
-                               		<p> Pour vous désinscrire, rendez-vous sur le site : <a href="' . home_url() . '/mon-compte/"> Tv Connectée.</p>
-                              	</body>
-                             </html>';
-
-                $headers = array('Content-Type: text/html; charset=UTF-8');
-
-                wp_mail($to, $subject, $message, $headers);
-                $this->view->displayMailSend();
-            } else {
-                $this->view->displayWrongPassword();
-            }
-        } elseif (isset($actionDelete)) {
-            $code = filter_input(INPUT_POST, 'codeDelete');
-            $userCode = $user->getCodeDeleteAccount();
-            if ($code == $userCode) {
-                $user->deleteCode();
-                $user->delete();
-                $this->view->displayModificationValidate();
-            } else {
-                echo 'Code ' . $code;
-                echo 'User code ' . $userCode;
-                $this->view->displayWrongPassword();
-            }
-        }
-        return $this->view->displayDeleteAccount() . $this->view->displayEnterCode();
+    if (in_array('administrator', $current_user->roles)) {
+        return '<p>La suppression de compte n’est pas autorisée pour les administrateurs.</p>';
     }
 
-	/**
-	 * Display modification options for the user.
-	 *
-	 * @return string
-	 */
-    public function chooseModif(): string {
+    $actionDeleteMyAccount = filter_input(INPUT_POST, 'deleteMyAccount');
+    $actionConfirmDelete = filter_input(INPUT_POST, 'deleteAccount');
+
+    $user = $this->model->get($current_user->ID);
+
+    if (isset($actionDeleteMyAccount)) {
+        $password = filter_input(INPUT_POST, 'verifPwd');
+        if (wp_check_password($password, $current_user->user_pass)) {
+            $code = wp_generate_password();
+            if (!empty($user->getCodeDeleteAccount())) {
+                $user->updateCode($code);
+            } else {
+                $user->createCode($code);
+            }
+
+            $to = $current_user->user_email;
+            $subject = "Désinscription à la télé-connecté";
+            $message = '
+                <!DOCTYPE html>
+                <html lang="fr">
+                    <head>
+                        <title>Désinscription à la télé-connecté</title>
+                    </head>
+                    <body>
+                        <p>Bonjour, vous avez décidé de vous désinscrire sur le site de la Télé Connecté.</p>
+                        <p>Votre code de désinscription est : ' . $code . '.</p>
+                        <p>Pour vous désinscrire, rendez-vous sur le site :
+                           <a href="' . home_url() . '/mon-compte/">Tv Connectée</a>.
+                        </p>
+                    </body>
+                </html>';
+            $headers = array('Content-Type: text/html; charset=UTF-8');
+
+            wp_mail($to, $subject, $message, $headers);
+            $this->view->displayMailSend();
+        } else {
+            $this->view->displayWrongPassword();
+        }
+    } elseif (isset($actionConfirmDelete)) {
+        $code = filter_input(INPUT_POST, 'codeDelete');
+        $userCode = $user->getCodeDeleteAccount();
+        if ($code == $userCode) {
+            $user->deleteCode();
+            $user->delete();
+            $this->view->displayModificationValidate();
+        } else {
+            $this->view->displayWrongPassword();
+        }
+    }
+
+    return $this->view->displayDeleteAccount() . $this->view->displayEnterCode();
+}
+
+
+    /**
+     * Modify his password, delete his account or modify his groups
+     *
+     * @return string
+     */
+    public function chooseModif() {
+        $current_user = wp_get_current_user();
         $string = $this->view->displayStartMultiSelect();
 
 		$string .= $this->view->displayTitleSelect('pass', 'Modifier mon mot de passe', true);

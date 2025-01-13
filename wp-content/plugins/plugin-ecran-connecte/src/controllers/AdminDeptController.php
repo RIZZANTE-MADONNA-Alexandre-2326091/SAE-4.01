@@ -47,7 +47,6 @@ class AdminDeptController extends UserController {
 		$isAdmin = in_array('administrator', $current_user->roles);
 		//$currentDept = $isAdmin ? null : $deptModel->getDepartmentUsers($current_user->ID)->getId();
 		$departments = $deptModel->getAll();
-
 		if (isset($action)) {
 
 			$login = filter_input(INPUT_POST, 'loginAdminDept');

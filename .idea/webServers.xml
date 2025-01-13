@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="f08dc2fa-52f7-4c64-bbde-1e28d57df3b0" name="sae" url="saeecransconnectes.alwaysdata.net">
+        <fileTransfer rootFolder="/home/saeecransconnectes" accessType="SFTP" host="ssh-saeecransconnectes.alwaysdata.net" port="22" sshConfigId="c25f99ae-70cc-470a-a574-f33f9b1e6258" sshConfig="saeecransconnectes@ssh-saeecransconnectes.alwaysdata.net:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

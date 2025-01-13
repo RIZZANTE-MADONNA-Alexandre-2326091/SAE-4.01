@@ -20,21 +20,31 @@ meteoRequest.onload = function () {
         var div = document.getElementById('Weather');
         div.innerHTML = "";
         var weather = document.createElement("DIV");
-        weather.innerHTML = temp + "<span class=\"degree\">°C</span>";
         weather.id = "weather";
+        weather.className = "weather-box";
         var imgTemp = document.createElement("IMG");
         imgTemp.id = "icon";
         imgTemp.src = "/wp-content/plugins/plugin-ecran-connecte/public/img/" + getIcon(json) + ".png";
         imgTemp.alt = getAlt(json);
+
+        var tempText = document.createElement("DIV");
+        tempText.className = "weather-text";
+        tempText.innerHTML = temp + "<span class=\"degree\">°C</span>";
+
         weather.appendChild(imgTemp);
+        weather.appendChild(tempText);
+        div.appendChild(weather);
         var wind = document.createElement("DIV");
-        wind.innerHTML = vent + "<span class=\"kmh\">km/h</span>";
         wind.id = "wind";
+        wind.className = "wind-box";
         var imgVent = document.createElement("IMG");
         imgVent.src = "/wp-content/plugins/plugin-ecran-connecte/public/img/wind.png";
-        imgVent.alt = "Img du vent";
+        imgVent.alt = "Icône du vent";
+        var windText = document.createElement("DIV");
+        windText.className = "wind-text";
+        windText.innerHTML = vent + "<span class=\"kmh\">km/h</span>";
         wind.appendChild(imgVent);
-        div.appendChild(weather);
+        wind.appendChild(windText);
         div.appendChild(wind);
         setTimeout(refreshWeather, 900000);
     }
