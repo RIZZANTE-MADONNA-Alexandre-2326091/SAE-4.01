@@ -2,11 +2,9 @@
 
 use Controllers\AlertController;
 use Controllers\CodeAdeController;
+use Controllers\DepartmentController;
 use Controllers\InformationController;
 use Controllers\SecretaryController;
-use Controllers\StudentController;
-use Controllers\StudyDirectorController;
-use Controllers\TeacherController;
 use Controllers\TechnicianController;
 use Controllers\TelevisionController;
 use Controllers\UserController;
@@ -211,6 +209,103 @@ function block_code_modify()
 add_action( 'init', 'block_code_modify' );
 
 /*
+ * DEPARTMENT BLOCKS
+ */
+
+/**
+ * Function of the block.
+ *
+ * @return string|void
+ */
+function department_render_callback(){
+	if(is_page()) {
+		$department = new DepartmentController();
+		return $department->insert();
+	}
+}
+
+/**
+ * Build a block.
+ *
+ * @return void
+ */
+function block_department(){
+	wp_register_script(
+		'department-script',
+		plugins_url( '/blocks/department/create.js', __FILE__ ),
+		array( 'wp-blocks', 'wp-element', 'wp-data' )
+	);
+
+	register_block_type('tvconnecteeamu/add-department', array(
+		'editor_script' => 'department-script',
+		'render_callback' => 'department_render_callback'
+	));
+}
+add_action('init', 'block_department');
+
+/**
+ * Function on the block.
+ *
+ * @return string|void
+ */
+function department_modify_render_callback(){
+	if(is_page()) {
+		$department = new DepartmentController();
+		return $department->modify();
+	}
+}
+
+/**
+ * Build a block.
+ *
+ * @return void
+ */
+function block_department_modify(): void{
+	wp_register_script(
+		'department_modify-script',
+		plugins_url( '/blocks/department/modify.js', __FILE__ ),
+		array( 'wp-blocks', 'wp-element', 'wp-data'  )
+	);
+
+	register_block_type('tvconnecteeamu/modify-department', array(
+		'editor_script' => 'department_modify-script',
+		'render_callback' => 'department_modify_render_callback'
+	));
+}
+add_action('init', 'block_department_modify');
+
+/**
+ * Function on the block.
+ *
+ * @return string
+ */
+function department_render_management_callback(){
+	if(is_page()) {
+		$department = new DepartmentController();
+		$department->delete();
+		return $department->displayAll();
+	}
+}
+
+/**
+ * Build a block.
+ *
+ * @return void
+ */
+function block_department_management(){
+	wp_register_script(
+		'department_manage-script',
+		plugins_url( '/blocks/department/displayAll.js', __FILE__ ),
+		array( 'wp-blocks', 'wp-element', 'wp-data'  )
+	);
+	register_block_type('tvconnecteeamu/manage-department', array(
+		'editor_script' => 'department-manage-script',
+		'render_callback' => 'department_render_management_callback'
+	));
+}
+add_action('init', 'block_department_management');
+
+/*
  * INFORMATION BLOCKS
  */
 
@@ -321,16 +416,7 @@ function schedule_render_callback()
 {
     if (is_page()) {
         $current_user = wp_get_current_user();
-        if(in_array('directeuretude', $current_user->roles)) {
-            $controller = new StudyDirectorController();
-            return $controller->displayMySchedule();
-        } else if (in_array("enseignant", $current_user->roles)) {
-            $controller = new TeacherController();
-            return $controller->displayMySchedule();
-        } else if (in_array("etudiant", $current_user->roles)) {
-            $controller = new StudentController();
-            return $controller->displayMySchedule();
-        } else if (in_array("television", $current_user->roles)) {
+        if (in_array("television", $current_user->roles)) {
             $controller = new TelevisionController();
             return $controller->displayMySchedule();
         } else if (in_array("technicien", $current_user->roles)) {

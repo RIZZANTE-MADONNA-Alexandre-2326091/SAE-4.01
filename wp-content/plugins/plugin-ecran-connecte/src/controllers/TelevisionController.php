@@ -98,7 +98,7 @@ class TelevisionController extends UserController implements Schedule
      * @return string
      */
     public function modify($user) {
-        $page = get_page_by_title('Gestion des utilisateurs');
+        $page = get_page_by_title_V2('Gestion des utilisateurs');
         $linkManageUser = get_permalink($page->ID);
 
         $codeAde = new CodeAde();
@@ -185,7 +185,7 @@ class TelevisionController extends UserController implements Schedule
             if (!empty($user->getCodes()[0])) {
                 $string .= $this->displaySchedule($user->getCodes()[0]->getCode());
             } else {
-                $string .= '<p>Vous n\'avez pas cours </p>';
+                $string .= '<div class="courstext">Vous n\'avez pas cours !</div>';
             }
         }
         return $string;

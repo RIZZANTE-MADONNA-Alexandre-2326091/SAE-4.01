@@ -41,10 +41,10 @@ class AlertView extends View
                 <label for="selectAlert">Année, groupe, demi-groupes concernés</label>
                 ' . $this->buildSelectCode($years, $groups, $halfGroups) . '
             </div>
-            <input type="button" onclick="addButtonAlert()" class="btn button_ecran" value="+">
-            <button type="submit" class="btn button_ecran" name="submit">Valider</button>
+            <input type="button" id="plus" onclick="addButtonAlert()" class="btn button_ecran" value="+">
+            <button type="submit" id="valider" class="btn button_ecran" name="submit">Valider</button>
         </form>
-        <a href="' . esc_url(get_permalink(get_page_by_title('Gestion des alertes'))) . '">Voir les alertes</a>' . $this->contextCreateAlert();
+        <a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des alertes'))) . '">Voir les alertes</a>' . $this->contextCreateAlert();
     }
 
     /**
@@ -57,12 +57,12 @@ class AlertView extends View
 		<hr class="half-rule">
 		<div>
 			<h2>Les alertes</h2>
-			<p class="lead">Lors de la création de votre alerte, celle-ci sera posté directement sur tous les téléviseurs qui utilisent  ce site.</p>
+			<p class="lead">Lors de la création de votre alerte, celle-ci sera posté directement sur tous les téléviseurs qui utilisent ce site.</p>
 			<p class="lead">Les alertes que vous créez seront affichées avec les alertes déjà présentes.</p>
 			<p class="lead">Les alertes sont affichées les une après les autres défilant à la chaîne en bas des téléviseurs.</p>
 			<div class="text-center">
 				<figure class="figure">
-					<img src="' . TV_PLUG_PATH . 'public/img/presentation.png" class="figure-img img-fluid rounded" alt="Représentation d\'un téléviseur">
+					<img src="' . TV_PLUG_PATH . 'public/img/presentation.png" class="figure-img rounded" alt="Représentation d\'un téléviseur">
 					<figcaption class="figure-caption">Représentation d\'un téléviseur</figcaption>
 				</figure>
 			</div>
@@ -84,7 +84,7 @@ class AlertView extends View
         $codes = $alert->getCodes();
 
         $form = '
-        <a href="' . esc_url(get_permalink(get_page_by_title('Gestion des alertes'))) . '">< Retour</a>
+        <a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des alertes'))) . '">< Retour</a>
         <form method="post" id="alert">
             <div class="form-group">
                 <label for="content">Contenu</label>
@@ -103,7 +103,7 @@ class AlertView extends View
             $count = 2;
             foreach ($codes as $code) {
                 $form .= '
-				<div class="row">' .
+				<div class="row" id="selctId' . $count . '">' .
                     $this->buildSelectCode($years, $groups, $halfGroups, $code, $count)
                     . '<input type="button" id="selectId' . $count . '" onclick="deleteRowAlert(this.id)" class="selectbtn" value="Supprimer">
                   </div>';
@@ -111,9 +111,9 @@ class AlertView extends View
             }
         }
 
-        $form .= '<input type="button" onclick="addButtonAlert()" value="+">
-                  <button type="submit" class="btn button_ecran" name="submit">Valider</button>
-                  <button type="submit" class="btn delete_button_ecran" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette alerte ?\');">Supprimer</button>
+        $form .= '<input type="button" id="plus" onclick="addButtonAlert()" class="btn button_ecran" value="+">
+                  <button type="submit" class="btn button_ecran" id="valider" name="submit">Valider</button>
+                  <button type="submit" class="btn delete_button_ecran" id="supprimer" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette alerte ?\');">Supprimer</button>
                 </form>' . $this->contextModify();
 
         return $form;
@@ -138,10 +138,10 @@ class AlertView extends View
 				<p class="lead">Vous pouvez retrouver ici toutes les alertes qui ont été créées sur ce site.</p>
 				<p class="lead mb-4">Les alertes sont triées de la plus vieille à la plus récente.</p>
 				<p class="lead mb-4">Vous pouvez modifier une alerte en cliquant sur "Modifier" à la ligne correspondante à l\'alerte.</p>
-				<p class="lead mb-4">Vous souhaitez supprimer une / plusieurs alerte(s) ? Cochez les cases des alertes puis cliquez sur "Supprimer" le bouton ce situe en bas du tableau.</p>
+				<p class="lead mb-4">Vous souhaitez supprimer une / plusieurs alerte(s) ? Cochez les cases des alertes puis cliquez sur "Supprimer" le bouton se situant en bas du tableau.</p>
 			</div>
 		</div>
-		<a href="' . esc_url(get_permalink(get_page_by_title('Créer une alerte'))) . '">Créer une alerte</a>
+		<a href="' . esc_url(get_permalink(get_page_by_title_V2('Créer une alerte'))) . '">Créer une alerte</a>
 		<hr class="half-rule">';
     }
 
@@ -212,21 +212,21 @@ class AlertView extends View
 
     public function noAlert() {
         return '
-		<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des alertes'))) . '">< Retour</a>
+		<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des alertes'))) . '">< Retour</a>
 		<div>
 			<h3>Alerte non trouvée</h3>
 			<p>Cette alerte n\'éxiste pas, veuillez bien vérifier d\'avoir bien cliqué sur une alerte.</p>
-			<a href="' . esc_url(get_permalink(get_page_by_title('Créer une alerte'))) . '">Créer une alerte</a>
+			<a href="' . esc_url(get_permalink(get_page_by_title_V2('Créer une alerte'))) . '">Créer une alerte</a>
 		</div>';
     }
 
     public function alertNotAllowed() {
         return '
-		<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des alertes'))) . '">< Retour</a>
+		<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des alertes'))) . '">< Retour</a>
 		<div>
 			<h3>Vous ne pouvez pas modifier cette alerte</h3>
 			<p>Cette alerte appartient à quelqu\'un d\'autre, vous ne pouvez donc pas modifier cette alerte.</p>
-			<a href="' . esc_url(get_permalink(get_page_by_title('Créer une alerte'))) . '">Créer une alerte</a>
+			<a href="' . esc_url(get_permalink(get_page_by_title_V2('Créer une alerte'))) . '">Créer une alerte</a>
 		</div>';
     }
 
@@ -234,14 +234,14 @@ class AlertView extends View
      * Display modal for validate the creation of an alert
      */
     public function displayAddValidate() {
-        $this->buildModal('Ajout d\'alerte', '<div class="alert alert-success"> Votre alerte a été envoyée !</div>', esc_url(get_permalink(get_page_by_title('Gestion des alertes'))));
+        $this->buildModal('Ajout d\'alerte', '<div class="alert alert-success"> Votre alerte a été envoyée !</div>', esc_url(get_permalink(get_page_by_title_V2('Gestion des alertes'))));
     }
 
     /**
      * Display modal for validate the modification of an alert
      */
     public function displayModifyValidate() {
-        $page = get_page_by_title('Gestion des alertes');
+        $page = get_page_by_title_V2('Gestion des alertes');
         $linkManageAlert = get_permalink($page->ID);
         $this->buildModal('Ajout d\'alerte', '<div class="alert alert-success"> Votre alerte a été modifiée ! </div>', $linkManageAlert);
     }

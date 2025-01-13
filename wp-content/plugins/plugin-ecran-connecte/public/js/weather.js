@@ -1,34 +1,15 @@
 var meteoRequest = new XMLHttpRequest();
-var startUrl = "https://api.openweathermap.org/data/2.5/weather?lat=";
-var url;
-var endUrl = "&lang=fr&APPID=ae546c64c1c36e47123b3d512efa723e";
-
-function success(pos){
-    var crd = pos.coords;
-
-    var longitude = crd.longitude;
-    var latitude = crd.latitude;
-
-    url = startUrl + latitude + "&lon=" + longitude + endUrl;
-
-    meteoRequest.open('GET', url, true);
-    meteoRequest.setRequestHeader('Accept', 'application/json');
-    meteoRequest.send();
-
-
-}
-
-function error(err) {
-    console.warn(`ERROR(${err.code}): ${err.message}`);
-}
+var longitude = weatherValues.long;
+var latitude = weatherValues.lat;
+var url = "https://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&lang=fr&APPID=ae546c64c1c36e47123b3d512efa723e";
 
 /**
  * Display the weather
  */
 function refreshWeather() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(success, error);
-    }
+    meteoRequest.open('GET', url, true);
+    meteoRequest.setRequestHeader('Accept', 'application/json');
+    meteoRequest.send();
 }
 
 meteoRequest.onload = function () {
@@ -39,21 +20,31 @@ meteoRequest.onload = function () {
         var div = document.getElementById('Weather');
         div.innerHTML = "";
         var weather = document.createElement("DIV");
-        weather.innerHTML = temp + "<span class=\"degree\">°C</span>";
         weather.id = "weather";
+        weather.className = "weather-box";
         var imgTemp = document.createElement("IMG");
         imgTemp.id = "icon";
         imgTemp.src = "/wp-content/plugins/plugin-ecran-connecte/public/img/" + getIcon(json) + ".png";
         imgTemp.alt = getAlt(json);
+
+        var tempText = document.createElement("DIV");
+        tempText.className = "weather-text";
+        tempText.innerHTML = temp + "<span class=\"degree\">°C</span>";
+
         weather.appendChild(imgTemp);
+        weather.appendChild(tempText);
+        div.appendChild(weather);
         var wind = document.createElement("DIV");
-        wind.innerHTML = vent + "<span class=\"kmh\">km/h</span>";
         wind.id = "wind";
+        wind.className = "wind-box";
         var imgVent = document.createElement("IMG");
         imgVent.src = "/wp-content/plugins/plugin-ecran-connecte/public/img/wind.png";
-        imgVent.alt = "Img du vent";
+        imgVent.alt = "Icône du vent";
+        var windText = document.createElement("DIV");
+        windText.className = "wind-text";
+        windText.innerHTML = vent + "<span class=\"kmh\">km/h</span>";
         wind.appendChild(imgVent);
-        div.appendChild(weather);
+        wind.appendChild(windText);
         div.appendChild(wind);
         setTimeout(refreshWeather, 900000);
     }

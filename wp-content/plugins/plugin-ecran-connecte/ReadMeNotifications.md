@@ -10,8 +10,8 @@ site internet (Option ***"Force HTTPS Usage"***).
 
 ## Créer un compte OneSignal
 
-Ce projet utilise OneSignal afin de pouvoir délivrer a ses utilisateurs des notifications push.  
-Vous allez donc devoir paramétrer un compte OneSignal afin de pouvoir utiliser cette fonctionnalité.
+Ce projet utilise OneSignal afin de pouvoir délivrer à ses utilisateurs des notifications push.  
+Vous allez donc devoir paramétrer un compte OneSignal dans le but de pouvoir utiliser cette fonctionnalité.
 
 Tout d'abord, rendez-vous sur [le site de OneSignal](https://onesignal.com) afin de créer un compte.
 

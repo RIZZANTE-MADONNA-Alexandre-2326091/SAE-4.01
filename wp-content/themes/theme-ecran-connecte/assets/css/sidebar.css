@@ -1,7 +1,18 @@
 /* SIDEBAR */
 .sidebar {
     min-width: 25%;
-    background-color: white;
-    border-radius: 5px;
-    margin-bottom: 10px;
+    background-color: #1f63de;
+    height: 100vh;
+}
+
+.sidebar-logo {
+    display: inline;
+    margin: 20px 0px 20px 0px;
+    max-width: 300px;
+    height: auto;
+    transition: transform 0.3s ease;
+}
+
+.sidebar-logo:hover {
+    transform: scale(1.01);
 }

@@ -64,7 +64,7 @@ function remove_admin_bar()
  */
 function wpm_admin_redirection()
 {
-    if (is_admin() && !current_user_can('administrator')) {
+    if (is_admin() && !current_user_can('administrator')  && !defined('DOING_AJAX')) {
         wp_redirect(home_url());
         exit;
     }
@@ -107,6 +107,28 @@ $args = array(
     'default-image' => get_template_directory_uri() . '/assets/media/header.png',
 );
 add_theme_support('custom-header', $args);
+
+function get_page_by_title_V2(string $title) {
+	// Define the arguments what to retrieve.
+	$args = array(
+		'post_type' => 'page',
+		'title' => $title,
+		'post_status' => 'publish',
+		'posts_per_page' => 1
+	);
+
+	// Execute the WP Query.
+	$my_query = new WP_Query($args);
+
+	// Start a loop.
+	if ( $my_query->have_posts() ) {
+		$my_query->the_post();
+		return get_post();
+	}
+
+	// Reset to the main query (IMPORTANT).
+	wp_reset_postdata();
+}
 
 //Met la bonne heure
 global $wpdb;
