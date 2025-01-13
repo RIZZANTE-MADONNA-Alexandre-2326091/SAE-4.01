@@ -48,14 +48,17 @@ class InformationController extends Controller
         $current_user = wp_get_current_user();
 
         // All forms
+
+
         $actionText = filter_input(INPUT_POST, 'createText');
         $actionImg = filter_input(INPUT_POST, 'createImg');
         $actionTab = filter_input(INPUT_POST, 'createTab');
         $actionPDF = filter_input(INPUT_POST, 'createPDF');
         $actionEvent = filter_input(INPUT_POST, 'createEvent');
         $actionVideoYT = filter_input(INPUT_POST, 'createVideoYT');
-		$actionVideoCLocal = filter_input(INPUT_POST, 'createVideoCLocal');
-		$actionVideoSLocal = filter_input(INPUT_POST, 'createVideoSLocal');
+        $actionVideoCLocal = filter_input(INPUT_POST, 'createVideoCLocal');
+        $actionVideoSLocal = filter_input(INPUT_POST, 'createVideoSLocal');
+        $actionRSS = filter_input(INPUT_POST, 'createRSS');
 
         // Variables
         $title = filter_input(INPUT_POST, 'title');
@@ -164,18 +167,18 @@ class InformationController extends Controller
         if(isset($actionVideoYT))
         {                      // If the information is a Youtube video
             $type = 'YTvideo';
-			if (str_contains($content, 'shorts'))
-			{
-				$information->setType($type . 'sh');
-			}
-			else if (str_contains($content, 'watch'))
-			{
-	            $information->setType($type . 'w');
-			}
-			else
-			{
-				$this->view->displayErrorInsertionInfo();
-			}
+            if (str_contains($content, 'shorts'))
+            {
+                $information->setType($type . 'sh');
+            }
+            else if (str_contains($content, 'watch'))
+            {
+                $information->setType($type . 'w');
+            }
+            else
+            {
+                $this->view->displayErrorInsertionInfo();
+            }
             $information->setContent($content);
 
             // Try to insert the information
@@ -188,35 +191,38 @@ class InformationController extends Controller
                 $this->view->displayErrorInsertionInfo();
             }
         }
-		if (isset($actionVideoCLocal) || isset($actionVideoSLocal))
-		{
-			$type = '';
-			if (isset($actionVideoCLocal))
-			{
-				$type = 'LocCvideo';
-			}
-			else if (isset($actionVideoSLocal))
-			{
-				$type = 'LocSvideo';
-			}
-			$information->setType($type);
-			$filename = $_FILES['contentFile']['name'];
-			$fileTmpName = $_FILES['contentFile']['tmp_name'];
-			$explodeName = explode('.', $filename);
-			$goodExtension = ['mp4'];
-			if (in_array(end($explodeName), $goodExtension))
-			{
-				$this->registerFile($filename, $fileTmpName, $information);
-			}
-            else if ($_FILES['contentFile']['size'] > 1073741824)
-            {
-                $this->view->displayVideoExceedsMaxSize();
+        if (isset($actionVideoCLocal) || isset($actionVideoSLocal)) {
+            $type = '';
+            if (isset($actionVideoCLocal)) {
+                $type = 'LocCvideo';
+            } else if (isset($actionVideoSLocal)) {
+                $type = 'LocSvideo';
             }
-			else
-			{
-				$this->view->displayNotConformVideo();
-			}
-		}
+            $information->setType($type);
+            $filename = $_FILES['contentFile']['name'];
+            $fileTmpName = $_FILES['contentFile']['tmp_name'];
+            $explodeName = explode('.', $filename);
+            $goodExtension = ['mp4'];
+            if (in_array(end($explodeName), $goodExtension)) {
+                $this->registerFile($filename, $fileTmpName, $information);
+            } else if ($_FILES['contentFile']['size'] > 1073741824) {
+                $this->view->displayVideoExceedsMaxSize();
+            } else {
+                $this->view->displayNotConformVideo();
+            }
+        }
+
+        if (isset($actionRSS))
+        {
+            $information->setContent($content);
+            $information->setType("rss");
+            if ($information->insert()) {
+                $this->view->displayCreateValidate();}
+            else {
+                $this->view->displayErrorInsertionInfo();}
+        }
+
+
         // Return a selector with all forms
         return
             $this->view->displayStartMultiSelect() .
@@ -225,9 +231,10 @@ class InformationController extends Controller
             $this->view->displayTitleSelect('table', 'Tableau') .
             $this->view->displayTitleSelect('pdf', 'PDF') .
             $this->view->displayTitleSelect('event', 'Événement') .
-            $this->view->displayTitleSelect('YTvideo','Vidéo Youtube') .
+            $this->view->displayTitleSelect('YTvideo', 'Vidéo Youtube') .
             $this->view->displayTitleSelect('LocalCVideo', 'Vidéo classique local') .
             $this->view->displayTitleSelect('LocalSVideo', 'Vidéo short local') .
+            $this->view->displayTitleSelect('rss', 'Flux RSS') .
             $this->view->displayEndOfTitle() .
             $this->view->displayContentSelect('text', $this->view->displayFormText(), true) .
             $this->view->displayContentSelect('image', $this->view->displayFormImg()) .
@@ -237,6 +244,7 @@ class InformationController extends Controller
             $this->view->displayContentSelect('YTvideo', $this->view->displayFormVideoYT()) .
             $this->view->displayContentSelect('LocalCVideo', $this->view->displayFormVideoCLocal()) .
             $this->view->displayContentSelect('LocalSVideo', $this->view->displayFormVideoSLocal()) .
+            $this->view->displayContentSelect('rss', $this->view->displayFormRSS()) .
             $this->view->displayEndDiv() .
             $this->view->contextCreateInformation();
     }
@@ -260,7 +268,7 @@ class InformationController extends Controller
         $information = $this->model->get($id);
 
         if (!(in_array('administrator', $current_user->roles) || in_array('secretaire', $current_user->roles)
-              || $information->getAuthor()->getId() == $current_user->ID)) {
+            || $information->getAuthor()->getId() == $current_user->ID)) {
             return $this->view->noInformation();
         }
 
@@ -309,75 +317,75 @@ class InformationController extends Controller
             {
                 // Change the content
                 if ($_FILES["contentFile"]['size'] != 0)
-				{
+                {
                     echo $_FILES["contentFile"]['size'];
                     $filename = $_FILES["contentFile"]['name'];
                     if ($information->getType() == 'img')
-					{
+                    {
                         $explodeName = explode('.', $filename);
                         $goodExtension = ['jpg', 'jpeg', 'gif', 'png', 'svg'];
                         if (in_array(end($explodeName), $goodExtension))
-						{
+                        {
                             $this->deleteFile($information->getId());   //$_SERVER['DOCUMENT_ROOT'].$this->model->getContent()
                             $this->registerFile($filename, $_FILES["contentFile"]['tmp_name'], $information);
                         }
-						else
-						{
+                        else
+                        {
                             $this->view->buildModal('Image non valide', '<p>Ce fichier est une image non valide, veuillez choisir une autre image</p>');
                         }
                     }
-					else if ($information->getType() == 'pdf')
-					{
+                    else if ($information->getType() == 'pdf')
+                    {
                         $explodeName = explode('.', $filename);
                         if (end($explodeName) == 'pdf')
-						{
+                        {
                             $this->deleteFile($information->getId());
                             $this->registerFile($filename, $_FILES["contentFile"]['tmp_name'], $information);
                         }
-						else
-						{
+                        else
+                        {
                             $this->view->buildModal('PDF non valide', '<p>Ce fichier est un PDF non valide, veuillez choisir un autre PDF</p>');
                         }
                     }
-					else if ($information->getType() == 'LocCvideo')
-					{
-						$explodeName = explode('.', $filename);
-						$goodExtension = ['mp4'];
-						if (in_array(end($explodeName), $goodExtension))
-						{
-							$this->deleteFile($information->getId());
-							$this->registerFile($filename, $_FILES["contentFile"]['tmp_name'], $information);
-						}
-						else
-						{
-							$this->view->buildModal('Vidéo non valide', '<p>Ce fichier est une vidéo non valide, veuillez choisir une autre vidéo</p>');
-						}
-					}
-					else if ($information->getType() == 'LocSvideo')
-					{
-						$explodeName = explode('.', $filename);
-						$goodExtension = ['mp4'];
-						if (in_array(end($explodeName), $goodExtension))
-						{
-							$this->deleteFile($information->getId());
-							$this->registerFile($filename, $_FILES["contentFile"]['tmp_name'], $information);
-						}
-						else
-						{
-							$this->view->buildModal('Vidéo non valide', '<p>Ce fichier est une vidéo non valide, veuillez choisir une autre vidéo</p>');
-						}
-					}
-					else if ($information->getType() == 'tab')
-					{
+                    else if ($information->getType() == 'LocCvideo')
+                    {
                         $explodeName = explode('.', $filename);
-                        $goodExtension = ['xls', 'xlsx', 'ods'];
+                        $goodExtension = ['mp4'];
                         if (in_array(end($explodeName), $goodExtension))
-						{
+                        {
                             $this->deleteFile($information->getId());
                             $this->registerFile($filename, $_FILES["contentFile"]['tmp_name'], $information);
                         }
-						else
-						{
+                        else
+                        {
+                            $this->view->buildModal('Vidéo non valide', '<p>Ce fichier est une vidéo non valide, veuillez choisir une autre vidéo</p>');
+                        }
+                    }
+                    else if ($information->getType() == 'LocSvideo')
+                    {
+                        $explodeName = explode('.', $filename);
+                        $goodExtension = ['mp4'];
+                        if (in_array(end($explodeName), $goodExtension))
+                        {
+                            $this->deleteFile($information->getId());
+                            $this->registerFile($filename, $_FILES["contentFile"]['tmp_name'], $information);
+                        }
+                        else
+                        {
+                            $this->view->buildModal('Vidéo non valide', '<p>Ce fichier est une vidéo non valide, veuillez choisir une autre vidéo</p>');
+                        }
+                    }
+                    else if ($information->getType() == 'tab')
+                    {
+                        $explodeName = explode('.', $filename);
+                        $goodExtension = ['xls', 'xlsx', 'ods'];
+                        if (in_array(end($explodeName), $goodExtension))
+                        {
+                            $this->deleteFile($information->getId());
+                            $this->registerFile($filename, $_FILES["contentFile"]['tmp_name'], $information);
+                        }
+                        else
+                        {
                             $this->view->buildModal('Tableau non valide', '<p>Ce fichier est un tableau non valide, veuillez choisir un autre tableau</p>');
                         }
                     }
@@ -526,20 +534,20 @@ class InformationController extends Controller
                 {
                     $content = 'Tableau Excel';
                 }
-				else if ($information->getType() === 'LocCvideo')
-				{
-					$content = '<video class="previsualisationVideoClassique" controls muted>
+                else if ($information->getType() === 'LocCvideo')
+                {
+                    $content = '<video class="previsualisationVideoClassique" controls muted>
 									<source src="' . $content . $information->getContent() . '" type="video/mp4">
 									<p>Votre navigateur ne permet pas de lire les vidéos de format mp4 avec HTML5.</p>
 								</video>';
-				}
-				else if ($information->getType() === 'LocSvideo')
-				{
-					$content = '<video class="previsualisationVideoShort" controls muted>
+                }
+                else if ($information->getType() === 'LocSvideo')
+                {
+                    $content = '<video class="previsualisationVideoShort" controls muted>
 									<source src="' . $content . $information->getContent() . '" type="video/mp4">
 									<p>Votre navigateur ne permet pas de lire les vidéos de format mp4 avec HTML5.</p>
 								</video>';
-				}
+                }
             }
             else
             {
@@ -551,19 +559,19 @@ class InformationController extends Controller
             {
                 $type = 'Image';
             }
-			else if ($information->getType() === 'pdf')
+            else if ($information->getType() === 'pdf')
             {
                 $type = 'PDF';
             }
-			else if ($information->getType() === 'event')
+            else if ($information->getType() === 'event')
             {
                 $type = 'Évènement';
             }
-			else if ($information->getType() === 'text')
+            else if ($information->getType() === 'text')
             {
                 $type = 'Texte';
             }
-			else if ($information->getType() === 'tab')
+            else if ($information->getType() === 'tab')
             {
                 $type = 'Table Excel';
             }
@@ -573,15 +581,15 @@ class InformationController extends Controller
             }
             else if ($information->getType() === 'YTvideow')
             {
-	            $type = 'Vidéo YouTube format "classique"';
+                $type = 'Vidéo YouTube format "classique"';
             }
             else if ($information->getType() === 'LocCvideo')
             {
-	            $type = 'Vidéo locale format "classique"';
+                $type = 'Vidéo locale format "classique"';
             }
             else if ($information->getType() === 'LocSvideo')
             {
-	            $type = 'Vidéo locale format "short"';
+                $type = 'Vidéo locale format "short"';
             }
             $dataList[] = [$row, $this->view->buildCheckbox($name, $information->getId()), $information->getTitle(), $content, $information->getCreationDate(), $information->getExpirationDate(), $information->getAuthor()->getLogin(), $type, $this->view->buildLinkForModify(esc_url(get_permalink(get_page_by_title('Modifier une information'))) . '?id=' . $information->getId())];
         }
