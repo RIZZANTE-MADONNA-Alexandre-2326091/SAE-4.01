@@ -101,12 +101,6 @@ class SecretaryController extends UserController
 	 * @return string A concatenated string containing the HTML output for user creation,
 	 * including multi-select start, titles, content, and context-specific user creation interface.
 	 */
-    public function createUsers(): string {
-    /**
-     * Create an user
-     *
-     * @return string
-     */
     public function createUsers() {
 	    $user_id = get_current_user_id();
 	    $user_info = get_userdata($user_id);
@@ -142,25 +136,6 @@ class SecretaryController extends UserController
 	    return $form;
     }
 
-	/**
-	 * Displays a multi-select interface for users, including secretaries, technicians, and televisions.
-	 *
-	 * @return string HTML content for the multi-select interface.
-	 */
-    public function displayUsers(): string {
-        $secretary = new SecretaryController();
-        $technician = new TechnicianController();
-        $television = new TelevisionController();
-        return
-            $this->view->displayStartMultiSelect() .
-            $this->view->displayTitleSelect('secretary', 'Secrétaires') .
-            $this->view->displayTitleSelect('technician', 'Technicien') .
-            $this->view->displayTitleSelect('television', 'Télévisions') .
-            $this->view->displayEndOfTitle() .
-            $this->view->displayContentSelect('secretary', $secretary->displayAllSecretary()) .
-            $this->view->displayContentSelect('technician', $technician->displayAllTechnician()) .
-            $this->view->displayContentSelect('television', $television->displayAllTv()) .
-            $this->view->displayEndDiv();
     /**
      * Display users by roles
      */
