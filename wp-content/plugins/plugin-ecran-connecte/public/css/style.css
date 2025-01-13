@@ -21,7 +21,7 @@
 }
 
 .delete_button_ecran {
-    background-color: #8e2525;
+    background-color: #d20000;
 }
 
 .active_ecran .page-link {
@@ -39,6 +39,7 @@ thead {
 
 .form-control {
     border-radius: 12px;
+    width: auto;
 }
 
 .nav-tabs {

@@ -16,3 +16,16 @@
 .sidebar-logo:hover {
     transform: scale(1.01);
 }
+
+/*barre multicolor
+.multicolor-band-image {
+    width: 10px;
+    height: 100vh;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: -1;
+}
+*/
+
+
