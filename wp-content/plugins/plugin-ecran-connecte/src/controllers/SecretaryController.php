@@ -5,6 +5,10 @@ namespace Controllers;
 use Models\User;
 use Views\SecretaryView;
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 /**
  * Class SecretaryController
  *
@@ -38,9 +42,9 @@ class SecretaryController extends UserController
 	/**
 	 * Displays the schedule by rendering the welcome admin view.
 	 *
-	 * @return mixed The result of rendering the welcome admin view.
+	 * @return string The result of rendering the welcome admin view.
 	 */
-    public function displayMySchedule(): mixed {
+    public function displayMySchedule(): string {
         return $this->view->displayWelcomeAdmin();
     }
 
@@ -101,7 +105,7 @@ class SecretaryController extends UserController
 	 * @return string A concatenated string containing the HTML output for user creation,
 	 * including multi-select start, titles, content, and context-specific user creation interface.
 	 */
-    public function createUsers() {
+    public function createUsers(): string {
 	    $user_id = get_current_user_id();
 	    $user_info = get_userdata($user_id);
 		$adminDept = null;
@@ -136,10 +140,16 @@ class SecretaryController extends UserController
 	    return $form;
     }
 
-    /**
-     * Display users by roles
-     */
-    public function displayUsers() {
+	/**
+	 * Generates and displays a multi-select form based on different user roles and their associated data.
+	 *
+	 * This method retrieves the current user information, determines if the user has an administrator role,
+	 * creates the necessary controllers for different roles, and dynamically builds a form for selecting
+	 * and displaying user data for secretaries, technicians, televisions, and optionally administrators.
+	 *
+	 * @return string The generated HTML form for displaying users based on their roles.
+	 */
+    public function displayUsers(): string{
 	    $user_id = get_current_user_id();
 	    $user_info = get_userdata($user_id);
 	    $adminDept = null;
