@@ -81,6 +81,7 @@ class InformationController extends Controller
         $information->setExpirationDate($endDate);
         $information->setAdminId(null);
 
+
         if (isset($actionText))
         {                      // If the information is a text
             $information->setContent($content);
@@ -221,6 +222,7 @@ class InformationController extends Controller
             else {
                 $this->view->displayErrorInsertionInfo();}
         }
+
 
 
         // Return a selector with all forms

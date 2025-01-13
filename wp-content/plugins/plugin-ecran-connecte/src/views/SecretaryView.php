@@ -27,7 +27,7 @@ class SecretaryView extends UserView
     }
 
     /**
-     * Display a button for download all schedules
+     * Display button for download all schedules
      */
     public function displayWelcomeAdmin() {
         return '

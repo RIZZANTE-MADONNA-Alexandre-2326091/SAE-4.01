@@ -63,7 +63,7 @@ class Information extends Model implements Entity, JsonSerializable
     public function insert()
     {
         $database = $this->getDatabase();
-        $request = $database->prepare("INSERT INTO ecran_information (title, content, creation_date, expiration_date, type, author, administration_id) VALUES (:title, :content, :creationDate, :expirationDate, :type, :userId, :administration_id) ");
+        $request = $database->prepare("INSERT INTO ecran_information (title, content, creation_date, expiration_date, type, author, administration_id, dept_id) VALUES (:title, :content, :creationDate, :expirationDate, :type, :userId, :administration_id, :dept_id)");
 
         $request->bindValue(':title', $this->getTitle(), PDO::PARAM_STR);
         $request->bindValue(':content', $this->getContent(), PDO::PARAM_STR);
@@ -71,11 +71,16 @@ class Information extends Model implements Entity, JsonSerializable
         $request->bindValue(':expirationDate', $this->getExpirationDate(), PDO::PARAM_STR);
         $request->bindValue(':type', $this->getType(), PDO::PARAM_STR);
         $request->bindValue(':userId', $this->getAuthor(), PDO::PARAM_INT);
-        $request->bindValue('administration_id', $this->getAdminId(), PDO::PARAM_INT);
+        $request->bindValue(':administration_id', $this->getAdminId(), PDO::PARAM_INT);
+        $request->bindValue(':dept_id', 1, PDO::PARAM_INT);
 
-        $request->execute();
-
-        return $database->lastInsertId();
+        try {
+            $request->execute();
+            return $database->lastInsertId();
+        } catch (PDOException $e) {
+            error_log('Insert Error: ' . $e->getMessage());
+            return false;
+        }
     }
 
     /**

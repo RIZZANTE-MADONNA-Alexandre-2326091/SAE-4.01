@@ -99,6 +99,7 @@ a:hover {
 .button_presentation_ecran {
     background-color: #1f63de;
     color: white;
+    border-radius: 30px;
 }
 
 .dropdown-menu {

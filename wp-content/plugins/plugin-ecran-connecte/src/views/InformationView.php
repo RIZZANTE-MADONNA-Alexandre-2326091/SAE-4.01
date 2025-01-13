@@ -29,7 +29,7 @@ class InformationView extends View
     public function displayFormText(string $title = null, string $content = null,
                                     string $endDate = null, string $type = "createText"): string
     {
-        $dateMin = date('Y-m-d', strtotime("+1 day"));
+        $dateMin = date ('Y-m-d', strtotime("+1 day"));
 
         $form = '
         <form method="post">
@@ -276,7 +276,7 @@ class InformationView extends View
                 <input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' .
             $dateMin . '" value="' . $endDate . '" required="required">
             </div>
-            
+
             <button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
 
         if ($type == 'submit')
@@ -315,7 +315,7 @@ class InformationView extends View
                 <input class="form-control-file" type="file" accept=".mp4" name="contentFile"/>
                 <input type="hidden" name="MAX_FILE_SIZE" value="1073741824"/>
             </div>
-            
+
             <div class="form-group">
 				<label for="expirationDate">Date d\'expiration</label>
 				<input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' . $dateMin . '" value="' . $endDate . '" required >
@@ -356,7 +356,7 @@ class InformationView extends View
                 <input class="form-control-file" type="file" accept=".mp4" name="contentFile"/>
                 <input type="hidden" name="MAX_FILE_SIZE" value="1073741824"/>
             </div>
-            
+
             <div class="form-group">
 				<label for="expirationDate">Date d\'expiration</label>
 				<input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' . $dateMin . '" value="' . $endDate . '" required >
@@ -371,39 +371,35 @@ class InformationView extends View
         $form .= '</form>';
         return $form;
     }
+    
 
-
-    public function displayFormRSS(string $title = null, string $rssLink = null, string $endDate = null, string $type = "createRSS"): string
-    {
-        $dateMin = date('Y-m-d', strtotime("+1 day"));
-
-        $form = '
-        <form method="post" enctype="multipart/form-data">
-            <div class="form-group">
-                <label for="title">Titre <span class="text-muted">(Optionnel)</span></label>
-                <input id="title" class="form-control" type="text" name="title" placeholder="Titre..." value="' . $title . '">
-            </div>
-            <div class="form-group">
-                <label for="rssLink">Lien RSS</label>
-                <input id="rssLink" class="form-control" type="text" name="rssLink" placeholder="Lien RSS..." value="' . $rssLink . '" required>
-            </div>
-            <div class="form-group">
-                <label for="logo">Ajout Logo (optionnelle)</label>
-                <input id="logo" class="form-control-file" type="file" name="logo">
-            </div>
-            <div class="form-group">
-                <label for="expirationDate">Date d\'expiration</label>
-                <input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' . $dateMin . '" value="' . $endDate . '" required>
-            </div>
-            <button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
-
-        if ($type == 'submit')
+        public function displayFormRSS(string $title = null, string $content = null, string $endDate = null, string $type = "createRSS"): string
         {
-            $form .= '<button type="submit" class="btn delete_button_ecran" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette information ?\');">Supprimer</button>';
-        }
+            $dateMin = date('Y-m-d', strtotime("+1 day"));
 
-        return $form . '</form>';
-    }
+            $form = '
+            <form method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="title">Titre <span class="text-muted">(Optionnel)</span></label>
+                    <input id="title" class="form-control" type="text" name="title" placeholder="Titre..." value="' . $title . '">
+                </div>
+                <div class="form-group">
+                    <label for="content">Lien RSS</label>
+                    <input id="content" class="form-control" type="text" name="content" placeholder="Lien RSS..." value="' . $content . '" required>
+                </div>
+                <div class="form-group">
+                    <label for="expirationDate">Date d\'expiration</label>
+                    <input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' . $dateMin . '" value="' . $endDate . '" required>
+                </div>
+                <button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
+
+            if ($type == 'submit')
+            {
+                $form .= '<button type="submit" class="btn delete_button_ecran" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette information ?\');">Supprimer</button>';
+            }
+
+            return $form . '</form>';
+        }
 
     /**
      * Explain how the information's display
