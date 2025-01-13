@@ -1,11 +1,5 @@
 <?php
 
-use Controllers\AlertRestController;
-use Controllers\CodeAdeRestController;
-use Controllers\InformationRestController;
-use Controllers\ProfileRestController;
-
-include __DIR__ . '/config-notifs.php';
 include_once 'vendor/R34ICS/R34ICS.php';
 include 'widgets/WidgetAlert.php';
 include 'widgets/WidgetWeather.php';
@@ -62,7 +56,6 @@ function loadScriptsEcran()
 
     // LIBRARY
     wp_enqueue_script('pdf-js', 'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.2.228/build/pdf.min.js', array(), '', false);
-    wp_enqueue_script('onesignal-js', 'https://cdn.onesignal.com/sdks/OneSignalSDK.js', array(), '', false);
     wp_enqueue_script('plugin-jquerymin', TV_PLUG_PATH . 'public/js/vendor/jquery.min.js', array('jquery'), '', true);
     wp_enqueue_script('plugin-JqueryEzMin', TV_PLUG_PATH . 'public/js/vendor/jquery.easing.min.js', array('jquery'), '', true);
     wp_enqueue_script('plugin-jqueryEzTic', TV_PLUG_PATH . 'public/js/vendor/jquery.easy-ticker.js', array('jquery'), '', true);
@@ -83,8 +76,6 @@ function loadScriptsEcran()
 	wp_enqueue_script('addCodeTv_script_ecran', TV_PLUG_PATH . 'public/js/addOrDeleteTvCode.js', array('jquery'), '1.0', true);
 	wp_enqueue_script('alertTicker_script_ecran', TV_PLUG_PATH . 'public/js/alertTicker.js', array('jquery'), '', true);
 	wp_enqueue_script('confPass_script_ecran', TV_PLUG_PATH . 'public/js/confirmPass.js', array('jquery'), '1.0', true);
-	wp_enqueue_script('oneSignal_script_ecran', TV_PLUG_PATH . 'public/js/oneSignalPush.js', array('jquery'), '', true);
-	wp_add_inline_script('oneSignal_script_ecran', 'const ONESIGNAL_APP_ID = \'' . ONESIGNAL_APP_ID . '\';', 'before');
 	wp_enqueue_script('scroll_script_ecran', TV_PLUG_PATH . 'public/js/scroll.js', array('plugin-jquerymin', 'plugin-jqueryEzTic', 'plugin-jqueryEzMinTic', 'plugin-JqueryEzMin'), '', true);
 	wp_enqueue_script('search_script_ecran', TV_PLUG_PATH . 'public/js/search.js', array('jquery'), '1.0', true);
 	wp_enqueue_script('slideshow_script_ecran', TV_PLUG_PATH . 'public/js/slideshow.js', array('jquery'), '2.0', true);
@@ -221,8 +212,7 @@ function installDatabaseEcran(): void
     		longitude FLOAT NOT NULL,
     		latitude FLOAT NOT NULL,
     		user_id BIGINT(20) UNSIGNED NOT NULL,
-    		PRIMARY KEY (id),
-        	UNIQUE KEY unique_user (user_id),    		
+    		PRIMARY KEY (id),    		
 	        FOREIGN KEY (user_id) REFERENCES wp_users(ID) ON DELETE CASCADE
     	) $charset_collate;";
 
@@ -235,6 +225,16 @@ add_action('plugins_loaded', 'installDatabaseEcran');
 /*
  * CREATE ROLES
  */
+
+$result = add_role(
+	'adminDept',
+	__('Administrateur Departement'),
+	array(
+		'read' => true,  // true allows this capability
+		'edit_posts' => true,
+		'delete_posts' => true,
+	)
+);
 
 $result = add_role(
     'secretaire',
@@ -265,31 +265,5 @@ $result = add_role(
         'delete_posts' => false, // Use false to explicitly deny
     )
 );
-
-$result = add_role(
-    'informationposter',
-    __('informationPoster'),
-    array(
-        'read' => true,  // true allows this capability
-    )
-);
-
-/*
- * CREATE REST API ENDPOINTS
- */
-
-add_action('rest_api_init', function () {
-    $controller = new InformationRestController();
-    $controller->register_routes();
-
-    $controller = new CodeAdeRestController();
-    $controller->register_routes();
-
-    $controller = new AlertRestController();
-    $controller->register_routes();
-
-    $controller = new ProfileRestController();
-    $controller->register_routes();
-});
 
 

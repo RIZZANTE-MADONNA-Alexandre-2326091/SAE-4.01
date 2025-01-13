@@ -13,18 +13,18 @@ namespace Views;
 class View
 {
 
-    /**
-     * Display a table, showing all element from a database
-     *
-     * @param $name
-     * @param $title
-     * @param $dataHeader
-     * @param $dataList
-     * @param string $idTable
-     *
-     * @return string
-     */
-    public function displayAll($name, $title, $dataHeader, $dataList, $idTable = '') {
+	/**
+	 * Generates and displays an HTML table with a search functionality and sorting options.
+	 *
+	 * @param string $name The name of the table, used for toggling checkboxes.
+	 * @param string $title The title displayed above the table.
+	 * @param array $dataHeader An array of column headers for the table.
+	 * @param array $dataList A two-dimensional array containing the data to be displayed in the table.
+	 * @param string $idTable An optional table ID for DOM manipulation (default is an empty string).
+	 *
+	 * @return string The HTML structure of the table.
+	 */
+    public function displayAll(string $name, string $title, array $dataHeader, array $dataList, string $idTable = ''): string {
         $name = '\'' . $name . '\'';
         $table = '
 		<h2>' . $title . '</h2>
@@ -61,7 +61,17 @@ class View
         return $table;
     }
 
-    public function pageNumber($pageNumber, $currentPage, $url, $numberElement = null) {
+	/**
+	 * Generate a pagination component based on the current page, total pages, and other parameters.
+	 *
+	 * @param int $pageNumber The total number of pages available.
+	 * @param int $currentPage The current active page in the pagination.
+	 * @param string $url The base URL for the pagination links.
+	 * @param mixed|null $numberElement An optional parameter to append as a query parameter in the pagination links.
+	 *
+	 * @return string The generated HTML string for the pagination component.
+	 */
+	public function pageNumber(int $pageNumber, int $currentPage, string $url, mixed $numberElement = null): string {
         $pagination = '
         <nav aria-label="Page navigation example">
             <ul class="pagination">';
@@ -110,60 +120,61 @@ class View
         return $pagination;
     }
 
-    /**
-     * Create a link for modify an element
-     *
-     * @param $link
-     *
-     * @return string
-     */
-    public function buildLinkForModify($link) {
+	/**
+	 * Builds an HTML link for modification.
+	 *
+	 * @param string $link The URL to be used for the modification link.
+	 *
+	 * @return string The generated HTML anchor tag with the provided link.
+	 */
+    public function buildLinkForModify(string $link): string {
         return '<a href="' . $link . '">Modifier</a>';
     }
 
-    /**
-     * Create a checkbox
-     *
-     * @param $name
-     * @param $id
-     *
-     * @return string
-     */
-    public function buildCheckbox($name, $id) {
+	/**
+	 * Builds an HTML checkbox input element with the given name and ID.
+	 *
+	 * @param string $name The name attribute for the checkbox input.
+	 * @param mixed $id The value attribute for the checkbox input.
+	 *
+	 * @return string The generated HTML string for the checkbox input element.
+	 */
+    public function buildCheckbox($name, $id): string {
         return '<input type="checkbox" name="checkboxStatus' . $name . '[]" value="' . $id . '"/>';
     }
 
-    /**
-     * Create the begin of a multi select
-     *
-     * @return string
-     */
-    public function displayStartMultiSelect() {
+	/**
+	 * Generates and returns the initial markup for a multi-selection navigation using tabs.
+	 *
+	 * @return string The HTML string for the starting structure of a tabbed navigation menu.
+	 */
+    public function displayStartMultiSelect(): string {
         return '<nav>
           <div class="nav nav-tabs" id="nav-tab" role="tablist">';
     }
 
-    /**
-     * Create one tab for the multi select
-     *
-     * @param $id           string id de l'onglet
-     * @param $title        string titre de l'onglet
-     * @param $active       bool affiche l'onglet (si c'est à true) lors du chargement de la page
-     * @return string
-     */
-    public function displayTitleSelect($id, $title, $active = false) {
+	/**
+	 * Generates and returns an HTML string for a navigation tab link with specified attributes.
+	 *
+	 * @param string $id The unique identifier used for the tab element.
+	 * @param string $title The display text for the tab link.
+	 * @param bool $active Optional. Indicates if the tab is active. Defaults to false.
+	 *
+	 * @return string The generated HTML string for the navigation tab link.
+	 */
+    public function displayTitleSelect(string $id, string $title, bool $active = false): string {
         $string = '<a class="nav-item nav-link';
         if ($active) $string .= ' active';
         $string .= '" id="nav-' . $id . '-tab" data-toggle="tab" href="#nav-' . $id . '" role="tab" aria-controls="nav-' . $id . '" aria-selected="false">' . $title . '</a>';
         return $string;
     }
 
-    /**
-     * Close the creation of new tab
-     *
-     * @return string
-     */
-    public function displayEndOfTitle() {
+	/**
+	 * Renders and returns the closing HTML structure for a navigation title and the opening of tab content.
+	 *
+	 * @return string The HTML string for ending a navigation title section and starting tab content.
+	 */
+    public function displayEndOfTitle(): string {
         return '
             </div>
         </nav>
@@ -171,35 +182,37 @@ class View
         <div class="tab-content" id="nav-tabContent">';
     }
 
-    /**
-     * Create the content for one tab
-     *
-     * @param $id           string
-     * @param $content      string
-     * @param $active       bool
-     *
-     * @return string
-     */
-    public function displayContentSelect($id, $content, $active = false) {
+	/**
+	 * Generates and displays a tab pane with the specified content and settings.
+	 *
+	 * @param string
+	 */
+    public function displayContentSelect(string $id, string $content, bool $active = false): string {
         $string = '<div class="tab-pane fade show';
         if ($active) $string .= ' active';
         $string .= '" id="nav-' . $id . '" role="tabpanel" aria-labelledby="nav-' . $id . '-tab">' . $content . '</div>';
         return $string;
     }
 
-    /**
-     * Refresh the page
-     */
-    public function refreshPage() {
+	/**
+	 * Refreshes the current page by outputting a meta refresh tag.
+	 *
+	 * @return void
+	 */
+    public function refreshPage(): void {
         echo '<meta http-equiv="refresh" content="0">';
     }
 
-    /**
-     * @param $title
-     * @param $content
-     * @param null $redirect
-     */
-    public function buildModal($title, $content, $redirect = null) {
+	/**
+	 * Builds and displays a modal dialog with specified title, content, and optional redirection.
+	 *
+	 * @param string $title The title text to be displayed in the modal header.
+	 * @param string $content The content to be displayed in the modal body.
+	 * @param string|null $redirect Optional URL for redirection upon closing the modal.
+	 *
+	 * @return void Outputs the generated modal HTML and JavaScript.
+	 */
+    public function buildModal(string $title, string $content, string $redirect = null): void {
         $modal = '
 		<!-- MODAL -->
 		<div class="modal" id="myModal" tabindex="-1" role="dialog">
@@ -229,28 +242,32 @@ class View
         echo $modal;
     }
 
-    /**
-     * Close a div
-     *
-     * @return string
-     */
-    public function displayEndDiv() {
+	/**
+	 * Returns the closing div tag as a string.
+	 *
+	 * @return string The closing div tag.
+	 */
+    public function displayEndDiv(): string {
         return '</div>';
     }
 
-    /**
-     * Display a message if the two password are different
-     */
-    public function displayBadPassword() {
-        $this->buildModal('Mauvais mot de passe', '<p class=\'alert alert-danger\'>Les deux mots de passe ne sont pas corrects </p>');
+	/**
+	 * Display a message indicating that the passwords are incorrect.
+	 *
+	 * @return void
+	 */
+    public function displayBadPassword(): void {
+        $this->buildModal('Mauvais mot de passe', '<p class=\'alert alert-danger\'>Les deux mots de passe ne sont pas correctes </p>');
     }
 
-    /**
-     * Display a message if an user already exist
-     *
-     * @param $doubles  array de login
-     */
-    public function displayErrorDouble($doubles) {
+	/**
+	 * Display an error message for duplicate entries during registration.
+	 *
+	 * @param array $doubles An array of entries that caused a problem during registration, typically due to duplicate login or email.
+	 *
+	 * @return void
+	 */
+    public function displayErrorDouble(array $doubles): void {
         $content = "";
         foreach ($doubles as $double) {
             $content .= '<p class="alert alert-danger">' . $double . ' a rencontré un problème lors de l\'enregistrement, veuillez vérifiez son login et son email !</p>';
@@ -258,46 +275,72 @@ class View
         $this->buildModal('Erreur durant l\'inscription', $content);
     }
 
-    /**
-     * Display a message if the inscription is a success
-     */
-    public function displayInsertValidate() {
+	/**
+	 * Display a message indicating successful registration.
+	 *
+	 * @return void
+	 */
+    public function displayInsertValidate(): void {
         $this->buildModal('Inscription validée', '<p class=\'alert alert-success\'>Votre inscription a été validée.</p>');
     }
 
-    /**
-     * Display a message if the extension of the file is wrong
-     */
-    public function displayWrongExtension() {
+	/**
+	 * Display a message indicating that the file has a wrong extension.
+	 *
+	 * @return void
+	 */
+    public function displayWrongExtension(): void {
         $this->buildModal('Mauvais fichier !', '<p class="alert alert-danger"> Mauvaise extension de fichier !</p>');
     }
 
-    /**
-     * Display a message if the file isn't a good file
-     */
-    public function displayWrongFile() {
+	/**
+	 * Displays a modal indicating that the user has uploaded the wrong file
+	 * or changed the column names in the Excel file.
+	 *
+	 * @return void
+	 */
+    public function displayWrongFile(): void {
         $this->buildModal('Mauvais fichier !', '<p class="alert alert-danger"> Vous utilisez un mauvais fichier excel / ou vous avez changé le nom des colonnes</p>');
     }
 
-    /**
-     * Display a message if the modification is a success
-     */
-    public function displayModificationValidate($redirect = null) {
+	/**
+	 * Displays a modal indicating that the modification has been successfully applied.
+	 *
+	 * @param string|null $redirect An optional URL to redirect to after applying the modification.
+	 *
+	 * @return void
+	 */
+    public function displayModificationValidate($redirect = null): void {
         $this->buildModal('Modification réussie', '<p class="alert alert-success"> La modification a été appliquée</p>', $redirect);
     }
 
-    /**
-     * Display a message if the creation of an user has failed
-     */
-    public function displayErrorInsertion() {
+	/**
+	 * Displays a modal indicating an error during the registration process,
+	 * such as the login or email address already being in use.
+	 *
+	 * @return void
+	 */
+    public function displayErrorInsertion(): void {
         $this->buildModal('Erreur lors de l\'inscription', '<p class="alert alert-danger"> Le login ou l\'adresse mail est déjà utilisé(e) </p>');
     }
 
-    public function errorMessageInvalidForm() {
-        $this->buildModal('Le formulaire n\'a pas été correctement remplie', '<p class="alert alert-danger">Le formulaire a été mal rempli, veuillez revoir les données rentrées et réessayez.</p>');
+	/**
+	 * Displays a modal indicating that the form has not been correctly completed
+	 * and prompts the user to review the entered data and try again.
+	 *
+	 * @return void
+	 */
+	public function errorMessageInvalidForm(): void {
+        $this->buildModal('Le formulaire n\'a pas été correctement remplie', '<p class="alert alert-danger">Le formulaire a été mal remplie, veuillez revoir les données rentrées et réessayez.</p>');
     }
 
-    public function errorMessageCantAdd() {
-        $this->buildModal('L\'ajout a échoué', '<p class="alert alert-danger">Une erreur s\'est produite lors de l\'envoi du formulaire, veuillez réessayer après avoir vérifié vos informations.</p>');
+	/**
+	 * Displays a modal indicating that the addition operation has failed
+	 * due to an error during form submission.
+	 *
+	 * @return void
+	 */
+	public function errorMessageCantAdd(): void {
+        $this->buildModal('L\'ajout a échoué', '<p class="alert alert-danger">Une erreur s\'est produite lors de l\'envoie du formulaire, veuillez réessayer après avoir vérifié vos informations.</p>');
     }
 }
