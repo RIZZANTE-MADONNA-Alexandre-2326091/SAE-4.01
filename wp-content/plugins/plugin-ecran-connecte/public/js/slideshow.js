@@ -23,17 +23,14 @@ let playersh;
 */
 let playerw;
 
+
+let player;
+
 /**
  * Temps en ms durant laquelle une information est affichée (par défaut 10s).
  * @defaultValue 10000
  */
 let timeout = 10000;
-
-/**
- * Savoir si une vidéo YouTube est terminée
- * @defaultValue false
- * */
-let done = false;
 
 /**
  * Diaporama des informations
@@ -52,7 +49,6 @@ let urlYoutube;
 
 infoSlideShow();
 scheduleSlideshow();
-
 
 /**
  * Fonction
@@ -181,22 +177,21 @@ function displayOrHide(slides, slideIndex)
 
         // Check if the slide exist
         if(slides[slideIndex] !== undefined) {
-
             console.log("--Slide n°"+ slideIndex);
+            console.log("timeout before = " + timeout);
             // Display the slide and reset timeout to its default value.
             slides[slideIndex].style.display = "block";
-            timeout = 10000;
             // Check child
             if(slides[slideIndex].childNodes) {
                 var count = 0;
                 // Try to find if it's a PDF or a video
                 for(let i = 0; i < slides[slideIndex].childNodes.length; ++i) {
                     console.log("Affichage slide index " + i + ": " + (slides[slideIndex].childNodes[i].className));
-                    // If is a PDF or a video
+                    // If is a PDF
                     if (slides[slideIndex].childNodes[i].className === 'canvas_pdf') {
 
                         console.log("--Lecture de PDF");
-
+                        timeout = 10000;
                         count = count + 1;
 
                         // Generate the url
@@ -285,19 +280,16 @@ function displayOrHide(slides, slideIndex)
                     * Si c'est une vidéo,
                     * ⇒ différents traitements en fonction du type de la vidéo
                     * */
-                    // If it's a YouTube short video
-                    if (slides[slideIndex].childNodes[i].className === 'videosh') {
-                        console.log("--Lecture vidéo Youtube short");
-                        const listeVideosShortsYouTube = document.querySelectorAll(".videosh");
-
-                        // Chargement de toutes les vidéos de même classe HTML
-                        for(let indexVideoShortYouTube = 0; indexVideoShortYouTube < listeVideosShortsYouTube.length; ++indexVideoShortYouTube) {
+                    //If it's a YouTube video
+                    if (slides[slideIndex].childNodes[i].className === 'videosh' || slides[slideIndex].childNodes[i].className === 'videow') {
+                        const listeVideosYouTube = document.querySelectorAll(".videosh, .videow");
+                        for (let indexVideoYouTube = 0; indexVideoYouTube < listeVideosYouTube.length; ++indexVideoYouTube) {
+                            let videoYouTube = listeVideosYouTube[indexVideoYouTube];
 
                             // Si la vidéo correspond à celle affichée, on associe un id pour l'API
-                            if (listeVideosShortsYouTube[indexVideoShortYouTube] === slides[slideIndex].childNodes[i]) {
-                                listeVideosShortsYouTube[indexVideoShortYouTube].id = "videoshID";
-
-                                urlYoutube = listeVideosShortsYouTube[indexVideoShortYouTube].src;
+                            if (videoYouTube === slides[slideIndex].childNodes[i]) {
+                                videoYouTube.id = "videoID";
+                                urlYoutube = videoYouTube.src;
                                 let lastElementIndex = 0;
                                 for (let i = 0; i < urlYoutube.length; ++i) {
                                     if (urlYoutube.charAt(i) === "?") {
@@ -305,51 +297,14 @@ function displayOrHide(slides, slideIndex)
                                         break;
                                     }
                                 }
-                                urlYoutube = urlYoutube.substring(30,lastElementIndex);
-                                onYouTubeIframeAPIReady();
+                                urlYoutube = urlYoutube.substring(30, lastElementIndex);
                             }
                             // Sinon, elle n'a pas l'id
                             else {
-                                listeVideosShortsYouTube[indexVideoShortYouTube].id = "";
+                                videoYouTube.id = "";
                             }
                         }
-                        console.log(listeVideosShortsYouTube);
-
-                        // TODO
-                    }
-                    // If it's a YouTube normal video
-                    else if (slides[slideIndex].childNodes[i].className === 'videow') {
-                        console.log("--Lecture vidéo Youtube classique");
-                        const listeVideosClassiqueYouTube = document.querySelectorAll(".videow");
-
-                        // Chargement de toutes les vidéos de même classe HTML
-                        for(let indexVideoClassiqueYouTube = 0; indexVideoClassiqueYouTube < listeVideosClassiqueYouTube.length; ++indexVideoClassiqueYouTube) {
-
-                            // Si la vidéo correspond à celle affichée, on associe un id pour l'API
-                            if (listeVideosClassiqueYouTube[indexVideoClassiqueYouTube] === slides[slideIndex].childNodes[i]) {
-                                listeVideosClassiqueYouTube[indexVideoClassiqueYouTube].id = "videowID";
-
-                                urlYoutube = listeVideosClassiqueYouTube[indexVideoClassiqueYouTube].src;
-                                let lastElementIndex = 0;
-                                for (let i = 0; i < urlYoutube.length; ++i) {
-                                    if (urlYoutube.charAt(i) === "?") {
-                                        lastElementIndex = i;
-                                        break;
-                                    }
-                                }
-                                console.log(urlYoutube);
-                                urlYoutube = urlYoutube.substring(30,lastElementIndex);
-                                console.log(urlYoutube);
-                                onYouTubeIframeAPIReady();
-                            }
-                            // Sinon, elle n'a pas l'id
-                            else {
-                                listeVideosClassiqueYouTube[indexVideoClassiqueYouTube].id = "";
-                            }
-                        }
-                        console.log(listeVideosClassiqueYouTube);
-
-                        // TODO
+                        onYouTubeIframeAPIReady();
                     }
                     // If it's a local normal video
                     else if (slides[slideIndex].childNodes[i].className === 'localCvideo') {
@@ -363,10 +318,8 @@ function displayOrHide(slides, slideIndex)
                             //Si la vidéo correspond à celle affichée
                             if (listeVideosClassiqueLocal[indexVideoClassiqueLocal] === slides[slideIndex].childNodes[i]) {
                                 timeout = videoClassiqueLocal.duration * 1000;
+                                console.log("timeout = " + timeout + "\tduration = " + videoClassiqueLocal.duration);
                             }
-
-                            console.log("timeout = " + timeout + "\tduration = " + videoClassiqueLocal.duration);
-                            console.log(videoClassiqueLocal);
 
                             //Chargement et lecture de la vidéo
                             videoClassiqueLocal.load();
@@ -392,10 +345,8 @@ function displayOrHide(slides, slideIndex)
                             //Si la vidéo correspond à celle affichée
                             if (listeVideosShortLocal[indexVideoShortLocal] === slides[slideIndex].childNodes[i]) {
                                 timeout = videoShortLocal.duration * 1000;
+                                console.log("timeout = " + timeout + "\tduration = " + videoShortLocal.duration);
                             }
-
-                            console.log("timeout = " + timeout + "\tduration = " + videoShortLocal.duration);
-                            console.log(videoShortLocal);
 
                             //Chargement de la vidéo
                             videoShortLocal.load();
@@ -409,9 +360,19 @@ function displayOrHide(slides, slideIndex)
                             }
                         }
                     }
+                    // If it's an image
+                    else if (slides[slideIndex].childNodes[i].className === 'img-thumbnail') {
+                        console.log('--Lecture image');
+                        timeout = 10000;
+                    }
+                    // If it's an image
+                    else if (slides[slideIndex].childNodes[i].className === 'text-info') {
+                        console.log('--Lecture texte');
+                        timeout = 10000;
+                    }
                 }
                 if (count === 0) {
-                    console.log("--Lecture image");
+                    console.log("--Lecture divers");
                     // Go to the next slide
                     ++slideIndex;
                 }
@@ -424,10 +385,10 @@ function displayOrHide(slides, slideIndex)
     }
 
     if(slides.length !== 1 || totalPage !== 1) {
+        console.log("Real timeout = " + timeout);
         setTimeout(function(){displayOrHide(slides, slideIndex)} , timeout);
     }
 }
-
 
 //TODO fonctions API Youtube
 /**
@@ -435,17 +396,10 @@ function displayOrHide(slides, slideIndex)
  * */
 function onYouTubeIframeAPIReady() {
     console.log("---API Youtube démarrée");
-    playersh = new YT.Player('videoshID', {
+    player = new YT.Player('videoID', {
         events: {
-            'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange
-        }
-    });
-
-    playerw = new YT.Player('videowID', {
-        events: {
-            'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange,
+            onReady : onPlayerReady,
+            onStateChange: onPlayerStateChange
         }
     });
 }
@@ -453,19 +407,36 @@ function onYouTubeIframeAPIReady() {
 /**
  * Fonction évènementielle qui s'active lors de l'évènement onReady: s'active lorsque le lecteur concerné est chargé.
  * */
+
 function onPlayerReady(event) {
     event.target.cueVideoById(urlYoutube, 0, "default");
+    console.log("Chargement vidéo");
+    console.log(event.target.getVideoUrl());
+    event.target.seekTo(0);
+    event.target.playVideo();
+    timeout = (event.target.getDuration() + 1) * 1000;
+    console.log("timeout YT = " + timeout);
+
 }
 
 /**
  * Fonction évènementielle qui s'active lors de l'évènement onStateChange: se déclenche lorsque l'état du lecteur concerné change.
  * */
+
 function onPlayerStateChange(event) {
     if (event.data === -1) {
-        event.target.pauseVideo();
         event.target.seekTo(0);
-        timeout = event.target.getDuration();
-        console.log("timeout YT = " + (timeout + 1) * 1000);
         event.target.playVideo();
+        timeout = (event.target.getDuration() + 1) * 1000;
+        console.log("timeout YT = " + timeout + "\tduration = " + event.target.getDuration());
     }
+    if (event.data === YT.PlayerState.ENDED) {
+        console.log("Vidéo terminée");
+        reloadVideo(event.target);
+    }
+}
+
+function reloadVideo(player) {
+    player.seekTo(0);
+    player.playVideo();
 }
