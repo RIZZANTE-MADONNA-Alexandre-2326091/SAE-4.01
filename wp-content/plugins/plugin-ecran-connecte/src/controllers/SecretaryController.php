@@ -96,15 +96,18 @@ class SecretaryController extends UserController
         $secretary = new SecretaryController();
         $technician = new TechnicianController();
         $television = new TelevisionController();
+        $tablet = new TabletController();
         return
             $this->view->displayStartMultiSelect() .
             $this->view->displayTitleSelect('secretary', 'Secrétaires') .
             $this->view->displayTitleSelect('technician', 'Technicien') .
             $this->view->displayTitleSelect('television', 'Télévisions') .
+            $this->view->displayTitleSelect('tablet', 'Tablette') .
             $this->view->displayEndOfTitle() .
             $this->view->displayContentSelect('secretary', $secretary->insert()) .
             $this->view->displayContentSelect('technician', $technician->insert()) .
             $this->view->displayContentSelect('television', $television->insert()) .
+            $this->view->displayContentSelect('tablet', $tablet->insert()) .
             $this->view->displayEndDiv() .
             $this->view->contextCreateUser();
     }
@@ -116,15 +119,19 @@ class SecretaryController extends UserController
         $secretary = new SecretaryController();
         $technician = new TechnicianController();
         $television = new TelevisionController();
+        $tablet = new TabletController();
+
         return
             $this->view->displayStartMultiSelect() .
             $this->view->displayTitleSelect('secretary', 'Secrétaires') .
             $this->view->displayTitleSelect('technician', 'Technicien') .
             $this->view->displayTitleSelect('television', 'Télévisions') .
+            $this->view->displayTitleSelect('tablet', 'Tablette') .
             $this->view->displayEndOfTitle() .
             $this->view->displayContentSelect('secretary', $secretary->displayAllSecretary()) .
             $this->view->displayContentSelect('technician', $technician->displayAllTechnician()) .
             $this->view->displayContentSelect('television', $television->displayAllTv()) .
+            $this->view->displayContentSelect('tablet', $tablet->displayAllTablets()) .
             $this->view->displayEndDiv();
     }
 
