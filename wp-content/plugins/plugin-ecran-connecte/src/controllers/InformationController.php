@@ -191,15 +191,11 @@ class InformationController extends Controller
                 $this->view->displayErrorInsertionInfo();
             }
         }
-        if (isset($actionVideoCLocal) || isset($actionVideoSLocal))
-        {
+        if (isset($actionVideoCLocal) || isset($actionVideoSLocal)) {
             $type = '';
-            if (isset($actionVideoCLocal))
-            {
+            if (isset($actionVideoCLocal)) {
                 $type = 'LocCvideo';
-            }
-            else if (isset($actionVideoSLocal))
-            {
+            } else if (isset($actionVideoSLocal)) {
                 $type = 'LocSvideo';
             }
             $information->setType($type);
@@ -207,38 +203,26 @@ class InformationController extends Controller
             $fileTmpName = $_FILES['contentFile']['tmp_name'];
             $explodeName = explode('.', $filename);
             $goodExtension = ['mp4'];
-            if (in_array(end($explodeName), $goodExtension))
-            {
+            if (in_array(end($explodeName), $goodExtension)) {
                 $this->registerFile($filename, $fileTmpName, $information);
-            }
-            else if ($_FILES['contentFile']['size'] > 1073741824)
-            {
+            } else if ($_FILES['contentFile']['size'] > 1073741824) {
                 $this->view->displayVideoExceedsMaxSize();
-            }
-            else
-            {
+            } else {
                 $this->view->displayNotConformVideo();
             }
-
-            if (isset($actionRSS)) {
-                $rssLink = filter_input(INPUT_POST, 'rssLink');
-                $logo = $_FILES['logo']['name'];
-                $fileTmpName = $_FILES['logo']['tmp_name'];
-
-                $information->setContent($rssLink);
-                $information->setType("rss");
-
-                if ($logo) {
-                    $this->registerFile($logo, $fileTmpName, $information);
-                }
-
-                if ($information->insert()) {
-                    $this->view->displayCreateValidate();
-                } else {
-                    $this->view->displayErrorInsertionInfo();
-                }
-            }
         }
+
+        if (isset($actionRSS))
+        {
+            $information->setContent($content);
+            $information->setType("rss");
+                if ($information->insert()) {
+                    $this->view->displayCreateValidate();}
+                else {
+                    $this->view->displayErrorInsertionInfo();}
+        }
+
+
         // Return a selector with all forms
         return
             $this->view->displayStartMultiSelect() .

@@ -289,6 +289,7 @@ class InformationView extends View
 		return $form;
 	}
 
+
 	public function displayFormVideoCLocal(string $title = null, string $content = null,
 		                                   string $endDate = null, string $type = "createVideoCLocal"): string
 	{
@@ -371,6 +372,39 @@ class InformationView extends View
 		return $form;
 	}
 
+
+    public function displayFormRSS(string $title = null, string $rssLink = null, string $endDate = null, string $type = "createRSS"): string
+    {
+        $dateMin = date('Y-m-d', strtotime("+1 day"));
+
+        $form = '
+        <form method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="title">Titre <span class="text-muted">(Optionnel)</span></label>
+                <input id="title" class="form-control" type="text" name="title" placeholder="Titre..." value="' . $title . '">
+            </div>
+            <div class="form-group">
+                <label for="rssLink">Lien RSS</label>
+                <input id="rssLink" class="form-control" type="text" name="rssLink" placeholder="Lien RSS..." value="' . $rssLink . '" required>
+            </div>
+            <div class="form-group">
+                <label for="logo">Ajout Logo (optionnelle)</label>
+                <input id="logo" class="form-control-file" type="file" name="logo">
+            </div>
+            <div class="form-group">
+                <label for="expirationDate">Date d\'expiration</label>
+                <input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' . $dateMin . '" value="' . $endDate . '" required>
+            </div>
+            <button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
+
+        if ($type == 'submit')
+        {
+            $form .= '<button type="submit" class="btn delete_button_ecran" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette information ?\');">Supprimer</button>';
+        }
+
+        return $form . '</form>';
+    }
+
     /**
      * Explain how the information's display
      *
@@ -392,28 +426,6 @@ class InformationView extends View
 				</figure>
 			</div>
 		</div>';
-    }
-
-    public function displayFormRSS(string $title = null, string $rssLink = null, string $logo = null, string $type = "createRSS"): string
-    {
-        $form = '
-    <form method="post" enctype="multipart/form-data">
-        <div class="form-group">
-            <label for="title">Titre <span class="text-muted">(Optionnel)</span></label>
-            <input id="title" class="form-control" type="text" name="title" placeholder="Titre..." value="' . $title . '">
-        </div>
-        <div class="form-group">
-            <label for="rssLink">Lien RSS</label>
-            <input id="rssLink" class="form-control" type="text" name="rssLink" placeholder="Lien RSS..." value="' . $rssLink . '" required>
-        </div>
-        <div class="form-group">
-            <label for="logo">Ajout Logo (optionnelle)</label>
-            <input id="logo" class="form-control-file" type="file" name="logo">
-        </div>
-        <button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>
-    </form>';
-
-        return $form;
     }
 
     /**
@@ -457,6 +469,10 @@ class InformationView extends View
 		elseif ($type == "pdf")
 		{
             return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormPDF($title, $content, $endDate, 'submit');
+        }
+        else if ($type == "rss")
+        {
+            return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormRSS($title, $content, $endDate, 'submit');
         }
 		elseif ($type == "event")
 		{
