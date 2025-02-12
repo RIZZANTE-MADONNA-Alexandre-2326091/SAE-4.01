@@ -17,17 +17,17 @@ class Department extends Model implements Entity, JsonSerializable
 	/**
 	 * @var int
 	 */
-	private $id;
+	private int $id;
 
 	/**
 	 * @var string
 	 * */
-	private $nameDept;
+	private string $nameDept;
 
 	/**
-	 * Insert a department in the database.
+	 * Inserts a new department into the database.
 	 *
-	 * @return string
+	 * @return string The ID of the newly inserted department.
 	 */
 	public function insert(): string {
 		$database = $this->getDatabase();
@@ -41,9 +41,9 @@ class Department extends Model implements Entity, JsonSerializable
 	}
 
 	/**
-	 * Modify a department.
+	 * Updates the department information in the database based on the current object properties.
 	 *
-	 * @return int
+	 * @return int Number of rows affected by the update query.
 	 */
 	public function update(): int {
 		$request = $this->getDatabase()->prepare("UPDATE ecran_department SET name = :name WHERE dept_id = :id");
@@ -57,9 +57,11 @@ class Department extends Model implements Entity, JsonSerializable
 	}
 
 	/**
-	 * Delete a department in the database
+	 * Deletes the department record identified by its ID from the database.
+	 *
+	 * @return int The number of rows affected by the delete operation.
 	 */
-	public function delete() {
+	public function delete(): int {
 		$request = $this->getDatabase()->prepare('DELETE FROM ecran_department WHERE dept_id = :id');
 
 		$request->bindValue(':id', $this->getId(), PDO::PARAM_INT);
@@ -70,13 +72,11 @@ class Department extends Model implements Entity, JsonSerializable
 	}
 
 	/**
-	 * Create a department
+	 * @param array $data The data to map to the Department entity, containing keys 'dept_id' and 'name'.
 	 *
-	 * @param $data
-	 *
-	 * @return $this
+	 * @return Department The Department entity with the mapped data.
 	 */
-	public function setEntity( $data ) {
+	public function setEntity( $data ):Department {
 		$entity = new Department();
 
 		$entity->setId($data['dept_id']);
@@ -86,13 +86,11 @@ class Department extends Model implements Entity, JsonSerializable
 	}
 
 	/**
-	 * Build a list of department
+	 * @param array $dataList The list of data to be converted into entities.
 	 *
-	 * @param $dataList
-	 *
-	 * @return array | Department
+	 * @return array|Department Returns an array of Department entities.
 	 */
-	public function setEntityList( $dataList ) {
+	public function setEntityList( $dataList ): array | Department {
 		$listEntity = array();
 		foreach ($dataList as $data){
 			$listEntity[] = $this->setEntity($data);
@@ -101,13 +99,11 @@ class Department extends Model implements Entity, JsonSerializable
 	}
 
 	/**
-	 * Return a department corresponding to the ID
+	 * @param int $id
 	 *
-	 * @param $id   int id
-	 *
-	 * @return Department | bool
+	 * @return Department|false
 	 */
-	public function get( $id ) {
+	public function get($id): false | Department {
 		$request = $this->getDatabase()->prepare("SELECT dept_id, name FROM ecran_department WHERE dept_id = :id LIMIT 1");
 
 		$request->bindParam(':id', $id, PDO::PARAM_INT);
@@ -121,9 +117,9 @@ class Department extends Model implements Entity, JsonSerializable
 	}
 
 	/**
-	 * Return the list of the all departments
+	 * Retrieves all departments from the database.
 	 *
-	 * @return array
+	 * @return array An array of department entities.
 	 */
 	public function getAll(): array {
 		$request = $this->getDatabase()->prepare("SELECT dept_id, name FROM ecran_department ORDER BY dept_id");
@@ -134,12 +130,14 @@ class Department extends Model implements Entity, JsonSerializable
 	}
 
 	/**
-	 * @param int $begin
-	 * @param int $numberElement
+	 * Retrieves a list of departments from the database, starting at a specified position and retrieving a specified number of elements.
 	 *
-	 * @return Department[]|void
+	 * @param int $begin The starting position for the query (default is 0).
+	 * @param int $numberElement The number of elements to retrieve (default is 25).
+	 *
+	 * @return array Returns an array containing the list of departments, or an empty array if no departments are found.
 	 */
-	public function getList(int $begin = 0, int $numberElement = 25) {
+	public function getList(int $begin = 0, int $numberElement = 25): array {
 		$request = $this->getDatabase()->prepare("SELECT dept_id, name FROM ecran_department ORDER BY dept_id ASC LIMIT :begin, :numberElement");
 
 		$request->bindValue(':begin', $begin, PDO::PARAM_INT);
@@ -154,13 +152,13 @@ class Department extends Model implements Entity, JsonSerializable
 	}
 
 	/**
-	 * Return a department by this name.
+	 * Retrieves department information based on the given department name.
 	 *
-	 * @param $name
+	 * @param string $name The name of the department to search for in the database.
 	 *
-	 * @return $this|array|Department
+	 * @return array Returns an array containing department details that match the given name, or an empty array if no match is found.
 	 */
-	public function getDepartmentName($name) {
+	public function getDepartmentName(string $name): array {
 		$request = $this->getDatabase()->prepare("SELECT dept_id, name FROM ecran_department WHERE name = :name LIMIT 1");
 
 		$request->bindValue(':name', $name, PDO::PARAM_STR);
@@ -199,7 +197,7 @@ class Department extends Model implements Entity, JsonSerializable
 	/**
 	 * @param int
 	 * */
-	public function setId( $id ) {
+	public function setId(int $id ): void {
 		$this->id = $id;
 	}
 
@@ -213,7 +211,7 @@ class Department extends Model implements Entity, JsonSerializable
 	/**
 	* @param string
 	 * */
-	public function setName( $nameDept ) {
+	public function setName(string $nameDept ): void {
 		$this->nameDept = $nameDept;
 	}
 

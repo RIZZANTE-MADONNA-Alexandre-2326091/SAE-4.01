@@ -8,17 +8,18 @@ use Models\User;
 
 class UserView extends View
 {
-	/**
-     * Display a creation form
-     *
-     * @param $name     string
-     *
-     * @return string
-     */
-    protected function displayBaseForm($name, $departments, $isAdmin = false, $currentDept = null) {
-	    $disabled = $isAdmin ? '' : 'disabled';
 
-		return '
+	/**
+	 * Displays a base form for user input, including fields for login, email, and password.
+	 *
+	 * @param string $name The identifier used to customize the form field names and attributes.
+	 *
+	 * @return string The HTML string of the generated form.
+	 */
+    protected function displayBaseForm(string $name, $isAdmin = false, $currentDept = null):string {
+        $disabled = $isAdmin ? '' : 'disabled';
+
+        return '
             <form method="post" class="cadre">
             	<div class="form-group">
                 	<label for="login' . $name . '">Login</label>
@@ -45,12 +46,12 @@ class UserView extends View
             </form>';
     }
 
-    /**
-     * Form for modify the password
-     *
-     * @return string
-     */
-    public function displayModifyPassword() {
+	/**
+	 * Display a form to modify the user's password.
+	 *
+	 * @return string The HTML content for the password modification form.
+	 */
+    public function displayModifyPassword(): string {
         return '
             <form id="check" method="post">
                 <h2>Modifier le mot de passe</h2>
@@ -62,12 +63,12 @@ class UserView extends View
             </form>';
     }
 
-    /**
-     * Form to generate a code to delete the account
-     *
-     * @return string
-     */
-    public function displayDeleteAccount() {
+	/**
+	 * Display a form to confirm account deletion by verifying the current password
+	 *
+	 * @return string The HTML string for the delete account form
+	 */
+    public function displayDeleteAccount(): string {
         return '
             <form id="check" method="post">
                 <h2>Supprimer le compte</h2>
@@ -77,7 +78,12 @@ class UserView extends View
             </form>';
     }
 
-	public function contextCreateUser() {
+	/**
+	 * Generates and returns an HTML structure for the user creation context.
+	 *
+	 * @return string The HTML content describing the context of creating users, including user types and their functionalities.
+	 */
+	public function contextCreateUser(): string {
         return '
         <hr class="half-rule">
         <div class="row">
@@ -96,12 +102,12 @@ class UserView extends View
         <a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des utilisateurs'))) . '">Voir les utilisateurs</a>';
     }
 
-    /**
-     * Form to delete the account
-     *
-     * @return string
-     */
-    public function displayEnterCode() {
+	/**
+	 * Display the form to enter the account deletion code.
+	 *
+	 * @return string The HTML content for the account deletion code form.
+	 */
+    public function displayEnterCode(): string {
         return '
         <form method="post">
             <label for="codeDelete"> Code de suppression de compte</label>
@@ -111,13 +117,13 @@ class UserView extends View
     }
 
 
-	/**
-	 * Generates an HTML string for the unsubscribe page.
-	 *
-	 * @return string The HTML content of the unsubscribe page containing a message and the unsubscribe code.
-	 */
-	public function displayUnsubscribe() {
-		return ' 
+    /**
+     * Generates an HTML string for the unsubscribe page.
+     *
+     * @return string The HTML content of the unsubscribe page containing a message and the unsubscribe code.
+     */
+    public function displayUnsubscribe(int $code) {
+        return ' 
  		<!DOCTYPE html>
              <html lang="fr">
                 <head>
@@ -129,7 +135,7 @@ class UserView extends View
                     <p> Pour vous désinscrire, rendez-vous sur le site : <a href="' . home_url() . '/mon-compte/"> Tv Connectée.</p>
                 </body>
              </html>';
-	}
+    }
 
 
 	/**

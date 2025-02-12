@@ -11,12 +11,12 @@ class AdminDeptController extends UserController {
 	/**
 	 * @var User
 	 */
-	private $model;
+	private User $model;
 
 	/**
 	 * @var AdminDeptView
 	 */
-	private $view;
+	private AdminDeptView $view;
 
 
 	/**
@@ -36,25 +36,24 @@ class AdminDeptController extends UserController {
 	 * duplicate users, and inserts the new user into the system. Based on the outcome,
 	 * it renders appropriate views for success, error, or incomplete data submission.
 	 *
-	 * @return mixed The rendered view based on the action performed.
+	 * @return string The rendered view based on the action performed.
 	 */
-	public function insert(){
+	public function insert(): string{
 		$action = filter_input(INPUT_POST, 'createAdminDept');
 
 		$current_user = wp_get_current_user();
 
 		$deptModel = new Department();
 		$isAdmin = in_array('administrator', $current_user->roles);
-		$currentDept = $isAdmin ? null : $deptModel->getDepartmentUsers($current_user->ID)->getId();
+		//$currentDept = $isAdmin ? null : $deptModel->getDepartmentUsers($current_user->ID)->getId();
 		$departments = $deptModel->getAll();
-
 		if (isset($action)) {
 
 			$login = filter_input(INPUT_POST, 'loginAdminDept');
 			$password = filter_input(INPUT_POST, 'pwdAdminDept');
 			$passwordConfirm = filter_input(INPUT_POST, 'pwdConfirmAdminDept');
 			$email = filter_input(INPUT_POST, 'emailAdminDept');
-			$deptId = $isAdmin ? filter_input(INPUT_POST, 'dept') : $currentDept;
+			//$deptId = $isAdmin ? filter_input(INPUT_POST, 'dept') : $currentDept;
 
 			if (is_string($login) && strlen($login) >= 4 && strlen($login) <= 25 &&
 			    is_string($password) && strlen($password) >= 8 && strlen($password) <= 25 &&
@@ -64,7 +63,7 @@ class AdminDeptController extends UserController {
 				$this->model->setPassword($password);
 				$this->model->setEmail($email);
 				$this->model->setRole('adminDept');
-				$this->model->setDeptId($deptId);
+				//$this->model->setDeptId($deptId);
 
 				if (!$this->checkDuplicateUser($this->model) && !$this->checkDuplicateIdDept($this->model) && $this->model->insert()) {
 					$this->view->displayInsertValidate();
@@ -75,24 +74,24 @@ class AdminDeptController extends UserController {
 				$this->view->displayErrorCreation();
 			}
 		}
-		return $this->view->displayFormAdminDept($departments, $isAdmin, $currentDept);
+		return $this->view->displayFormAdminDept($departments, $isAdmin/*, $currentDept*/);
 	}
 
 	/**
 	 * Retrieves and displays all users with the role of 'adminDept'.
 	 *
-	 * @return mixed The result of displaying all admin department users, as handled by the view.
+	 * @return string The result of displaying all admin department users, as handled by the view.
 	 */
-	public function displayAllAdminDept() {
+	public function displayAllAdminDept(): string {
 		$users = $this->model->getUsersByRole('adminDept');
 
-		$deptModel = new Department();
-		$userDeptList = array();
-		foreach ($users as $user) {
-			$userDeptList[] = $deptModel->getUserInDept($user->getId())->getName();
-		}
+//		$deptModel = new Department();
+//		$userDeptList = array();
+//		foreach ($users as $user) {
+//			$userDeptList[] = $deptModel->getUserInDept($user->getId())->getName();
+//		}
 
-		return $this->view->displayAllAdminDept($users, $userDeptList);
+		return $this->view->displayAllAdminDept($users/*, $userDeptList*/);
 	}
 
 

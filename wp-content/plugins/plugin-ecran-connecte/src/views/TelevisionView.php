@@ -15,19 +15,19 @@ use Models\User;
  */
 class TelevisionView extends UserView
 {
-    /**
-     * Display a form to create a television
-     *
-     * @param $years        CodeAde[]
-     * @param $groups       CodeAde[]
-     * @param $halfGroups   CodeAde[]
-     *
-     * @return string
-     */
-    public function displayFormTelevision($years, $groups, $halfGroups, $departments, $isAdmin = null, $currentDept = null) {
-	    $disabled = $isAdmin ? '' : 'disabled';
+	/**
+	 * Generates and displays the television account creation form.
+	 *
+	 * @param array $years An array of years to populate the dropdown for schedule selection.
+	 * @param array $groups An array of groups used for schedule selection.
+	 * @param array $halfGroups An array of half-groups used for schedule selection.
+	 *
+	 * @return string The HTML string of the television account creation form.
+	 */
+    public function displayFormTelevision(array $years,array $groups, array $halfGroups, $isAdmin = null, $currentDept = null): string {
+        $disabled = $isAdmin ? '' : 'disabled';
 
-		$form = '
+        $form = '
         <h2> Compte télévision</h2>
         <p class="lead">Pour créer des télévisions, remplissez ce formulaire avec les valeurs demandées.</p>
         <p class="lead">Vous pouvez mettre autant d\'emploi du temps que vous souhaitez, cliquez sur "Ajouter des emplois du temps</p>
@@ -60,14 +60,17 @@ class TelevisionView extends UserView
         return $form;
     }
 
-    /**
-     * Display all televisions in a table
-     *
-     * @param $users    User[]
-     *
-     * @return string
-     */
-    public function displayAllTv($users, $userDeptList) {
+	/**
+	 * Displays all televisions with related user information.
+	 *
+	 * This method generates a structured representation of televisions, including details
+	 * about the user login, number of schedules, and modification options.
+	 *
+	 * @param array $users An array of user objects, where each object contains user details such as ID, login, and codes.
+	 *
+	 * @return string A formatted string representation of televisions and their associated user information.
+	 */
+    public function displayAllTv(array $users, $userDeptList): string {
         $page = get_page_by_title_V2('Modifier un utilisateur');
         $linkManageUser = get_permalink($page->ID);
 
@@ -85,17 +88,18 @@ class TelevisionView extends UserView
         return $this->displayAll($name, $title, $header, $row, 'tele');
     }
 
-    /**
-     * Display a form to modify a television
-     *
-     * @param $user         User
-     * @param $years        CodeAde[]
-     * @param $groups       CodeAde[]
-     * @param $halfGroups   CodeAde[]
-     *
-     * @return string
-     */
-    public function modifyForm($user, $years, $groups, $halfGroups) {
+	/**
+	 * Generates and returns the HTML form for modifying a user's schedule data.
+	 *
+	 * This method creates a dynamic form based on the user's existing schedule codes, with options
+	 * to update, add, or remove schedules. The form includes functionality for interacting with the
+	 * provided years, groups, and half-groups data.
+	 *
+	 * @param User $user The user object containing details such as login and existing schedule codes.
+	 * @param array $years An array of available years to populate selection fields.
+	 * @param array $groups An array of available
+	 */
+    public function modifyForm(User $user, array $years, array $groups, array $halfGroups): string {
         $count = 0;
         $string = '
         <a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des utilisateurs'))) . '">< Retour</a>
@@ -130,18 +134,22 @@ class TelevisionView extends UserView
         return $string;
     }
 
-    /**
-     * Build a select with all codes Ade
-     *
-     * @param $years        CodeAde[]
-     * @param $groups       CodeAde[]
-     * @param $halfGroups   CodeAde[]
-     * @param $code         CodeAde
-     * @param $count        int
-     *
-     * @return string
-     */
-    public function buildSelectCode($years, $groups, $halfGroups, $code = null, $count = 0) {
+	/**
+	 * Builds an HTML select element with options for years, groups, and half-groups.
+	 *
+	 * This method dynamically generates a dropdown menu containing categorized groups of options,
+	 * including options for years, groups, and half-groups. An initial option tied to an existing
+	 * CodeAde object can be included if provided.
+	 *
+	 * @param array $years An array of objects representing years. Each object must have methods getCode() and getTitle() to retrieve the year code and title respectively.
+	 * @param array $groups An array of objects representing groups. Each object must have methods getCode() and getTitle() to retrieve the group code and title respectively.
+	 * @param array $halfGroups An array of objects representing half-groups. Each object must have methods getCode() and getTitle() to retrieve the half-group code and title respectively.
+	 * @param CodeAde|null $code An optional object representing a preselected code. The object must provide getCode() and getTitle() methods. If null, no predefined option is selected.
+	 * @param int $count A unique identifier used to differentiate the generated select element, typically in its ID attribute. Default is 0.
+	 *
+	 * @return string The generated HTML string for the select element, including all options and optgroup elements.
+	 */
+    public function buildSelectCode(array $years, array $groups, array $halfGroups, CodeAde $code = null, int $count = 0): string {
         $select = '<select class="form-control firstSelect" id="selectId' . $count . '" name="selectTv[]" required="">';
 
         if (!is_null($code)) {
@@ -170,12 +178,17 @@ class TelevisionView extends UserView
         return $select;
     }
 
-    /**
-     * Display form to modify the password of a television
-     *
-     * @return string
-     */
-    public function modifyPassword() {
+	/**
+	 * Generates the HTML form for modifying a password.
+	 *
+	 * This method creates and returns an HTML string representation of a form,
+	 * allowing users to input and confirm a new password. It includes validation
+	 * attributes such as a minimum length and utilizes JavaScript for real-time
+	 * password matching checks.
+	 *
+	 * @return string The HTML form as a string for modifying a password.
+	 */
+    public function modifyPassword(): string {
         return '
 		<form method="post">
 		<label>Nouveau mot de passe </label>
@@ -185,21 +198,27 @@ class TelevisionView extends UserView
 
     }
 
-    /**
-     * Start a slideshow
-     *
-     * @return string
-     */
-    public function displayStartSlide() {
+	/**
+	 * Generates and returns the HTML structure for the start of a slideshow container.
+	 *
+	 * This method provides the opening HTML tag for a slideshow container with predefined
+	 * attributes and classes for styling and functionality.
+	 *
+	 * @return string The HTML string representing the opening of a slideshow container.
+	 */
+    public function displayStartSlide(): string {
         return '<div id="slideshow-container" class="slideshow-container">';
     }
 
-    /**
-     * Separate all slide by this
-     *
-     * @return string
-     */
-    public function displayMidSlide() {
+	/**
+	 * Displays a middle slide structure for a slideshow.
+	 *
+	 * This method generates the HTML structure for a single middle slide
+	 * in the slideshow presentation.
+	 *
+	 * @return string A string containing the HTML structure for the middle slide.
+	 */
+    public function displayMidSlide(): string {
         return '<div class="mySlides">';
     }
 }

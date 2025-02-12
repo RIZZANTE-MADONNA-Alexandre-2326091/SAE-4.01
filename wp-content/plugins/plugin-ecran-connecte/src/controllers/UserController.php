@@ -23,12 +23,12 @@ class UserController extends Controller
     /**
      * @var User
      */
-    private $model;
+    private User $model;
 
     /**
      * @var UserView
      */
-    private $view;
+    private UserView $view;
 
     /**
      * UserController constructor.
@@ -38,12 +38,12 @@ class UserController extends Controller
         $this->view = new UserView();
     }
 
-    /**
-     * Delete an user
-     *
-     * @param $id   int
-     */
-    public function delete($id) {
+	/**
+	 * Deletes a user and associated data such as alerts and information.
+	 *
+	 * @param int $id The ID of the user
+	 */
+    public function delete(int $id): void {
         $user = $this->model->get($id);
         $userData = get_userdata($id);
         $user->delete();
@@ -67,52 +67,58 @@ class UserController extends Controller
         }
     }
 
-    /**
-     * Delete the account of the user
-     */
-    public function deleteAccount() {
-        $action = filter_input(INPUT_POST, 'deleteMyAccount');
-        $actionDelete = filter_input(INPUT_POST, 'deleteAccount');
-        $current_user = wp_get_current_user();
-        $user = $this->model->get($current_user->ID);
-        if (isset($action)) {
-            $password = filter_input(INPUT_POST, 'verifPwd');
-            if (wp_check_password($password, $current_user->user_pass)) {
+	/**
+	 * Handles the deletion of a user's account, providing functionality for requesting and validating deletion codes.
+	 *
+	 * @return string
+	 */
+    public function deleteAccount(): string {
+    if (in_array('administrator', $current_user->roles)) {
+        return '<p>La suppression de compte n’est pas autorisée pour les administrateurs.</p>';
+    }
 
-                $code = wp_generate_password();
-                if (!empty($user->getCodeDeleteAccount())) {
-                    $user->updateCode($code);
-                } else {
-                    $user->createCode($code);
-                }
+    $actionDeleteMyAccount = filter_input(INPUT_POST, 'deleteMyAccount');
+    $actionConfirmDelete = filter_input(INPUT_POST, 'deleteAccount');
+
+    $user = $this->model->get($current_user->ID);
+
+    if (isset($actionDeleteMyAccount)) {
+        $password = filter_input(INPUT_POST, 'verifPwd');
+        if (wp_check_password($password, $current_user->user_pass)) {
+            $code = wp_generate_password();
+            if (!empty($user->getCodeDeleteAccount())) {
+                $user->updateCode($code);
+            } else {
+                $user->createCode($code);
+            }
 
                 //Build Mail
                 $to = $current_user->user_email;
                 $subject = "Désinscription à la télé-connecté";
-                $message = $this->view->displayUnsubscribe();
+                $message = $this->view->displayUnsubscribe($code);
 
                 $headers = array('Content-Type: text/html; charset=UTF-8');
 
-                wp_mail($to, $subject, $message, $headers);
-                $this->view->displayMailSend();
-            } else {
-                $this->view->displayWrongPassword();
-            }
-        } elseif (isset($actionDelete)) {
-            $code = filter_input(INPUT_POST, 'codeDelete');
-            $userCode = $user->getCodeDeleteAccount();
-            if ($code == $userCode) {
-                $user->deleteCode();
-                $user->delete();
-                $this->view->displayModificationValidate();
-            } else {
-                echo 'Code ' . $code;
-                echo 'User code ' . $userCode;
-                $this->view->displayWrongPassword();
-            }
+            wp_mail($to, $subject, $message, $headers);
+            $this->view->displayMailSend();
+        } else {
+            $this->view->displayWrongPassword();
         }
-        return $this->view->displayDeleteAccount() . $this->view->displayEnterCode();
+    } elseif (isset($actionConfirmDelete)) {
+        $code = filter_input(INPUT_POST, 'codeDelete');
+        $userCode = $user->getCodeDeleteAccount();
+        if ($code == $userCode) {
+            $user->deleteCode();
+            $user->delete();
+            $this->view->displayModificationValidate();
+        } else {
+            $this->view->displayWrongPassword();
+        }
     }
+
+    return $this->view->displayDeleteAccount() . $this->view->displayEnterCode();
+}
+
 
     /**
      * Modify his password, delete his account or modify his groups
@@ -123,12 +129,7 @@ class UserController extends Controller
         $current_user = wp_get_current_user();
         $string = $this->view->displayStartMultiSelect();
 
-        if (in_array('etudiant', $current_user->roles)) {
-            $string .= $this->view->displayTitleSelect('code', 'Modifier mes codes', true) .
-                $this->view->displayTitleSelect('pass', 'Modifier mon mot de passe');
-        } else {
-            $string .= $this->view->displayTitleSelect('pass', 'Modifier mon mot de passe', true);
-        }
+		$string .= $this->view->displayTitleSelect('pass', 'Modifier mon mot de passe', true);
 
         $string .= $this->view->displayTitleSelect('delete', 'Supprimer mon compte') . $this->view->displayEndOfTitle();
 
@@ -139,10 +140,12 @@ class UserController extends Controller
         return $string;
     }
 
-    /**
-     * Modify the password of the user
-     */
-    public function modifyPwd() {
+	/**
+	 * Modifies the password for the current user.
+	 *
+	 * @return string
+	 */
+    public function modifyPwd(): string {
         $action = filter_input(INPUT_POST, 'modifyMyPwd');
         $current_user = wp_get_current_user();
         if (isset($action)) {
@@ -158,15 +161,15 @@ class UserController extends Controller
         return $this->view->displayModifyPassword();
     }
 
-    /**
-     * Display schedule
-     *
-     * @param $code     int Code ADE of the schedule
-     * @param $allDay   bool
-     *
-     * @return string|bool
-     */
-    public function displaySchedule($code, $allDay = false) {
+	/**
+	 * Display a schedule based on a given code and parameters.
+	 *
+	 * @param string $code The unique code to identify the schedule file.
+	 * @param bool $allDay Optional. Whether to display events as all-day events. Default is false.
+	 *
+	 * @return string Rendered HTML of the schedule.
+	 */
+    public function displaySchedule(string $code,bool $allDay = false): string {
         global $R34ICS;
         $R34ICS = new R34ICS();
 
@@ -204,14 +207,14 @@ class UserController extends Controller
         return $this->view->displaySelectSchedule();
     }
 
-    /**
-     * Check if a code Ade already exists with the same title or code
-     *
-     * @param User $newUser
-     *
-     * @return bool
-     */
-    public function checkDuplicateUser(User $newUser) {
+	/**
+	 * Checks for duplicate user based on login and email.
+	 *
+	 * @param User $newUser The user object containing login and email to check for duplicates.
+	 *
+	 * @return bool Returns true if a duplicate user is found, otherwise false.
+	 */
+    public function checkDuplicateUser(User $newUser): bool {
         $codesAde = $this->model->checkUser($newUser->getLogin(), $newUser->getEmail());
 
         if (sizeof($codesAde) > 0) {
@@ -221,12 +224,20 @@ class UserController extends Controller
         return false;
     }
 
-    /**
-     * Modify codes ade for the student
-     *
-     * @return string
-     */
-    public function modifyCodes() {
+	/**
+	 * Processes and updates the modification of codes associated with the current user.
+	 *
+	 * The method retrieves user input for year, group, and half-group codes,
+	 * validates them, and associates them with their corresponding types.
+	 * If the codes are valid, they are updated in the model and stored
+	 * for the current user. Feedback messages are displayed based on the
+	 * success or failure of the update. The method also fetches all
+	 * available codes for display.
+	 *
+	 * @return string Returns the generated view displaying the current codes
+	 *               alongside available year, group, and half-group codes.
+	 */
+    public function modifyCodes(): string {
         $current_user = wp_get_current_user();
         $codeAde = new CodeAde();
         $this->model = $this->model->get($current_user->ID);

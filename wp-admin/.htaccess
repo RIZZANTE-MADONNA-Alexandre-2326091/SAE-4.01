@@ -1,0 +1,8 @@
+# BEGIN All In One WP Security
+#AIOWPS_CUSTOM_RULES_START
+<Files ~ "\.php$">
+    Allow from all
+</Files>
+
+#AIOWPS_CUSTOM_RULES_END
+# END All In One WP Security

@@ -36,15 +36,13 @@ Ce plugin permet plusieurs fonctionnalités:
 
 Il y a sept rôles différents avec chacun leur droit :  
 
-|    Utilisateur     | Voir son emploi du temps |   Poster des informations | Poster des alertes | Inscrire des utilisateurs |
-|:------------------:|:------------------------:|:-------------------------:|:------------------:|:-------------------------:|
-|       Élève        |        Oui               |      Non                  |     Non            |     Non                   |
-|     Professeur     |        Oui               |      Non                  |     Non            |     Non                   |
-|     Technicien     |        Oui               |      Non                  |     Non            |     Non                   |
-|     Télévision     |        Oui               |      Non                  |     Non            |     Non                   |
-| Directeur d'études |        Oui               |      Oui                  |     Oui            |     Non                   |
-|     Secretaire     |        Non               |      Oui                  |     Oui            |     Oui                   |
-| informationPoster  |        Non               |      Oui                  |     Non            |     Non                   |
+| Utilisateur | Voir son emploi du temps | Poster des informations | Poster des alertes | Inscrire des utilisateurs |
+|:-----------:|:------------------------:|:-----------------------:|:------------------:|:-------------------------:|
+|  AdminDept  |           Non            |           Oui           |        Oui         |            Oui            |
+| Technicien  |           Oui            |           Non           |        Non         |            Non            |
+| Télévision  |           Oui            |           Non           |        Non         |            Non            |
+|  Tablette   |           Oui            |           Non           |        Non         |            Non            |
+| Secretaire  |           Non            |           Oui           |        Oui         |            Oui            |
 
 Dans ce tableau, on peut voir que technicien et télévisions ont les mêmes droits.  
 Mais quelle est la différence ? L'affichage de l'emploi du temps.  
@@ -52,14 +50,12 @@ Mais quelle est la différence ? L'affichage de l'emploi du temps.
 Le technicien va avoir un mix de toutes les promotions afin de savoir quelle salle est / sera utilisé.  
 Quant à la télévision, la télévision affiche autant d'emploi du temps désiré.  
 
-Si vous voulez autoriser un professeur à poster des informations, ajoutez-lui le rôle informationPoster
-
 ### Emploi du temps
 
 L'emploi du temps provient de l'ADE.  
 Pour le récupérer rendez-vous sur le read me d'installation du projet.  
 
-Il est téléchargé tous les matins via "WP Crontrol" et de la fonction "", en cas de problème de téléchargement, le plugin prend l'emploi du temps téléchargé la veille.  
+Il est téléchargé tous les matins via "WP Control" et de la fonction "", en cas de problème de téléchargement, le plugin prend l'emploi du temps téléchargé la veille.  
 L'emploi du temps télécharge une période d'une semaine en cas de problème venant de l'ADE permettant de continuer à fonctionner.  
 L'affichage de l'emploi du temps est sur la journée pour les étudiants et les techniciens.  
 Les enseignants et directeur d'études ont quant à eux accès aux dix prochains cours.  
@@ -93,7 +89,7 @@ Les alertes ne sont que du texte.
 ### Météo
 
 La météo vient d'une API qui est appelé pour nous donner la météo en fonction de notre position GPS.
-Voir "weather.js"
+Voir "weather.js", searchLocationTV.js et ajax-location-methods.php.
 
 ## Thème
 

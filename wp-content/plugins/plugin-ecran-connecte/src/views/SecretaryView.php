@@ -14,22 +14,25 @@ use Models\User;
 class SecretaryView extends UserView
 {
 
-    /**
-     * Display the creation form
-     *
-     * @return string
-     */
-    public function displayFormSecretary($departements, $isAdmin, $currentDept) {
+	/**
+	 * Displays the form for creating a secretary account.
+	 *
+	 * @return string The HTML content for the secretary account creation form.
+	 */
+    public function displayFormSecretary($departements, $isAdmin, $currentDept): string {
         return '
         <h2> Compte secrétaire </h2>
         <p class="lead">Pour créer des secrétaires, remplissez ce formulaire avec les valeurs demandées.</p>
         ' . $this->displayBaseForm('Secre', $departements, $isAdmin, $currentDept);
     }
 
-    /**
-     * Display a button for download all schedules
-     */
-    public function displayWelcomeAdmin() {
+	/**
+	 * Display the welcome page for the admin interface, including various options for creating,
+	 * managing, and updating information, alerts, users, and schedules for connected televisions.
+	 *
+	 * @return string The HTML content for the admin welcome page.
+	 */
+    public function displayWelcomeAdmin(): string {
         return '
         <div class="row">
             <div class="col-6 mx-auto col-md-6 order-md-1">
@@ -102,14 +105,14 @@ class SecretaryView extends UserView
         </div>';
     }
 
-    /**
-     * Display all secretary
-     *
-     * @param $users    User[]
-     *
-     * @return string
-     */
-    public function displayAllSecretary($users, $userDeptList) {
+	/**
+	 * Display a list of all secretaries with their associated details.
+	 *
+	 * @param array $users An array of user objects representing secretaries.
+	 *
+	 * @return string The rendered display of all secretaries.
+	 */
+    public function displayAllSecretary(array $users, $userDeptList): string {
         $title = 'Secrétaires';
         $name = 'Secre';
         $header = ['Login', 'Département'];
@@ -124,10 +127,12 @@ class SecretaryView extends UserView
         return $this->displayAll($name, $title, $header, $row, 'Secre');
     }
 
-    /**
-     * Ask to the user to choose an user
-     */
-    public function displayNoUser() {
+	/**
+	 * Displays an alert message indicating that no user has been selected.
+	 *
+	 * @return string The HTML string containing the alert message.
+	 */
+    public function displayNoUser(): string {
         return '<p class="alert alert-danger">Veuillez choisir un utilisateur </p>';
     }
 }

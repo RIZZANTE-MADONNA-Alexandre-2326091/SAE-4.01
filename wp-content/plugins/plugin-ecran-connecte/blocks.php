@@ -422,7 +422,7 @@ function schedule_render_callback()
         } else if (in_array("technicien", $current_user->roles)) {
             $controller = new TechnicianController();
             return $controller->displayMySchedule();
-        } else if (in_array("administrator", $current_user->roles) || in_array("secretaire", $current_user->roles)) {
+        } else if (in_array("administrator", $current_user->roles) || in_array("adminDept", $current_user->roles) || in_array("secretaire", $current_user->roles)) {
             $controller = new SecretaryController();
             return $controller->displayMySchedule();
         }
@@ -477,6 +477,7 @@ function block_schedules()
     ));
 }
 add_action( 'init', 'block_schedules' );
+
 
 /*
  * USER BLOCKS

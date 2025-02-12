@@ -1,0 +1,116 @@
+.img_table_ecran {
+    width: 25%;
+}
+
+.img-thumbnail {
+    max-height: 62vh;
+}
+
+/*
+    Prévisualisations des vidéos en local
+*/
+
+.previsualisationVideoClassique {
+    width: 50%;
+    height: 30%;
+    max-width: 50%;
+    max-height: 30%;
+}
+
+.previsualisationVideoShort {
+    width: 30%;
+    height: 50%;
+    max-width: 30%;
+    max-height: 50%;
+}
+
+/*
+    Configuration pour le style des vidéos
+*/
+
+.videosh, .localSvideo {
+    height: 62vh;
+    width: 75%;
+}
+
+.videow, .localCvideo {
+    height: 92vh;
+    width: 65vw;
+
+    margin-left: -315%;
+    margin-top: -25%;
+}
+
+.rss-feed {
+    list-style-type: none;
+    padding: 0;
+}
+
+.rss-feed li {
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+    margin-left: 0;
+}
+
+.rss-feed a {
+    font-size: 18px;
+    font-weight: bold;
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
+.rss-feed a:hover {
+    text-decoration: underline;
+}
+
+.rss-description {
+    color: #000c69;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    background-color: white;
+    border-radius: 05px;
+    text-align: left;
+    outline: 2px solid #1c2eb5;
+    padding: 5px;
+}
+
+@media only screen and (max-width: 1000px) {
+    .videosh, .localSvideo {
+        height: 65vh;
+    }
+    .videow, .localCvideo {
+        height: 90vh;
+        width: 65vw;
+    }
+}
+
+@media only screen and (max-width: 1000px) {
+    .videow, .localCvideo {
+        height: 95vh;
+        width: 62vw;
+        margin-top: -13%;
+    }
+}
+
+@media only screen and (max-height: 700px) {
+    .videosh, .localSvideo {
+        height: 65vh;
+    }
+    .videow, .localCvideo {
+        height: 92vh;
+        width: 62vw;
+        margin-top: -13%;
+    }
+}
+@media only screen and (max-height: 580px) {
+    .videosh, .localSvideo {
+        height: 60vh;
+    }
+}
+@media only screen and (max-height: 500px) {
+    .videosh, .localSvideo {
+        height: 50vh;
+    }
+}

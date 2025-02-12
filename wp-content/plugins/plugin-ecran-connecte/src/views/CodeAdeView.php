@@ -14,12 +14,12 @@ use Models\CodeAde;
 class CodeAdeView extends View
 {
 
-    /**
-     * Display form for create code ade
-     *
-     * @return string
-     */
-    public function createForm() {
+	/**
+	 * Generate and return an HTML form for adding a code ADE.
+	 *
+	 * @return string The HTML form as a string.
+	 */
+    public function createForm(): string {
         return '
         <form method="post">
             <div class="form-group">
@@ -48,16 +48,16 @@ class CodeAdeView extends View
         </form>';
     }
 
-    /**
-     * Display a form for modify a code ade
-     *
-     * @param $title    string
-     * @param $type     string
-     * @param $code     int
-     *
-     * @return string
-     */
-    public function displayModifyCode($title, $type, $code) {
+	/**
+	 * Displays a form to modify an ADE code.
+	 *
+	 * @param string $title The current title of the ADE code.
+	 * @param string $type The current type associated with the ADE code.
+	 * @param int $code The current code to be modified.
+	 *
+	 * @return string The HTML form as a string for modifying the ADE code.
+	 */
+    public function displayModifyCode(string $title, string $type, int $code): string {
         $page = get_page_by_title_V2('Gestion des codes ADE');
         $linkManageCode = get_permalink($page->ID);
 
@@ -83,14 +83,14 @@ class CodeAdeView extends View
          </form>';
     }
 
-    /**
-     * Display options for selecting a code type
-     *
-     * @param string $selectedType Currently selected type of the code
-     *
-     * @return string
-     */
-    private function createTypeOption($selectedType) {
+	/**
+	 * Generate a list of HTML option elements for selecting a type.
+	 *
+	 * @param string $selectedType The value of the currently selected type.
+	 *
+	 * @return string The HTML string containing all option elements.
+	 */
+    private function createTypeOption(string $selectedType): string {
         $result = '';
 
         // Declare available code types
@@ -122,16 +122,16 @@ class CodeAdeView extends View
         return $result;
     }
 
-    /**
-     * Display all information of a code ade
-     *
-     * @param $years        CodeAde[]
-     * @param $groups       CodeAde[]
-     * @param $halfGroups   CodeAde[]
-     *
-     * @return          string
-     */
-    public function displayAllCode($years, $groups, $halfGroups) {
+	/**
+	 * Displays a list of all ADE codes including years, groups, and half-groups.
+	 *
+	 * @param array $years An array of ADE codes categorized as years.
+	 * @param array $groups An array of ADE codes categorized as groups.
+	 * @param array $halfGroups An array of ADE codes categorized as half-groups.
+	 *
+	 * @return string The rendered HTML output displaying all the ADE codes.
+	 */
+    public function displayAllCode(array $years,array $groups,array $halfGroups): string {
         $page = get_page_by_title_V2('Modifier un code ADE');
         $linkManageCodeAde = get_permalink($page->ID);
 
@@ -161,47 +161,59 @@ class CodeAdeView extends View
         return $this->displayAll($name, $title, $header, $row, 'code');
     }
 
-    /**
-     * Display a success message for the creation of a new code ADE
-     */
-    public function successCreation() {
+	/**
+	 * Display a success message for the creation of a code ADE.
+	 *
+	 * @return void
+	 */
+    public function successCreation(): void {
         $this->buildModal('Ajout du code ADE', '<p>Le code ADE a bien été ajouté</p>');
     }
 
-    /**
-     * Display a success message for the modification of a code ADE
-     */
-    public function successModification() {
+	/**
+	 * Displays a success modal for ADE code modification.
+	 *
+	 * @return void
+	 */
+    public function successModification(): void {
         $page = get_page_by_title_V2('Gestion des codes ADE');
         $linkManageCode = get_permalink($page->ID);
         $this->buildModal('Modification du code ADE', '<p>Le code ADE a bien été modifié</p>', $linkManageCode);
     }
 
-    /**
-     * Display an error message for the creation of a code ADE
-     */
-    public function errorCreation() {
+	/**
+	 * Displays an error modal for ADE code creation failure.
+	 *
+	 * @return void
+	 */
+    public function errorCreation(): void {
         $this->buildModal('Erreur lors de l\'ajout du code ADE', '<p>Le code ADE a rencontré une erreur lors de son ajout</p>');
     }
 
-    /**
-     * Display an error message for the modification of a code ADE
-     */
-    public function errorModification() {
+	/**
+	 * Displays an error modal for ADE code modification failure.
+	 *
+	 * @return void
+	 */
+    public function errorModification(): void {
         $this->buildModal('Erreur lors de la modification du code ADE', '<p>Le code ADE a rencontré une erreur lors de sa modification</p>');
     }
 
-    /**
-     * Error message if title or code exist
-     */
-    public function displayErrorDoubleCode() {
+	/**
+	 * Displays an error message indicating that a code or title already exists.
+	 *
+	 * @return void
+	 */
+    public function displayErrorDoubleCode(): void {
         echo '<p class="alert alert-danger"> Ce code ou ce titre existe déjà</p>';
     }
 
-    /**
-     * Display an message if there is nothing
-     */
-    public function errorNobody() {
+	/**
+	 * Displays an error message indicating no content is available and provides a link to return.
+	 *
+	 * @return void
+	 */
+    public function errorNobody(): void {
         $page = get_page_by_title_V2('Gestion des codes ADE');
         $linkManageCode = get_permalink($page->ID);
         echo '<p>Il n\'y a rien par ici</p><a href="' . $linkManageCode . '">Retour</a>';

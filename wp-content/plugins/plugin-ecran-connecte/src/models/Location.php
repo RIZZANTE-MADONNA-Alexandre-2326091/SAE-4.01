@@ -37,9 +37,9 @@ class Location extends Model implements Entity, JsonSerializable {
 
 
 	/**
-	 * Insert a location in the database.
+	 * Inserts a new record into the ecran_location table using the provided data.
 	 *
-	 * @return string
+	 * @return string The ID of the newly inserted record.
 	 */
 	public function insert(): string {
 		$database = $this->getDatabase();
@@ -57,41 +57,48 @@ class Location extends Model implements Entity, JsonSerializable {
 
 			$request->execute();
 
-			// Valider la transaction
 			$lastId = $database->lastInsertId();
 			$database->commit();
 
 			return $lastId;
 
 		} catch (PDOException $e) {
-			$database->rollBack(); // Annule la transaction en cas d'erreur
 			error_log('Error during INSERT: ' . $e->getMessage());
 			throw $e;
 		}
 	}
 
 	/**
-	 * Update a location in the database.
+	 * Updates the location data for a specific user in the database.
 	 *
-	 * @return int
+	 * @return int The number of rows affected by the update operation. Returns 0 in case of an error.
 	 */
 	public function update(): int {
-		$request = $this->getDatabase()->prepare( "UPDATE ecran_location SET longitude = :longitude, latitude = :latitude
-                           								 WHERE user_id = :user_id" );
+		try {
+			$request = $this->getDatabase()->prepare(
+				"UPDATE ecran_location SET longitude = :longitude, latitude = :latitude
+             WHERE user_id = :user_id");
 
-		$request->bindValue( ':longitude', $this->getLongitude());
-		$request->bindValue( ':latitude', $this->getLatitude());
-		$request->bindValue( ':user_id', $this->getIdUser(), PDO::PARAM_INT);
+			$request->bindValue(':longitude', $this->getLongitude());
+			$request->bindValue(':latitude', $this->getLatitude());
+			$request->bindValue(':user_id', $this->getIdUser(), PDO::PARAM_INT);
 
-		$request->execute();
+			$request->execute();
 
-		return $request->rowCount();
+			$rowsAffected = $request->rowCount(); // Nombre de lignes affectées
+			error_log("Lignes affectées par la mise à jour : $rowsAffected");
+
+			return $rowsAffected;
+		} catch (PDOException $e) {
+			error_log('Erreur lors de la mise à jour : ' . $e->getMessage());
+			return 0;
+		}
 	}
 
 	/**
-	 * Delete a location in the database.
+	 * Deletes a record from the database based on the entity's ID.
 	 *
-	 * @return int
+	 * @return int The number of rows affected by the delete operation.
 	 */
 	public function delete(): int {
 		$request = $this->getDatabase()->prepare( 'DELETE FROM ecran_location WHERE id = :id' );
@@ -104,11 +111,11 @@ class Location extends Model implements Entity, JsonSerializable {
 	}
 
 	/**
-	 * Retrieves an entity from the database based on the provided ID.
+	 * Retrieves a specific location entity from the database based on its ID.
 	 *
-	 * @param int $id The ID of the entity to retrieve.
+	 * @param int $id The ID of the location to retrieve.
 	 *
-	 * @return array|false The entity data as an associative array if found, or false if no matching entity was found.
+	 * @return Location|false The location entity if found, or false if not found.
 	 */
 	public function get( $id ): Location|false {
 		$request = $this->getDatabase()->prepare( "SELECT id, longitude, latitude, user_id FROM ecran_location WHERE id = :id LIMIT 1" );

@@ -19,12 +19,12 @@ class SecretaryController extends UserController
     /**
      * @var User
      */
-    private $model;
+    private User $model;
 
     /**
      * @var SecretaryView
      */
-    private $view;
+    private SecretaryView $view;
 
     /**
      * Constructor of SecretaryController.
@@ -36,17 +36,24 @@ class SecretaryController extends UserController
     }
 
 
-    /**
-     * Display the magic button to dl schedule
-     */
-    public function displayMySchedule() {
+	/**
+	 * Displays the schedule by rendering the welcome admin view.
+	 *
+	 * @return string The result of rendering the welcome admin view.
+	 */
+    public function displayMySchedule(): string {
         return $this->view->displayWelcomeAdmin();
     }
 
-    /**
-     * Insert a secretary in the database
-     */
-    public function insert() {
+	/**
+	 * Handles the insertion of a secretary user record into the system.
+	 * Validates the input data, ensures it meets requirements, checks for duplicate users,
+	 * and calls the model to perform the actual insertion. Displays appropriate views based
+	 * on success or failure of actions.
+	 *
+	 * @return string The output of the secretary form view after the operation is handled.
+	 */
+    public function insert(): string {
         $action = filter_input(INPUT_POST, 'createSecre');
 
 	    $currentUser = wp_get_current_user();
@@ -88,12 +95,13 @@ class SecretaryController extends UserController
         return $this->view->displayFormSecretary($departments, $isAdmin, $currentDept);
     }
 
-    /**
-     * Display all secretary
-     *
-     * @return string
-     */
-    public function displayAllSecretary() {
+	/**
+	 * Displays all secretaries by retrieving users with the role of 'secretaire' and rendering the appropriate view.
+	 *
+	 *
+     * @return string The result of the view's displayAllSecretary method.
+	 */
+    public function displayAllSecretary(): string {
         $users = $this->model->getUsersByRole('secretaire');
 
 		$deptModel = new Department();
@@ -107,12 +115,13 @@ class SecretaryController extends UserController
 
     /*** MANAGE USER ***/
 
-    /**
-     * Create an user
-     *
-     * @return string
-     */
-    public function createUsers() {
+	/**
+	 * Creates users and generates a multi-select interface for different user roles.
+	 *
+	 * @return string A concatenated string containing the HTML output for user creation,
+	 * including multi-select start, titles, content, and context-specific user creation interface.
+	 */
+    public function createUsers(): string {
 	    $user_id = get_current_user_id();
 	    $user_info = get_userdata($user_id);
 		$adminDept = null;
@@ -147,10 +156,16 @@ class SecretaryController extends UserController
 	    return $form;
     }
 
-    /**
-     * Display users by roles
-     */
-    public function displayUsers() {
+	/**
+	 * Generates and displays a multi-select form based on different user roles and their associated data.
+	 *
+	 * This method retrieves the current user information, determines if the user has an administrator role,
+	 * creates the necessary controllers for different roles, and dynamically builds a form for selecting
+	 * and displaying user data for secretaries, technicians, televisions, and optionally administrators.
+	 *
+	 * @return string The generated HTML form for displaying users based on their roles.
+	 */
+    public function displayUsers(): string{
 	    $user_id = get_current_user_id();
 	    $user_info = get_userdata($user_id);
 	    $adminDept = null;
@@ -185,10 +200,18 @@ class SecretaryController extends UserController
 	    return $form;
     }
 
-    /**
-     * Modify an user
-     */
-    public function modifyUser() {
+	/**
+	 * Modifies a user based on their ID and role.
+	 *
+	 * This method retrieves a user from the database and WordPress system
+	 * using their ID. If the user exists and their role includes "television",
+	 * it delegates the modification process to the TelevisionController.
+	 * Otherwise, it displays a "no user" view.
+	 *
+	 * @return string Returns the result of the modification process if the user exists
+	 *               and meets the criteria, otherwise returns the "no user" view.
+	 */
+    public function modifyUser(): string {
         $id = $_GET['id'];
         if (is_numeric($id) && $this->model->get($id)) {
             $user = $this->model->get($id);
@@ -206,10 +229,16 @@ class SecretaryController extends UserController
         }
     }
 
-    /**
-     * Delete users
-     */
-    public function deleteUsers() {
+	/**
+	 * Deletes users based on their roles and selected checkboxes.
+	 *
+	 * This method processes the delete action triggered via a POST request.
+	 * It iterates through predefined roles, checks for corresponding selected checkboxes,
+	 * and deletes the associated users by their IDs.
+	 *
+	 * @return void
+	 */
+    public function deleteUsers(): void {
         $actionDelete = filter_input(INPUT_POST, 'delete');
         $roles = ['Tech', 'Secre', 'Tele'];
         if (isset($actionDelete)) {
@@ -224,12 +253,14 @@ class SecretaryController extends UserController
         }
     }
 
-    /**
-     * Delete an user
-     *
-     * @param $id
-     */
-    private function deleteUser($id) {
+	/**
+	 * Deletes a user by their unique identifier.
+	 *
+	 * @param int $id The unique identifier of the user to delete.
+	 *
+	 * @return void
+	 */
+    private function deleteUser($id): void {
         $user = $this->model->get($id);
         $user->delete();
     }
