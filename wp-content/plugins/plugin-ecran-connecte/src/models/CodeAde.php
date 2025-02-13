@@ -143,9 +143,9 @@ class CodeAde extends Model implements Entity, JsonSerializable
 	 *
 	 * @param mixed $type The type to filter the database records by.
 	 *
-	 * @return CodeAde The list of matching entities retrieved from the database.
+	 * @return array The list of matching entities retrieved from the database.
 	 */
-    public function getAllFromType(mixed $type): CodeAde {
+    public function getAllFromType(mixed $type): array {
         $request = $this->getDatabase()->prepare('SELECT id, title, code, type FROM ecran_code_ade WHERE type = :type ORDER BY id DESC LIMIT 500');
 
         $request->bindParam(':type', $type, PDO::PARAM_STR);

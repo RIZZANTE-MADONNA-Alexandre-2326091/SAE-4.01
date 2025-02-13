@@ -249,21 +249,22 @@ class View
     }
 
 
-	public function displayAllDept( array $dept, $currentDept = null ) {
-		$form = '';
-		foreach ( $dept as $d ) {
-			$selected = $d->getId() == $currentDept ? 'selected' : '';
-			$form .= '<option' . $selected . ' value="' . $d->getId() . '">' . $d->getName() . '</option>';
-		}
-		return $form;
-	}
+    public function displayAllDept(array $departments, int $currentDept = null): string
+    {
+        $form = '';
+        foreach ($departments as $dept) {
+            $selected = ($dept->getId() == $currentDept) ? 'selected' : '';
+            $form .= '<option' . $selected . ' value="' . $dept->getId() . '">' . $dept->getName() . '</option>';
+        }
+        return $form;
+    }
 
     /**
-     * Close a div
+     * Close a div.
      *
      * @return string
      */
-    public function displayEndDiv(): string {
+    public function endDiv(): string {
         return '</div>';
     }
 
@@ -271,8 +272,9 @@ class View
 	 * Display a message indicating that the passwords are incorrect.
 	 *
 	 * @return void
-	 */
-    public function displayBadPassword(): void {
+     */
+    public function displayBadPassword(): void
+    {
         $this->buildModal('Mauvais mot de passe', '<p class=\'alert alert-danger\'>Les deux mots de passe ne sont pas correctes </p>');
     }
 
@@ -326,10 +328,6 @@ class View
 	 *
 	 * @return void
 	 */
-    public function displayModificationValidate($redirect = null): void {
-    /**
-     * Display a message if the modification is a success
-     */
     public function displayModificationValidate($redirect = null) {
         $this->buildModal('Modification réussie', '<p class="alert alert-success"> La modification a été appliquée</p>', $redirect);
     }

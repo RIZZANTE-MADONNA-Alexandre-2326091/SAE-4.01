@@ -42,8 +42,9 @@ class TechnicianView extends UserView
         $row = array();
         $count = 0;
         foreach ($users as $user) {
+            $row[] = [$count+1, $this->buildCheckbox($name, $user->getId()), $user->getLogin(), $userDeptList[$count]];
+
             ++$count;
-            $row[] = [$count, $this->buildCheckbox($name, $user->getId()), $user->getLogin(), $userDeptList[$count - 1]];
         }
 
         return $this->displayAll($name, $title, $header, $row, $name);

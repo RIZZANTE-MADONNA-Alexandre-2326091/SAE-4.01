@@ -68,8 +68,7 @@ class TechnicianController extends UserController implements Schedule
 
             if (is_string($login) && strlen($login) >= 4 && strlen($login) <= 25 &&
                 is_string($password) && strlen($password) >= 8 && strlen($password) <= 25 &&
-                $password === $passwordConfirm
-                && is_email($email)) {
+                $password === $passwordConfirm && is_email($email)) {
 
                 $this->model->setLogin($login);
                 $this->model->setPassword($password);

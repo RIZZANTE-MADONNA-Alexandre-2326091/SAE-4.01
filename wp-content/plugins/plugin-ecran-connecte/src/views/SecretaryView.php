@@ -109,10 +109,11 @@ class SecretaryView extends UserView
 	 * Display a list of all secretaries with their associated details.
 	 *
 	 * @param array $users An array of user objects representing secretaries.
+     * @param array $userDeptList
 	 *
 	 * @return string The rendered display of all secretaries.
 	 */
-    public function displayAllSecretary(array $users, $userDeptList): string {
+    public function displayAllSecretary(array $users, array $userDeptList): string {
         $title = 'Secrétaires';
         $name = 'Secre';
         $header = ['Login', 'Département'];
@@ -120,11 +121,12 @@ class SecretaryView extends UserView
         $row = array();
         $count = 0;
         foreach ($users as $user) {
+            $row[] = [$count+1, $this->buildCheckbox($name, $user->getId()), $user->getLogin(), $userDeptList[$count]];
+
             ++$count;
-            $row[] = [$count, $this->buildCheckbox($name, $user->getId()), $user->getLogin(), $userDeptList[$count - 1]];
         }
 
-        return $this->displayAll($name, $title, $header, $row, 'Secre');
+        return $this->displayAll($name, $title, $header, $row, $name);
     }
 
 	/**

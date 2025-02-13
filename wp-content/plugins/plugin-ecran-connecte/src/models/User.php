@@ -52,11 +52,11 @@ class User extends Model implements Entity, JsonSerializable
 	private $deptId;
 
 	/**
-     * Insert an user in the database
+     * Insert an user in the database.
      *
-     * @return bool
+     * @return string
      */
-    public function insert() {
+    public function insert(): string {
         // Take 7 lines to create an user with a specific role
         $userData = array(
             'user_login' => $this->getLogin(),
@@ -89,7 +89,7 @@ class User extends Model implements Entity, JsonSerializable
             }
         }
 
-        return $id;
+        return $database->lastInsertId();
     }
 
 	/**
@@ -205,11 +205,10 @@ class User extends Model implements Entity, JsonSerializable
 	 * @return User[]|void The list of users matching the specified role, or void if no users are found.
 	 */
     public function getUsersByRole($role) {
-        $request = $this->getDatabase()->prepare('SELECT wpu.ID, user_login, user_pass, user_email 
-														FROM wp_users wpu, wp_usermeta meta, ecran_dept_user edu
-														WHERE wpu.ID = meta.user_id AND edu.user_id = wpu.ID 
-														AND meta.meta_value =:role 
-														ORDER BY wpu.user_login LIMIT 1000');
+        $request = $this->getDatabase()->prepare('SELECT wpu.ID as ID, user_login, user_pass, user_email, edu.dept_id 
+                                                        FROM wp_users wpu JOIN wp_usermeta meta ON wpu.ID = meta.user_id  
+                                                        JOIN ecran_dept_user edu ON edu.user_id = wpu.ID AND meta.meta_value = :role 
+                                                        ORDER BY wpu.user_login LIMIT 1000');
 
         $size = strlen($role);
         $role = 'a:1:{s:' . $size . ':"' . $role . '";b:1;}';
@@ -376,9 +375,9 @@ class User extends Model implements Entity, JsonSerializable
         $entity->setPassword($data['user_pass']);
         $entity->setEmail($data['user_email']);
         $entity->setRole(get_user_by('ID', $data['ID'])->roles[0]);
-	    $entity->setDeptId($data['dept_id']) ? : 0;
+	    $entity->setDeptId(($data['dept_id']) ?: 0);
 
-        $request = $this->getDatabase()->prepare('SELECT id, title, code, type FROM ecran_code_ade
+        $request = $this->getDatabase()->prepare('SELECT id, title, code, type, dept_id FROM ecran_code_ade
     													JOIN ecran_code_user ON ecran_code_ade.id = ecran_code_user.code_ade_id
                              							WHERE ecran_code_user.user_id = :id');
 

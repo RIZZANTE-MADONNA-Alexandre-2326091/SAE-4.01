@@ -49,19 +49,18 @@ class TelevisionController extends UserController implements Schedule
         $action = filter_input(INPUT_POST, 'createTv');
 
         $codeAde = new CodeAde();
-		$currentUser = wp_get_current_user();
 
-	    $deptModel = new Department();
-		$isAdmin = in_array('administrator', $currentUser->roles);
-		$currentDept = $isAdmin ? null : $deptModel->getUserInDept($currentUser->ID)->getId();
+        $currentUser = wp_get_current_user();
+        $deptModel = new Department();
+        $isAdmin = in_array('administrator', $currentUser->roles);
+        $currentDept = $isAdmin ? null : $deptModel->getUserInDept($currentUser->ID)->getId();
 
         if (isset($action)) {
-
             $login = filter_input(INPUT_POST, 'loginTv');
             $password = filter_input(INPUT_POST, 'pwdTv');
             $passwordConfirm = filter_input(INPUT_POST, 'pwdConfirmTv');
-	        $deptId = $isAdmin ? null : filter_input(INPUT_POST, 'deptTv');
-			$codes = filter_input(INPUT_POST, 'selectTv',FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
+            $deptId = $isAdmin ? filter_input(INPUT_POST, 'deptIdTv') : $currentDept;
+            $codes = filter_input(INPUT_POST, 'selectTv', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
 
             if (is_string($login) && strlen($login) >= 4 && strlen($login) <= 25 &&
                 is_string($password) && strlen($password) >= 8 && strlen($password) <= 25 &&
@@ -71,24 +70,26 @@ class TelevisionController extends UserController implements Schedule
                 foreach ($codes as $code) {
                     if (is_numeric($code) && $code > 0) {
                         if (is_null($codeAde->getByCode($code)->getId())) {
-                            return 'error';
+                            return 'error'; // Code invalide;
                         } else {
                             $codesAde[] = $codeAde->getByCode($code);
                         }
                     }
                 }
 
+                // Configuration du modèle de télévision
                 $this->model->setLogin($login);
                 $this->model->setEmail($login . '@' . $login . '.fr');
                 $this->model->setPassword($password);
                 $this->model->setRole('television');
                 $this->model->setCodes($codesAde);
-	            $this->model->setDeptId($deptId);
+                $this->model->setDeptId($deptId);
 
+                // Insertion du modèle dans la base de données
                 if (!$this->checkDuplicateUser($this->model) && $this->model->insert()) {
                     $this->view->displayInsertValidate();
                 } else {
-                    $this->view->displayErrorLogin();
+                    $this->view->displayErrorInsertion();
                 }
             } else {
                 $this->view->displayErrorCreation();
@@ -99,9 +100,9 @@ class TelevisionController extends UserController implements Schedule
         $groups = $codeAde->getAllFromType('group');
         $halfGroups = $codeAde->getAllFromType('halfGroup');
 
-	    $departments = $deptModel->getAll();
+        $allDepts = $deptModel->getAll();
 
-        return $this->view->displayFormTelevision($years, $groups, $halfGroups, $departments, $isAdmin, $currentDept);
+        return $this->view->displayFormTelevision($years, $groups, $halfGroups, $allDepts, $isAdmin, $currentDept);
     }
 
 	/**

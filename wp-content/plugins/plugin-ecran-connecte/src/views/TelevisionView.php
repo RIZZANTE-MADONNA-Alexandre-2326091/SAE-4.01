@@ -24,13 +24,13 @@ class TelevisionView extends UserView
 	 *
 	 * @return string The HTML string of the television account creation form.
 	 */
-    public function displayFormTelevision(array $years,array $groups, array $halfGroups, $isAdmin = null, $currentDept = null): string {
+    public function displayFormTelevision(array $years, array $groups, array $halfGroups, array $departments, $isAdmin = null, $currentDept = null): string {
         $disabled = $isAdmin ? '' : 'disabled';
 
-        $form = '
+        return '
         <h2> Compte télévision</h2>
         <p class="lead">Pour créer des télévisions, remplissez ce formulaire avec les valeurs demandées.</p>
-        <p class="lead">Vous pouvez mettre autant d\'emploi du temps que vous souhaitez, cliquez sur "Ajouter des emplois du temps</p>
+        <p class="lead">Vous pouvez mettre autant d\'emploi du temps que vous souhaitez, cliquez sur "Ajouter des emplois du temps".</p>
         <form method="post" id="registerTvForm">
             <div class="form-group">
             	<label for="loginTv">Login</label>
@@ -56,8 +56,6 @@ class TelevisionView extends UserView
             <input type="button" class="btn button_ecran" id="addSchedule" onclick="addButtonTv()" value="Ajouter des emplois du temps">
             <button type="submit" class="btn button_ecran" id="validTv" name="createTv">Créer</button>
         </form>';
-
-        return $form;
     }
 
 	/**
@@ -81,8 +79,12 @@ class TelevisionView extends UserView
         $row = array();
         $count = 0;
         foreach ($users as $user) {
+            $row[] = [$count+1,
+                $this->buildCheckbox($name, $user->getId()),
+                $user->getLogin(), sizeof($user->getCodes()),
+                $userDeptList[$count], $this->buildLinkForModify($linkManageUser . '?id=' . $user->getId())];
+
             ++$count;
-            $row[] = [$count, $this->buildCheckbox($name, $user->getId()), $user->getLogin(), sizeof($user->getCodes()), $userDeptList[$count-1], $this->buildLinkForModify($linkManageUser . '?id=' . $user->getId())];
         }
 
         return $this->displayAll($name, $title, $header, $row, 'tele');

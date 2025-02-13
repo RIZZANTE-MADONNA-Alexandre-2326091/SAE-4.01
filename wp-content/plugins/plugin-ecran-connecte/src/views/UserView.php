@@ -16,7 +16,7 @@ class UserView extends View
 	 *
 	 * @return string The HTML string of the generated form.
 	 */
-    protected function displayBaseForm(string $name, $isAdmin = false, $currentDept = null):string {
+    protected function displayBaseForm(string $name, array $departments, bool $isAdmin = false, int $currentDept = null):string {
         $disabled = $isAdmin ? '' : 'disabled';
 
         return '

@@ -228,7 +228,7 @@ class InformationController extends Controller
             $this->view->displayContentSelect('LocalCVideo', $this->view->displayFormVideoCLocal()) .
             $this->view->displayContentSelect('LocalSVideo', $this->view->displayFormVideoSLocal()) .
             $this->view->displayContentSelect('rss', $this->view->displayFormRSS()) .
-            $this->view->displayEndDiv() .
+            $this->view->endDiv() .
             $this->view->contextCreateInformation();
     }
 
@@ -666,7 +666,7 @@ class InformationController extends Controller
                 $this->view->displaySlide($information->getTitle(), $information->getContent(), $information->getType(), $adminSite);
             }
         }
-        $this->view->displayEndDiv();
+        $this->view->endDiv();
     }
 
 	/**
@@ -748,7 +748,7 @@ class InformationController extends Controller
                 echo '<img src="' . TV_UPLOAD_PATH . $event->getContent() . '" alt="' . $event->getTitle() . '">';
             }
         }
-        return $this->view->displayEndDiv();
+        return $this->view->endDiv();
     }
 
 	/**
