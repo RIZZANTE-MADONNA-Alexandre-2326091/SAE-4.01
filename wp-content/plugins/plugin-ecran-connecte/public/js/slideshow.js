@@ -281,16 +281,29 @@ function displayOrHide(slides, slideIndex)
                             // Si la vidéo correspond à celle affichée, on associe un id pour l'API
                             if (videoYouTube === slides[slideIndex].childNodes[i]) {
                                 videoYouTube.id = "videoID";
-                                urlYoutube = document.getElementsByClassName("lien").src;
-                                
+                                urlYoutube = slides[slideIndex].childNodes[i].children();
+                                console.log(urlYoutube);
+
+                                let lienRealise = false;
                                 let lastElementIndex = 0;
-                                for (let i = 0; i < urlYoutube.length; ++i) {
-                                    if (urlYoutube.charAt(i) === "?") {
+                                for (let i = 24; i < urlYoutube.length; ++i) {
+                                    if (urlYoutube.charAt(i) === '?') {
                                         lastElementIndex = i;
+                                        urlYoutube = urlYoutube.substring(30, lastElementIndex);
+                                        lienRealise = true;
                                         break;
                                     }
                                 }
-                                urlYoutube = urlYoutube.substring(30, lastElementIndex);
+                                if(!lienRealise) {
+                                    let lienVerifShort = "";
+                                    for (let i = 24; i < 30; ++i) {
+                                        lienVerifShort += urlYoutube.charAt(i);
+                                    }
+                                    if (lienVerifShort === "shorts") {
+                                        urlYoutube = urlYoutube.substring(30,)
+                                    }
+                                }
+
                             }
                             // Sinon, elle n'a pas l'id
                             else {
@@ -359,9 +372,14 @@ function displayOrHide(slides, slideIndex)
                         console.log('--Lecture image');
                         timeout = 10000;
                     }
-                    // If it's an image
+                    // If it's text
                     else if (slides[slideIndex].childNodes[i].className === 'text-info') {
                         console.log('--Lecture texte');
+                        timeout = 10000;
+                    }
+                    // If it's a RSS flow
+                    else if (slides[slideIndex].childNodes[i].className === 'rss-feed') {
+                        console.log('--Lecture rss');
                         timeout = 10000;
                     }
                 }
@@ -385,11 +403,17 @@ function displayOrHide(slides, slideIndex)
 }
 
 //TODO corriger vidéos YouTube
-/**
- * Fonction qui démarre l'API et attribue les valeurs aux lecteurs de vidéos.
- * */
 
+/**
+ * Classe qui permet de gérer les vidéos YouTube
+ * */
 class YouTubeIframeAPI {
+    /**
+     * Constructeur de la classe
+     * @param player Lecteur de la vidéo
+     * @param timeout Temps de la vidéo pour le défilement des informations
+     * @param urlId l'identifiant YouTube de la vidéo
+     * */
     constructor(player, timeout, urlId) {
         this.player = player;
         this.timeout = timeout;
@@ -409,6 +433,9 @@ class YouTubeIframeAPI {
         return this.urlId;
     }
 
+    /**
+     * Fonction qui démarre l'API et attribue les valeurs aux lecteurs de vidéos.
+     * */
     onYouTubeIframeAPIReady() {
         console.log("---API Youtube démarrée");
         this.player = new YT.Player('videoID', {

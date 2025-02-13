@@ -546,6 +546,8 @@ class InformationView extends View
 		{
 			$link = substr_replace($content,'embed',24,6);
             $link = substr_replace($link, '-nocookie', 19, 0);
+
+            echo '<span class="lien"><p id="">' . $content . '</p></span>';
             echo '<div class="videosh"></div>';
 			/*echo '<iframe id="" class="videosh" src="' . $link . '?autoplay=1&loop=1&playlist=' . substr($link,30) . '&mute=1&controls=0&disablekb=1&enablejsapi=1"
 				  title="YouTube short player" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
@@ -555,6 +557,8 @@ class InformationView extends View
 		{
 			$link = substr_replace($content,'embed/',24,8);
             $link = substr_replace($link, '-nocookie', 19, 0);
+
+            echo '<span class="lien"><p>' . $content . '</p></span>';
             echo '<div class="videow"></div>';
 			/*echo '<iframe id="" class="videow" src="' . $link . '?autoplay=1&loop=1playlist=' . substr($link,30) . '&mute=1&controls=0&disablekb=1&enablejsapi=1"
 				  title="YouTube video player" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
