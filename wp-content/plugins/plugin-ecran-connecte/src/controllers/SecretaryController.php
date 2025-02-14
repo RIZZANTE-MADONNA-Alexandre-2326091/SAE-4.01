@@ -213,6 +213,7 @@ class SecretaryController extends UserController
 	 */
     public function modifyUser(): string {
         $id = $_GET['id'];
+
         if (is_numeric($id) && $this->model->get($id)) {
             $user = $this->model->get($id);
 
@@ -221,12 +222,9 @@ class SecretaryController extends UserController
             if (in_array("television", $wordpressUser->roles)) {
                 $controller = new TelevisionController();
                 return $controller->modify($user);
-            } else {
-                return $this->view->displayNoUser();
             }
-        } else {
-            return $this->view->displayNoUser();
         }
+        return $this->view->displayNoUser();
     }
 
 	/**

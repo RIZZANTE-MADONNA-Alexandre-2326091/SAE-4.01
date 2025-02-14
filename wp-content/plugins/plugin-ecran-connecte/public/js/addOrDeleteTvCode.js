@@ -1,4 +1,4 @@
-let count = 0;
+ let count = 0;
 
 /**
  * Create a new select to add a new group for the television
@@ -7,9 +7,13 @@ function addButtonTv() {
     console.log(count);
     count = count + 1;
 
-    $.ajax({
-        url: '/wp-content/plugins/plugin-ecran-connecte/public/js/utils/allCodes.php',
-    }).done(function (data) {
+     $.ajax({
+         url: '/wp-admin/admin-ajax.php',
+         type: 'POST',
+         data: {
+             action: 'get_all_codes'
+         }
+     }).done(function (data) {
         let div = $('<div >', {
             class: 'row',
             id: count
@@ -28,10 +32,9 @@ function addButtonTv() {
         }).appendTo(div)
 
         // Delete buttons from the form.
-        let delePlus = document.getElementById("addSchedule");
-        delePlus.remove();
-        let deleValider = document.getElementById("validTv");
-        deleValider.remove();
+        document.getElementById("addSchedule").remove();
+
+        document.getElementById("validTv").remove();
 
         var presenceReturn = false;
         let idReturn;
@@ -73,8 +76,6 @@ function addButtonTv() {
  * @param id
  */
 function deleteRow(id) {
-    let dele = document.getElementById(id);
-    dele.remove();
-    let dele2 = document.getElementById(id);
-    dele2.remove();
+    document.getElementById(id).remove();
+
 }

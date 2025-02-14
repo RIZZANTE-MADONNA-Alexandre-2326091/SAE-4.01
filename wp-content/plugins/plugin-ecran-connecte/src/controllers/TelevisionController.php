@@ -138,7 +138,6 @@ class TelevisionController extends UserController implements Schedule
                 $this->view->displayModificationValidate($linkManageUser);
             }
         }
-
         $years = $codeAde->getAllFromType('year');
         $groups = $codeAde->getAllFromType('group');
         $halfGroups = $codeAde->getAllFromType('halfGroup');
