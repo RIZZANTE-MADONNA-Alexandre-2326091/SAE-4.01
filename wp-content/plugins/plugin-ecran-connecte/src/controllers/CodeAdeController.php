@@ -3,6 +3,7 @@
 namespace Controllers;
 
 use Models\CodeAde;
+use Models\Department;
 use Views\CodeAdeView;
 
 /**
@@ -48,6 +49,13 @@ class CodeAdeController extends Controller
     public function insert(): string {
         $action = filter_input(INPUT_POST, 'submit');
 
+        $current_user = wp_get_current_user();
+
+        $deptModel = new Department();
+        $isAdmin = in_array('administrator', $current_user->roles);
+        $currentDept = $isAdmin ? null : $deptModel->getUserInDept($current_user->ID)->getId();
+        $departments = $deptModel->getAll();
+
         if (isset($action)) {
 
             $validType = ['year', 'group', 'halfGroup'];
@@ -55,6 +63,7 @@ class CodeAdeController extends Controller
             $title = filter_input(INPUT_POST, 'title');
             $code = filter_input(INPUT_POST, 'code');
             $type = filter_input(INPUT_POST, 'type');
+            $deptId = filter_input(INPUT_POST, 'dept');
 
             if (is_string($title) && strlen($title) > 4 && strlen($title) < 30 &&
                 is_numeric($code) && is_string($code) && strlen($code) < 20 &&
@@ -63,9 +72,9 @@ class CodeAdeController extends Controller
                 $this->model->setTitle($title);
                 $this->model->setCode($code);
                 $this->model->setType($type);
+                $this->model->setDeptId($deptId);
 
                 if (!$this->checkDuplicateCode($this->model) && $this->model->insert()) {
-
                     $this->view->successCreation();
                     $this->addFile($code);
                     $this->view->refreshPage();
@@ -76,7 +85,7 @@ class CodeAdeController extends Controller
                 $this->view->errorCreation();
             }
         }
-        return $this->view->createForm();
+        return $this->view->createForm($departments, $isAdmin, $currentDept);
     }
 
 

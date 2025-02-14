@@ -95,8 +95,7 @@ class User extends Model implements Entity, JsonSerializable
 	/**
 	 * Updates user information in the database, including their password and associated codes.
 	 *
-	 * If the user's role is 'enseignant' or 'directeuretude', it updates the first associated code.
-	 * Otherwise, it clears all associated codes for the user and then inserts the appropriate codes
+	 * It clears all associated codes for the user and then inserts the appropriate codes
 	 * based on the user's current code data.
 	 *
 	 * @return int Returns the number of rows affected by the final executed database operation.

@@ -158,7 +158,7 @@ class Department extends Model implements Entity, JsonSerializable
 	 *
 	 * @return array Returns an array containing department details that match the given name, or an empty array if no match is found.
 	 */
-	public function getDepartmentName(string $name): array {
+	public function getDepartmentByName(string $name): array {
 		$request = $this->getDatabase()->prepare("SELECT dept_id, name FROM ecran_department WHERE name = :name LIMIT 1");
 
 		$request->bindValue(':name', $name, PDO::PARAM_STR);
@@ -173,9 +173,9 @@ class Department extends Model implements Entity, JsonSerializable
 	 *
 	 * @param int $userId The ID of the user whose associated departments are to be retrieved.
 	 *
-	 * @return ?Department Returns an array of departments, where each department contains its ID and name.
+	 * @return Department Returns an array of departments, where each department contains its ID and name.
 	 */
-    public function getUserInDept(int $userId): ?Department
+    public function getUserInDept(int $userId): Department
     {
         $request = $this->getDatabase()->prepare("SELECT ed.dept_id, ed.name FROM ecran_department ed
                                               JOIN ecran_dept_user edu ON edu.dept_id = ed.dept_id
@@ -185,11 +185,6 @@ class Department extends Model implements Entity, JsonSerializable
         $request->execute();
 
         $data = $request->fetch(PDO::FETCH_ASSOC);
-
-        if (!$data) {
-            error_log("⚠️ Aucun département trouvé pour user ID " . $userId);
-            return null;
-        }
 
         return $this->setEntity($data);
     }
