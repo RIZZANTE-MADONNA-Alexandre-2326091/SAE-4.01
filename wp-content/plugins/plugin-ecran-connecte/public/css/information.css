@@ -7,39 +7,8 @@
 }
 
 /*
-    Prévisualisations des vidéos en local
+    Style pour l'affichage des informations rss dans la télévision
 */
-
-.previsualisationVideoClassique {
-    width: 50%;
-    height: 30%;
-    max-width: 50%;
-    max-height: 30%;
-}
-
-.previsualisationVideoShort {
-    width: 30%;
-    height: 50%;
-    max-width: 30%;
-    max-height: 50%;
-}
-
-/*
-    Configuration pour le style des vidéos
-*/
-
-.videosh, .localSvideo {
-    height: 62vh;
-    width: 75%;
-}
-
-.videow, .localCvideo {
-    height: 92vh;
-    width: 65vw;
-
-    margin-left: -315%;
-    margin-top: -25%;
-}
 
 .rss-feed {
     list-style-type: none;
@@ -76,6 +45,45 @@
     padding: 5px;
 }
 
+/*
+    Prévisualisations des vidéos dans la page "Voir mes informations"
+*/
+
+.previsualisationVideoClassique {
+    width: 50%;
+    height: 30%;
+    max-width: 50%;
+    max-height: 30%;
+}
+
+.previsualisationVideoShort {
+    width: 30%;
+    height: 50%;
+    max-width: 30%;
+    max-height: 50%;
+}
+
+/*
+    Configuration pour le style des vidéos dans la télévision
+*/
+
+.videosh, .localSvideo {
+    height: 62vh;
+    width: 75%;
+}
+
+.videow, .localCvideo {
+    height: 92vh;
+    width: 65vw;
+
+    margin-left: -315%;
+    margin-top: -25%;
+}
+
+
+/*
+    Affichage responsive des vidéos dans la télévision
+*/
 @media only screen and (max-width: 1000px) {
     .videosh, .localSvideo {
         height: 65vh;
