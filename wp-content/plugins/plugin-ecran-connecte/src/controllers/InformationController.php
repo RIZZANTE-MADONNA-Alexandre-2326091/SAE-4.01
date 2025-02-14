@@ -32,7 +32,8 @@ class InformationController extends Controller
     /**
      * Constructor of InformationController
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->model = new Information();
         $this->view = new InformationView();
     }
@@ -45,7 +46,8 @@ class InformationController extends Controller
 	 * @return string A rendered HTML selector for information creation forms, including type and content options.
 	 * @throws Exception If an error occurs during file registration or database insertion.
 	 */
-    public function create(): string {
+    public function create(): string
+    {
         $current_user = wp_get_current_user();
 
         // All forms
@@ -53,7 +55,6 @@ class InformationController extends Controller
 
         $actionText = filter_input(INPUT_POST, 'createText');
         $actionImg = filter_input(INPUT_POST, 'createImg');
-        $actionTab = filter_input(INPUT_POST, 'createTab');
         $actionPDF = filter_input(INPUT_POST, 'createPDF');
         $actionEvent = filter_input(INPUT_POST, 'createEvent');
         $actionVideoYT = filter_input(INPUT_POST, 'createVideoYT');
@@ -115,7 +116,8 @@ class InformationController extends Controller
                 $this->view->buildModal('Image non valide', '<p>Ce fichier est une image non valide, veuillez choisir une autre image</p>');
             }
         }
-        if (isset($actionPDF)) {
+        if (isset($actionPDF))
+        {
             $type = "pdf";
             $information->setType($type);
             $filename = $_FILES['contentFile']['name'];
@@ -149,13 +151,14 @@ class InformationController extends Controller
             }
         }
         if(isset($actionVideoYT))
-        {                      // If the information is a Youtube video
+        {
+            // If the information is a Youtube video
             $type = 'YTvideo';
-            if (str_contains($content, 'shorts'))
+            if (str_contains($content, 'https://www.youtube.com/shorts/'))
             {
                 $information->setType($type . 'sh');
             }
-            else if (str_contains($content, 'watch'))
+            else if (str_contains($content, 'https://www.youtube.com/watch?v='))
             {
                 $information->setType($type . 'w');
             }
@@ -175,11 +178,14 @@ class InformationController extends Controller
                 $this->view->displayErrorInsertionInfo();
             }
         }
-        if (isset($actionVideoCLocal) || isset($actionVideoSLocal)) {
+        if (isset($actionVideoCLocal) || isset($actionVideoSLocal))
+        {
             $type = '';
-            if (isset($actionVideoCLocal)) {
+            if (isset($actionVideoCLocal))
+            {
                 $type = 'LocCvideo';
-            } else if (isset($actionVideoSLocal)) {
+            } else if (isset($actionVideoSLocal))
+            {
                 $type = 'LocSvideo';
             }
             $information->setType($type);
@@ -187,11 +193,15 @@ class InformationController extends Controller
             $fileTmpName = $_FILES['contentFile']['tmp_name'];
             $explodeName = explode('.', $filename);
             $goodExtension = ['mp4'];
-            if (in_array(end($explodeName), $goodExtension)) {
+            if (in_array(end($explodeName), $goodExtension))
+            {
                 $this->registerFile($filename, $fileTmpName, $information);
-            } else if ($_FILES['contentFile']['size'] > 1073741824) {
+            } else if ($_FILES['contentFile']['size'] > 1073741824)
+            {
                 $this->view->displayVideoExceedsMaxSize();
-            } else {
+            }
+            else
+            {
                 $this->view->displayNotConformVideo();
             }
         }
@@ -200,13 +210,15 @@ class InformationController extends Controller
         {
             $information->setContent($content);
             $information->setType("rss");
-            if ($information->insert()) {
-                $this->view->displayCreateValidate();}
-            else {
-                $this->view->displayErrorInsertionInfo();}
+            if ($information->insert())
+            {
+                $this->view->displayCreateValidate();
+            }
+            else
+            {
+                $this->view->displayErrorInsertionInfo();
+            }
         }
-
-
 
         // Return a selector with all forms
         return
@@ -243,10 +255,12 @@ class InformationController extends Controller
 	 *               or an error message based on the action and its outcome.
 	 * @throws Exception Throws exceptions for invalid file operations or unexpected errors.
 	 */
-    public function modify(): string {
+    public function modify(): string
+    {
         $id = $_GET['id'];
 
-        if (empty($id) || is_numeric($id) && !$this->model->get($id)) {
+        if (empty($id) || is_numeric($id) && !$this->model->get($id))
+        {
             return $this->view->noInformation();
         }
 
@@ -254,16 +268,19 @@ class InformationController extends Controller
         $information = $this->model->get($id);
 
         if (!(in_array('administrator', $current_user->roles) || in_array('secretaire', $current_user->roles)
-            || $information->getAuthor()->getId() == $current_user->ID)) {
+            || $information->getAuthor()->getId() == $current_user->ID))
+        {
             return $this->view->noInformation();
         }
 
-        if (!is_null($information->getAdminId())) {
+        if (!is_null($information->getAdminId()))
+        {
             return $this->view->informationNotAllowed();
         }
 
         $submit = filter_input(INPUT_POST, 'submit');
-        if (isset($submit)) {
+        if (isset($submit))
+        {
             $title = filter_input(INPUT_POST, 'title');
             $content = filter_input(INPUT_POST, 'content');
             $endDate = filter_input(INPUT_POST, 'expirationDate');
@@ -378,15 +395,19 @@ class InformationController extends Controller
                 }
             }
 
-            if ($information->update()) {
+            if ($information->update())
+            {
                 $this->view->displayModifyValidate();
-            } else {
+            }
+            else
+            {
                 $this->view->errorMessageCantAdd();
             }
         }
 
         $delete = filter_input(INPUT_POST, 'delete');
-        if (isset($delete)) {
+        if (isset($delete))
+        {
             $information->delete();
             $this->view->displayModifyValidate();
         }
@@ -404,7 +425,8 @@ class InformationController extends Controller
 	 *
 	 * @return void
 	 */
-    public function registerFile( string $filename, string $tmpName, object $entity): void {
+    public function registerFile( string $filename, string $tmpName, object $entity): void
+    {
         $id = 'temporary';
         $extension_upload = strtolower(substr(strrchr($filename, '.'), 1));
         $name = $_SERVER['DOCUMENT_ROOT'] . TV_UPLOAD_PATH . $id . '.' . $extension_upload;
@@ -456,7 +478,8 @@ class InformationController extends Controller
 	 *
 	 * @return void
 	 */
-    public function deleteFile(int $id): void {
+    public function deleteFile(int $id): void
+    {
         $this->model = $this->model->get($id);
         $source = $_SERVER['DOCUMENT_ROOT'] . TV_UPLOAD_PATH . $this->model->getContent();
         wp_delete_file($source);
@@ -509,7 +532,7 @@ class InformationController extends Controller
                 $content = URL_WEBSITE_VIEWER . TV_UPLOAD_PATH;
             }
 
-            if (in_array($information->getType(), ['img', 'pdf', 'event', 'tab', 'LocCvideo', 'LocSvideo']))
+            if (in_array($information->getType(), ['img', 'pdf', 'event', 'tab', 'LocCvideo', 'LocSvideo', 'YTvideosh', 'YTvideow']))
             {
                 if (in_array($contentExplode[1], $imgExtension))
                 {
@@ -536,6 +559,24 @@ class InformationController extends Controller
 									<source src="' . $content . $information->getContent() . '" type="video/mp4">
 									<p>Votre navigateur ne permet pas de lire les vidéos de format mp4 avec HTML5.</p>
 								</video>';
+                }
+                else if ($information->getType() === 'YTvideosh')
+                {
+                    $link = substr_replace($information->getContent(),'embed/',24,6);
+                    $link = substr_replace($link, '-nocookie', 19, 0);
+                    $content = $information->getContent() . '<br><iframe class="previsualisationVideoShort" src="' . $link .
+                        '?playlist=' . substr($link,30) . '&mute=1"
+				        title="YouTube video player" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
+				        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';
+                }
+                else if ($information->getType() === 'YTvideow')
+                {
+                    $link = substr_replace($information->getContent(),'embed/',24,8);
+                    $link = substr_replace($link, '-nocookie', 19, 0);
+                    $content = $information->getContent() . '<br><iframe class="previsualisationVideoClassique" src="' . $link .
+                        '?playlist=' . substr($link,30) . '&mute=1"
+				        title="YouTube video pr" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
+				        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';;
                 }
             }
             else
@@ -580,7 +621,7 @@ class InformationController extends Controller
             {
                 $type = 'Vidéo locale format "short"';
             }
-            $dataList[] = [$row, $this->view->buildCheckbox($name, $information->getId()), $information->getTitle(), $content, $information->getCreationDate(), $information->getExpirationDate(), $information->getAuthor()->getLogin(), $type, $this->view->buildLinkForModify(esc_url(get_permalink(get_page_by_title('Modifier une information'))) . '?id=' . $information->getId())];
+            $dataList[] = [$row, $this->view->buildCheckbox($name, $information->getId()), $information->getTitle(), $content, $information->getCreationDate(), $information->getExpirationDate(), $information->getAuthor()->getLogin(), $type, $this->view->buildLinkForModify(esc_url(get_permalink(get_page_by_title_V2('Modifier une information'))) . '?id=' . $information->getId())];
         }
 
         $submit = filter_input(INPUT_POST, 'delete');
@@ -594,7 +635,7 @@ class InformationController extends Controller
                     if (in_array('administrator', $current_user->roles) || in_array('secretaire', $current_user->roles) || $entity->getAuthor()->getId() == $current_user->ID)
                     {
                         $type = $entity->getType();
-                        $types = ['img', 'pdf', 'tab', 'event', 'LocCvideo', 'LocSvideo'];
+                        $types = ['img', 'pdf', 'tab', 'event', 'LocCvideo', 'LocSvideo', 'YTvideosh', 'YTvideow'];
                         if (in_array($type, $types))
                         {
                             $this->deleteFile($id);
@@ -610,7 +651,7 @@ class InformationController extends Controller
         {
             $returnString = $this->view->contextDisplayAll();
         }
-        return $returnString . $this->view->displayAll($name, 'Informations', $header, $dataList) . $this->view->pageNumber($maxPage, $pageNumber, esc_url(get_permalink(get_page_by_title('Gestion des informations'))), $number);
+        return $returnString . $this->view->displayAll($name, 'Informations', $header, $dataList) . $this->view->pageNumber($maxPage, $pageNumber, esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))), $number);
     }
 
 
@@ -639,7 +680,8 @@ class InformationController extends Controller
 	 *
 	 * @return void
 	 */
-    public function informationMain(): void {
+    public function informationMain(): void
+    {
         $informations = $this->model->getList();
         $this->view->displayStartSlideshow();
         foreach ($informations as $information)
@@ -678,7 +720,8 @@ class InformationController extends Controller
 	 *
 	 * @return void
 	 */
-	public function registerNewInformation(): void {
+	public function registerNewInformation(): void
+    {
         $informationList = $this->model->getFromAdminWebsite();
         $myInformationList = $this->model->getAdminWebsiteInformation();
         foreach ($myInformationList as $information)
@@ -729,7 +772,8 @@ class InformationController extends Controller
 	 *
 	 * @return string
 	 */
-    public function displayEvent(): string {
+    public function displayEvent(): string
+    {
         $events = $this->model->getListInformationEvent();
         $this->view->displayStartSlideEvent();
         foreach ($events as $event)
@@ -759,7 +803,8 @@ class InformationController extends Controller
 	 *
 	 * @return array An array of HTML strings, where each string represents a table with 10 rows (or fewer).
 	 */
-    public function readSpreadSheet(string $content): array {
+    public function readSpreadSheet(string $content): array
+    {
         $file = $_SERVER['DOCUMENT_ROOT'] . $content;
 
 	    $array     = explode( ".", $file );
