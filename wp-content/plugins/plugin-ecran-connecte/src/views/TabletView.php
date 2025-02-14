@@ -4,7 +4,9 @@ namespace Views;
 
 class TabletView extends UserView
 {
-    public function displayFormTablet() {
+    public function displayFormTablet(array $departments, $isAdmin = null, $currentDept = null) {
+        $disabled = $isAdmin ? '' : 'disabled';
+
         return '
         <h2>Compte tablette</h2>
         <p class="lead">Pour créer des utilisateurs tablette, remplissez ce formulaire avec les valeurs demandées.</p>
@@ -20,14 +22,20 @@ class TabletView extends UserView
                 <input class="form-control" minlength="8" maxlength="25" type="password" id="pwdConfTablet" name="pwdConfirmTablet" placeholder="Confirmer le Mot de passe" required="" onkeyup=checkPwd("Tablet")>
                 <small id="passwordHelpBlock" class="form-text text-muted">Votre mot de passe doit contenir entre 8 et 25 caractères</small>
             </div>
+            <div class="form-group">
+                <label for="deptTablet">Département</label>
+                <select name="deptTablet" class="form-control"' . $disabled . '>
+                    ' . $this->displayAllDept($departments, $currentDept) . '
+                </select>
+            </div>
             <button type="submit" class="btn button_ecran" id="validTablet" name="createTablet">Créer</button>
         </form>';
     }
 
-    public function displayAllTablets($users) {
-        $output = '<h2>Liste des utilisateurs Tablet</h2><table class="table"><thead><tr><th>Login</th></tr></thead><tbody>';
-        foreach ($users as $user) {
-            $output .= '<tr><td>' . $user->getLogin() . '</td></tr>';
+    public function displayAllTablets($users, $userDeptList) {
+        $output = '<h2>Liste des utilisateurs Tablet</h2><table class="table"><thead><tr><th>Login</th><th>Département</th></tr></thead><tbody>';
+        foreach ($users as $index => $user) {
+            $output .= '<tr><td>' . $user->getLogin() . '</td><td>' . $userDeptList[$index] . '</td></tr>';
         }
         $output .= '</tbody></table>';
         return $output;
