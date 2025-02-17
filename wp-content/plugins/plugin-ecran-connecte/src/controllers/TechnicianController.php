@@ -141,20 +141,20 @@ class TechnicianController extends UserController implements Schedule
 				}
 			}
 
-			// Tri des cours : par heure, par numéro de salle, puis par étage
+			// Tri des cours : par etages, puis par heure, puis par salle
 			usort( $courses, function ( $a, $b ) {
-				// Trier par heure
-				if ( $a['time'] === $b['time'] ) {
-					// Trier par salle
-					if ( $a['room'] === $b['room'] ) {
-						// Trier par étage
-						return $a['floor'] <=> $b['floor'];
+				// Trier par étage
+				if ( $a['floor'] === $b['floor'] ) {
+					// Trier par heure
+					if ( $a['time'] === $b['time'] ) {
+						// Trier par numéro de salle
+						return $a['room'] <=> $b['room'];
 					}
 
-					return $a['room'] <=> $b['room'];
+					return $a['time'] <=> $b['time'];
 				}
 
-				return $a['time'] <=> $b['time'];
+				return $a['floor'] <=> $b['floor'];
 			} );
 
 			// Génération de l'affichage après tri
