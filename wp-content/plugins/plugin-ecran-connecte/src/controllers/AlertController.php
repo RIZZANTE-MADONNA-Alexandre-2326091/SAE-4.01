@@ -211,9 +211,10 @@ class AlertController extends Controller
             $alertList = $this->model->getAuthorListAlert($current_user->ID, $begin, $number);
         }
         $name = 'Alert';
-        $header = ['Contenu', 'Date de création', 'Date d\'expiration', 'Auteur', 'Département', 'Modifier'];
+        $header = ['Contenu', 'Date de création', 'Date d\'expiration', 'Auteur', 'Modifier'];
         $dataList = [];
         $row = $begin;
+
         foreach ($alertList as $alert) {
             $dataList[] = [$row+1, $this->view->buildCheckbox($name, $alert->getId()), $alert->getContent(), $alert->getCreationDate(), $alert->getExpirationDate(), $alert->getAuthor()->getLogin(), $this->view->buildLinkForModify(esc_url(get_permalink(get_page_by_title_V2('Modifier une alerte'))) . '?id=' . $alert->getId())];
             ++$row;
@@ -250,8 +251,6 @@ class AlertController extends Controller
         // Get codes from current user
         $current_user = wp_get_current_user();
         $alertsUser = $this->model->getForUser($current_user->ID);
-        //$alertsUser = array_unique($alertsUser); // Delete duplicate
-
         foreach ($this->model->getForEveryone() as $alert) {
             $alertsUser[] = $alert;
         }

@@ -49,11 +49,11 @@ class CodeAdeController extends Controller
     public function insert(): string {
         $action = filter_input(INPUT_POST, 'submit');
 
-        $current_user = wp_get_current_user();
+        $currentUser = wp_get_current_user();
 
         $deptModel = new Department();
-        $isAdmin = in_array('administrator', $current_user->roles);
-        $currentDept = $isAdmin ? null : $deptModel->getUserInDept($current_user->ID)->getId();
+        $isAdmin = in_array('administrator', $currentUser->roles);
+        $currentDept = $isAdmin ? null : $deptModel->getUserInDept($currentUser->ID)->getId();
         $departments = $deptModel->getAll();
 
         if (isset($action)) {

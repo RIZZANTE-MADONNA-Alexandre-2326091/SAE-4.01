@@ -38,7 +38,8 @@ class CodeAde extends Model implements Entity, JsonSerializable
     /**
      * @var int
      */
-    private int $dept_id;
+    private int $deptId;
+
 
 	/**
 	 * Inserts a new record into the ecran_code_ade table with the specified type, title, and code.
@@ -291,7 +292,7 @@ class CodeAde extends Model implements Entity, JsonSerializable
      */
     public function getDeptId(): int
     {
-        return $this->dept_id;
+        return $this->deptId;
     }
 
 
@@ -300,7 +301,7 @@ class CodeAde extends Model implements Entity, JsonSerializable
      */
     public function setDeptId(int $dept_id): void
     {
-        $this->dept_id = $dept_id;
+        $this->deptId = $dept_id;
     }
 
 	/**
