@@ -73,6 +73,7 @@ class UserController extends Controller
 	 * @return string
 	 */
     public function deleteAccount(): string {
+    $current_user = wp_get_current_user();
     if (in_array('administrator', $current_user->roles)) {
         return '<p>La suppression de compte n’est pas autorisée pour les administrateurs.</p>';
     }
@@ -126,7 +127,6 @@ class UserController extends Controller
      * @return string
      */
     public function chooseModif() {
-        $current_user = wp_get_current_user();
         $string = $this->view->displayStartMultiSelect();
 
 		$string .= $this->view->displayTitleSelect('pass', 'Modifier mon mot de passe', true);

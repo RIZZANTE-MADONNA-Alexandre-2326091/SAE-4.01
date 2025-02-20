@@ -172,13 +172,13 @@ class TelevisionController extends UserController implements Schedule
     public function displayMySchedule(): string {
         $current_user = wp_get_current_user();
         $user = $this->model->get($current_user->ID);
-        $user = $this->model->getMycodes([$user])[0];
+        $user = $this->model->getMyCodes([$user])[0];
 
         $string = "";
         if (sizeof($user->getCodes()) > 1) {
             if (get_theme_mod('ecran_connecte_schedule_scroll', 'vert') == 'vert') {
                 $string .= '<div class="ticker1">
-						<div class="innerWrap tv-schedule">';
+                        <div class="innerWrap tv-schedule">';
                 foreach ($user->getCodes() as $code) {
                     $path = $this->getFilePath($code->getCode());
                     if (file_exists($path)) {
@@ -198,17 +198,17 @@ class TelevisionController extends UserController implements Schedule
                         if ($this->displaySchedule($code->getCode())) {
                             $string .= $this->view->displayMidSlide();
                             $string .= $this->displaySchedule($code->getCode());
-                            $string .= $this->view->displayEndDiv();
+                            $string .= '</div>';
                         }
                     }
                 }
-                $string .= $this->view->displayEndDiv();
+                $string .= '</div>';
             }
         } else {
             if (!empty($user->getCodes()[0])) {
                 $string .= $this->displaySchedule($user->getCodes()[0]->getCode());
             } else {
-                $string .= '<div class="courstext">Vous n\'avez pas cours !</div>';
+                $string .= '<p>Vous n\'avez pas cours</p>';
             }
         }
         return $string;
