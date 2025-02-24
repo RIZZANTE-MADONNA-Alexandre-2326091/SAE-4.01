@@ -67,6 +67,7 @@ class CodeAdeView extends View
 	 * @return string The HTML form as a string for modifying the ADE code.
 	 */
     public function displayModifyCode(string $title, string $type, int $code): string {
+
         $page = get_page_by_title_V2('Gestion des codes ADE');
         $linkManageCode = get_permalink($page->ID);
 

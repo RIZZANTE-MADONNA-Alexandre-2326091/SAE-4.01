@@ -101,9 +101,8 @@ class CodeAdeController extends Controller
 	 */
     public function modify(): string {
         $id = $_GET['id'];
-        if (is_numeric($id) && !$this->model->get($id)) {
+        if (is_numeric($id) && !$this->model->get($id))
             return $this->view->errorNobody();
-        }
 
         $result = $codeAde = $this->model->get($id);
 
