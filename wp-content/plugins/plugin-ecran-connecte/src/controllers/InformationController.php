@@ -83,7 +83,6 @@ class InformationController extends Controller
         $information->setCreationDate($creationDate);
         $information->setExpirationDate($endDate);
         $information->setAdminId(null);
-        $information->setDeptId(null);
 
 
         if (isset($actionText))
