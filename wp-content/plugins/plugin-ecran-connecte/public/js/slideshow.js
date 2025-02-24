@@ -25,6 +25,11 @@ let player;
 let timeout = parseInt(document.getElementById("timeout").innerHTML);
 
 /**
+ * Temps de défilement en ms par défaut
+ * */
+const defaultTimeout = timeout;
+
+/**
  * Type de défilement des vidéos classiques
  * */
 let typeDefilement = document.getElementById("typeDefilement");
@@ -403,17 +408,17 @@ function displayOrHide(slides, slideIndex)
                     // If it's an image
                     else if (slides[slideIndex].childNodes[i].className === 'img-thumbnail') {
                         console.log('--Lecture image');
-                        timeout = 10000;
+                        timeout = defaultTimeout;
                     }
                     // If it's text
                     else if (slides[slideIndex].childNodes[i].className === 'text-info') {
                         console.log('--Lecture texte');
-                        timeout = 10000;
+                        timeout = defaultTimeout;
                     }
                     // If it's a RSS flow
                     else if (slides[slideIndex].childNodes[i].className === 'rss-feed') {
                         console.log('--Lecture rss');
-                        timeout = 10000;
+                        timeout = defaultTimeout;
                     }
                 }
                 if (count === 0) {
