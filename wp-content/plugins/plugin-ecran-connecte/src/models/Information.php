@@ -47,7 +47,7 @@ class Information extends Model implements Entity, JsonSerializable
     private $content;
 
     /**
-     * @var string (Text | Image | excel | PDF | Event | Video Youtube ou local (short ou classique))
+     * @var string (Text | Image | PDF | Event | Video Youtube ou local (short ou classique) | RSS)
      */
     private $type;
 
@@ -64,7 +64,7 @@ class Information extends Model implements Entity, JsonSerializable
     public function insert(): string
     {
         $database = $this->getDatabase();
-        $request = $database->prepare("INSERT INTO ecran_information (title, content, creation_date, expiration_date, type, author, administration_id) VALUES (:title, :content, :creationDate, :expirationDate, :type, :userId, :administration_id");
+        $request = $database->prepare("INSERT INTO ecran_information (title, content, creation_date, expiration_date, type, author, administration_id) VALUES (:title, :content, :creationDate, :expirationDate, :type, :userId, :administration_id)");
 
         $request->bindValue(':title', $this->getTitle(), PDO::PARAM_STR);
         $request->bindValue(':content', $this->getContent(), PDO::PARAM_STR);
@@ -181,11 +181,6 @@ class Information extends Model implements Entity, JsonSerializable
 
         return $this->setEntityList($request->fetchAll(PDO::FETCH_ASSOC));
     } //getAuthorListInformation()
-
-    public function getInformationByTelevision()
-    {
-
-    }
 
     public function countAll()
     {

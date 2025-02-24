@@ -522,6 +522,7 @@ class InformationController extends Controller
         $dataList = [];
         $row = $begin;
         $imgExtension = ['jpg', 'jpeg', 'gif', 'png', 'svg'];
+        $videoExtension = 'mp4';
         foreach ($informationList as $information)
         {
             ++$row;
@@ -544,18 +545,14 @@ class InformationController extends Controller
                 {
                     $content = '[pdf-embedder url="' . TV_UPLOAD_PATH . $information->getContent() . '"]';
                 }
-                else if ($information->getType() === 'tab')
-                {
-                    $content = 'Tableau Excel';
-                }
-                else if ($information->getType() === 'LocCvideo')
+                else if ($information->getType() === 'LocCvideo' && $contentExplode[1] === $videoExtension)
                 {
                     $content = '<video class="previsualisationVideoClassique" controls muted>
 									<source src="' . $content . $information->getContent() . '" type="video/mp4">
 									<p>Votre navigateur ne permet pas de lire les vidéos de format mp4 avec HTML5.</p>
 								</video>';
                 }
-                else if ($information->getType() === 'LocSvideo')
+                else if ($information->getType() === 'LocSvideo' && $contentExplode[1] === $videoExtension)
                 {
                     $content = '<video class="previsualisationVideoShort" controls muted>
 									<source src="' . $content . $information->getContent() . '" type="video/mp4">
@@ -603,10 +600,6 @@ class InformationController extends Controller
             {
                 $type = 'Texte';
             }
-            else if ($information->getType() === 'tab')
-            {
-                $type = 'Table Excel';
-            }
             else if ($information->getType() === 'YTvideosh')
             {
                 $type = 'Vidéo YouTube format "short"';
@@ -637,7 +630,7 @@ class InformationController extends Controller
                     if (in_array('administrator', $current_user->roles) || in_array('secretaire', $current_user->roles) || $entity->getAuthor()->getId() == $current_user->ID)
                     {
                         $type = $entity->getType();
-                        $types = ['img', 'pdf', 'tab', 'event', 'LocCvideo', 'LocSvideo', 'YTvideosh', 'YTvideow'];
+                        $types = ['img', 'pdf', 'event', 'LocCvideo', 'LocSvideo', 'YTvideosh', 'YTvideow'];
                         if (in_array($type, $types))
                         {
                             $this->deleteFile($id);

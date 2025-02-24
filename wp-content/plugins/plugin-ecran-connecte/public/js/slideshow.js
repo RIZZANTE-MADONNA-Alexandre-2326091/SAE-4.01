@@ -127,7 +127,7 @@ function separeVideosIntoASlide(slides) {
 }
 
 /**
- * Begin a slideshow if there is some informations
+ * Begin a slideshow if there is some informations where "classic" videos are show in the schedule slideshow
  */
 function infoSlideShowSuret() {
     if (document.getElementsByClassName("myInfoSlides").length > 0) {
@@ -138,6 +138,9 @@ function infoSlideShowSuret() {
     }
 }
 
+/**
+ * Begin a slideshow if there is some informations where "classic" videos are show in the foreground, ahead of the schedule
+ */
 function infoSlideShowDefil() {
     //TODO
     if (document.getElementsByClassName("myInfoSlides").length > 0) {
