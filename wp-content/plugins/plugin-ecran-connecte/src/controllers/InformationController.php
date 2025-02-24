@@ -49,11 +49,8 @@ class InformationController extends Controller
         $current_user = wp_get_current_user();
 
         // All forms
-
-
         $actionText = filter_input(INPUT_POST, 'createText');
         $actionImg = filter_input(INPUT_POST, 'createImg');
-        $actionTab = filter_input(INPUT_POST, 'createTab');
         $actionPDF = filter_input(INPUT_POST, 'createPDF');
         $actionEvent = filter_input(INPUT_POST, 'createEvent');
         $actionVideoYT = filter_input(INPUT_POST, 'createVideoYT');
@@ -87,7 +84,6 @@ class InformationController extends Controller
         {                      // If the information is a text
             $information->setContent($content);
             $information->setType("text");
-
             // Try to insert the information
             if ($information->insert())
             {
@@ -205,8 +201,6 @@ class InformationController extends Controller
             else {
                 $this->view->displayErrorInsertionInfo();}
         }
-
-
 
         // Return a selector with all forms
         return
@@ -410,7 +404,7 @@ class InformationController extends Controller
         $name = $_SERVER['DOCUMENT_ROOT'] . TV_UPLOAD_PATH . $id . '.' . $extension_upload;
 
         // Upload the file
-        if ($result = move_uploaded_file($tmpName, $name))
+        if (move_uploaded_file($tmpName, $name))
         {
             $entity->setContent('temporary content');
             if ($entity->getId() == null)
@@ -483,7 +477,7 @@ class InformationController extends Controller
             $pageNumber = $maxPage;
         }
         $current_user = wp_get_current_user();
-        if (in_array('administrator', $current_user->roles) || in_array('secretaire', $current_user->roles))
+        if (in_array('administrator', $current_user->roles) || in_array('adminDept', $current_user->roles) || in_array('secretaire', $current_user->roles))
         {
             $informationList = $this->model->getList($begin, $number);
         }

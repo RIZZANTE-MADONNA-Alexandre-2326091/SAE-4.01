@@ -83,7 +83,7 @@ class AlertController extends Controller
                 $this->model->setCodes($codesAde);
 
                 // Insert
-                if ($id = $this->model->insert()) {
+                if ($this->model->insert()) {
                     $this->view->displayAddValidate();
                 } else {
                     $this->view->errorMessageCantAdd();
