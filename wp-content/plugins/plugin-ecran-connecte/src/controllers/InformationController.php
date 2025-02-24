@@ -4,6 +4,7 @@ namespace Controllers;
 
 use Exception;
 use Models\Information;
+use Models\User;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Views\InformationView;
 
@@ -82,6 +83,7 @@ class InformationController extends Controller
         $information->setCreationDate($creationDate);
         $information->setExpirationDate($endDate);
         $information->setAdminId(null);
+        $information->setDeptId(null);
 
 
         if (isset($actionText))
@@ -296,7 +298,7 @@ class InformationController extends Controller
             //Verify the format of the video we want to modify
             else if ($information->getType() == 'YTvideosh')
             {
-                if (str_contains($content, 'shorts'))
+                if (str_contains($content, 'https://www.youtube.com/shorts/'))
                 {
                     $information->setContent($content);
                 }
@@ -307,7 +309,7 @@ class InformationController extends Controller
             }
             else if ($information->getType() == 'YTvideow')
             {
-                if (str_contains($content, 'watch'))
+                if (str_contains($content, 'https://www.youtube.com/watch?v='))
                 {
                     $information->setContent($content);
                 }
@@ -562,10 +564,10 @@ class InformationController extends Controller
                 }
                 else if ($information->getType() === 'YTvideosh')
                 {
-                    $link = substr_replace($information->getContent(),'embed/',24,6);
+                    $link = substr_replace($information->getContent(),'embed',24,6);
                     $link = substr_replace($link, '-nocookie', 19, 0);
                     $content = $information->getContent() . '<br><iframe class="previsualisationVideoShort" src="' . $link .
-                        '?playlist=' . substr($link,30) . '&mute=1"
+                        '?playlist=' . substr($link,39) . '&mute=1"
 				        title="YouTube video player" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
 				        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';
                 }
@@ -574,9 +576,9 @@ class InformationController extends Controller
                     $link = substr_replace($information->getContent(),'embed/',24,8);
                     $link = substr_replace($link, '-nocookie', 19, 0);
                     $content = $information->getContent() . '<br><iframe class="previsualisationVideoClassique" src="' . $link .
-                        '?playlist=' . substr($link,30) . '&mute=1"
+                        '?playlist=' . substr($link,39) . '&mute=1"
 				        title="YouTube video pr" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
-				        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';;
+				        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';
                 }
             }
             else
@@ -683,21 +685,19 @@ class InformationController extends Controller
     public function informationMain(): void
     {
         $informations = $this->model->getList();
+        $currentUser = wp_get_current_user();
+        $user = new User();
         $this->view->displayStartSlideshow();
         foreach ($informations as $information)
         {
             $endDate = date('Y-m-d', strtotime($information->getExpirationDate()));
             if (!$this->endDateCheckInfo($information->getId(), $endDate))
             {
-                if ($information->getType() == 'tab')
+                if (in_array('television', $currentUser->roles))
                 {
-                    $list = $this->readSpreadSheet(TV_UPLOAD_PATH . $information->getContent());
-                    $content = "";
-                    foreach ($list as $table)
-                    {
-                        $content .= $table;
-                    }
-                    $information->setContent($content);
+                    $user->get($currentUser->ID);
+                    $typeDefilement = $user->getTypeDefilement();
+                    $timeout = $user->getTimeout();
                 }
 
                 $adminSite = true;
@@ -705,7 +705,7 @@ class InformationController extends Controller
                 {
                     $adminSite = false;
                 }
-                $this->view->displaySlide($information->getTitle(), $information->getContent(), $information->getType(), $adminSite);
+                $this->view->displaySlide($information->getTitle(), $information->getContent(), $information->getType(), $typeDefilement, $timeout, $adminSite);
             }
         }
         $this->view->displayEndDiv();

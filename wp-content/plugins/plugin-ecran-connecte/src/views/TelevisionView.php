@@ -42,6 +42,18 @@ class TelevisionView extends UserView
             	<small id="passwordHelpBlock" class="form-text text-muted">Votre mot de passe doit contenir entre 8 et 25 caractère</small>
             </div>
             <div class="form-group">
+                <p class="lead">Choisissez le mode d\'affichage des vidéos classiques</p>
+                <label for="defilement">Défilement entre les emplois du temps</label>
+                <input type="radio" name="defilement" value="defil"/>
+                <br>
+                <label for="defilement">Sur-impréssion par-dessus les emplois du temps</label>
+                <input type="radio" name="defilement" value="suret"/>
+            </div>
+            <div class="form-group">
+                <label for="temps">Temps de défilement des informations</label>
+                <input type="number" name="temps" placeholder="Temps en secondes (par défaut 10s)">
+            </div>
+            <div class="form-group">
             	<label>Premier emploi du temps</label>' .
             $this->buildSelectCode($years, $groups, $halfGroups) . '
             </div>
@@ -68,13 +80,13 @@ class TelevisionView extends UserView
 
         $title = 'Televisions';
         $name = 'Tele';
-        $header = ['Login', 'Nombre d\'emplois du temps ', 'Modifier'];
+        $header = ['Login', 'Nombre d\'emplois du temps', 'Temps de défilement', 'Type de défilement', 'Modifier'];
 
         $row = array();
         $count = 0;
         foreach ($users as $user) {
             ++$count;
-            $row[] = [$count, $this->buildCheckbox($name, $user->getId()), $user->getLogin(), sizeof($user->getCodes()), $this->buildLinkForModify($linkManageUser . '?id=' . $user->getId())];
+            $row[] = [$count, $this->buildCheckbox($name, $user->getId()), $user->getLogin(), sizeof($user->getCodes()), $user->getTimeout() . ' s', $user->getTypeDefilement(), $this->buildLinkForModify($linkManageUser . '?id=' . $user->getId())];
         }
 
         return $this->displayAll($name, $title, $header, $row, 'tele');
@@ -97,6 +109,18 @@ class TelevisionView extends UserView
         <a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des utilisateurs'))) . '">< Retour</a>
         <h2>' . $user->getLogin() . '</h2>
          <form method="post" id="registerTvForm">
+            <div class="form-group">
+                <p class="lead">Choisissez le mode d\'affichage des vidéos classiques</p>
+                <label for="defilement">Défilement entre les emplois du temps</label>
+                <input type="radio" name="defilement" value="defil"/>
+                <br>
+                <label for="defilement">Sur-impréssion par-dessus les emplois du temps</label>
+                <input type="radio" name="defilement" value="suret"/>
+            </div>
+            <div class="form-group">
+                <label for="temps">Temps de défilement des informations</label>
+                <input type="number" name="temps" placeholder="Temps en secondes (par défaut 10s)">
+            </div>
             <label id="selectId1"> Emploi du temps</label>';
 
         foreach ($user->getCodes() as $code) {

@@ -55,6 +55,8 @@ class TelevisionController extends UserController implements Schedule
             $password = filter_input(INPUT_POST, 'pwdTv');
             $passwordConfirm = filter_input(INPUT_POST, 'pwdConfirmTv');
             $codes = $_POST['selectTv'];
+            $typeDefilement = $_POST['defilement'];
+            $tempsDefilement = filter_input(INPUT_POST, 'temps');
 
             if (is_string($login) && strlen($login) >= 4 && strlen($login) <= 25 &&
                 is_string($password) && strlen($password) >= 8 && strlen($password) <= 25 &&
@@ -76,6 +78,10 @@ class TelevisionController extends UserController implements Schedule
                 $this->model->setPassword($password);
                 $this->model->setRole('television');
                 $this->model->setCodes($codesAde);
+
+                $this->model->setTypeDefilement($typeDefilement);
+
+                $this->model->setTimeout($tempsDefilement * 1000);
 
                 if (!$this->checkDuplicateUser($this->model) && $this->model->insert()) {
                     $this->view->displayInsertValidate();
@@ -111,6 +117,8 @@ class TelevisionController extends UserController implements Schedule
 
         if (isset($action)) {
             $codes = $_POST['selectTv'];
+            $typeDefilement = $_POST['defilement'];
+            $tempsDefilement = filter_input(INPUT_POST, 'temps');
 
             $codesAde = array();
             foreach ($codes as $code) {
@@ -120,6 +128,9 @@ class TelevisionController extends UserController implements Schedule
                     $codesAde[] = $codeAde->getByCode($code);
                 }
             }
+
+            $user->setTypeDefilement($typeDefilement);
+            $user->setTimeout($tempsDefilement * 1000);
 
             $user->setCodes($codesAde);
 

@@ -22,7 +22,12 @@ let player;
  * Temps en ms durant laquelle une information est affichée (par défaut 10s).
  * @defaultValue 10000
  */
-let timeout = 10000;
+let timeout = parseInt(document.getElementById("timeout").innerHTML);
+
+/**
+ * Type de défilement des vidéos classiques
+ * */
+let typeDefilement = document.getElementById("typeDefilement");
 
 /**
  * Diaporama des informations
@@ -39,7 +44,18 @@ let slidesVideos;
  * */
 let urlYoutube;
 
-infoSlideShow();
+if (typeDefilement === "suret") {
+    infoSlideShowSuret();
+}
+else if (typeDefilement === "defil") {
+    infoSlideShowDefil();
+}
+else {
+    console.error("Erreur dans le type de défilement des vidéos");
+    slidesShow = document.getElementsByClassName("myInfoSlides");
+    console.log("-Début du diaporama");
+    displayOrHide(slidesShow, 0);
+}
 scheduleSlideshow();
 
 /**
@@ -58,6 +74,7 @@ function separeVideosIntoASlide(slides) {
     for (let i = 0; i < slides.length; ++i) {
         if (slides[i].childNodes) {
             for (let index = 0; index < slides[i].childNodes.length; ++index) {
+
                 //Séparer les vidéos YouTube classiques
                 for (let indexyt = 0; indexyt < videoYT.length; ++indexyt) {
 
@@ -77,6 +94,7 @@ function separeVideosIntoASlide(slides) {
                         }
                     }
                 }
+
                 //Séparer les vidéos locales classiques
                 for (let indexc = 0; indexc < videoC.length; ++indexc) {
 
@@ -106,9 +124,18 @@ function separeVideosIntoASlide(slides) {
 /**
  * Begin a slideshow if there is some informations
  */
-function infoSlideShow()
-{
-    if(document.getElementsByClassName("myInfoSlides").length > 0) {
+function infoSlideShowSuret() {
+    if (document.getElementsByClassName("myInfoSlides").length > 0) {
+        slidesShow = document.getElementsByClassName("myInfoSlides");
+        slidesShow = separeVideosIntoASlide(slidesShow);
+        console.log("-Début du diaporama");
+        displayOrHide(slidesShow, 0);
+    }
+}
+
+function infoSlideShowDefil() {
+    //TODO
+    if (document.getElementsByClassName("myInfoSlides").length > 0) {
         slidesShow = document.getElementsByClassName("myInfoSlides");
         slidesShow = separeVideosIntoASlide(slidesShow);
         console.log("-Début du diaporama");
@@ -136,18 +163,20 @@ function scheduleSlideshow()
 function displayOrHide(slides, slideIndex)
 {
     if(slides.length > 0) {
-
+        // Vérifier le type de diaporama: diaporama normal
         if(slides.length > 1) {
             for (let i = 0; i < slides.length; ++i) {
                 slides[i].style.display = "none";
             }
         }
+        //Si c'est un diaporama de vidéos
         if(slidesVideos.length > 1) {
             for (let i = 0; i < slidesVideos.length; ++i) {
                 slidesVideos[i].style.display = "none";
             }
         }
 
+        //Fin d'un diaporama
         if(slideIndex === slides.length) {
             if (slides.length === slidesVideos.length
                 && (slides[0].childNodes[1].className === "videow"
@@ -281,27 +310,31 @@ function displayOrHide(slides, slideIndex)
                             // Si la vidéo correspond à celle affichée, on associe un id pour l'API
                             if (videoYouTube === slides[slideIndex].childNodes[i]) {
                                 videoYouTube.id = "videoID";
-                                urlYoutube = slides[slideIndex].childNodes[i].children();
+                                urlYoutube = slides[slideIndex].childNodes[i].firstChild;
                                 console.log(urlYoutube);
 
-                                let lienRealise = false;
+                                let lienClassiqueRealise = false;
                                 let lastElementIndex = 0;
                                 for (let i = 24; i < urlYoutube.length; ++i) {
                                     if (urlYoutube.charAt(i) === '?') {
                                         lastElementIndex = i;
-                                        urlYoutube = urlYoutube.substring(30, lastElementIndex);
-                                        lienRealise = true;
+                                        urlYoutube = urlYoutube.substring(30);
+                                        lienClassiqueRealise = true;
                                         break;
                                     }
                                 }
-                                if(!lienRealise) {
+                                let lienShortRealise = false;
+                                if(!lienClassiqueRealise) {
                                     let lienVerifShort = "";
                                     for (let i = 24; i < 30; ++i) {
                                         lienVerifShort += urlYoutube.charAt(i);
                                     }
                                     if (lienVerifShort === "shorts") {
-                                        urlYoutube = urlYoutube.substring(30,)
+                                        urlYoutube = urlYoutube.substring(30);
                                     }
+                                }
+                                if (!lienShortRealise) {
+                                    console.log("Erreur de chargement vidéo YouTube");
                                 }
 
                             }

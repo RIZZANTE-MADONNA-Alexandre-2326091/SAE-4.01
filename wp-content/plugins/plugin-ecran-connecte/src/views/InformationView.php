@@ -5,6 +5,7 @@ namespace Views;
 
 use Controllers\InformationController;
 use Models\Information;
+use Models\RssModel;
 
 /**
  * Class InformationView
@@ -503,11 +504,14 @@ class InformationView extends View
      * @param string $title
      * @param string $content
      * @param string $type
+     * @param int $timeout
      * @param bool $adminSite
      */
-    public function displaySlide(string $title, string $content, string $type, bool $adminSite = false): void
+    public function displaySlide(string $title, string $content, string $type, string $typeDefilement, int $timeout, bool $adminSite = false): void
     {
         echo '<div class="myInfoSlides text-center">';
+        echo '<p id="timeout" style="display: none">' . $timeout . '</p>';
+        echo '<p id="typeDefilement" style="display: none">' . $typeDefilement . '</p>';
 
         // If the title is empty
         if ($title != "Sans titre")
@@ -580,9 +584,9 @@ class InformationView extends View
         }
 
         else if ($type == 'rss') {
-            $rssModel = new \Models\RssModel($content);
+            $rssModel = new RssModel($content);
             $rssFeed = $rssModel->getRssFeed();
-            $rssView = new \Views\RssView();
+            $rssView = new RssView();
             echo $rssView->render($rssFeed);
         }
 

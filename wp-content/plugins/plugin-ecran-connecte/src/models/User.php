@@ -37,7 +37,7 @@ class User extends Model implements Entity, JsonSerializable
     private $email;
 
     /**
-     * @var string (Student | Teacher | Television | Secretary | Study Director | Technician)
+     * @var string (Television | Secretary | Technician)
      */
     private $role;
 
@@ -45,6 +45,16 @@ class User extends Model implements Entity, JsonSerializable
      * @var CodeAde[]
      */
     private $codes;
+
+    /**
+     * @var string Type of videos slideshow for a television
+     */
+    private $typeDefilement;
+
+    /**
+     * @var int Time of timeout for each information, by default 10 seconds
+     * */
+    private $timeout;
 
 	/**
 	 * Inserts a new user into the system with the specified details and assigns codes if the user's role is 'television'.
@@ -75,17 +85,22 @@ class User extends Model implements Entity, JsonSerializable
 
                 $request->execute();
             }
+            $request = $this->getDatabase()->prepare('INSERT INTO ecran_television (id_user, type_defilement, timeout) VALUES (:idUser, :typeDefilement, :timeout)');
+            $request->bindParam(':idUser', $id, PDO::PARAM_INT);
+            $request->bindValue(':typeDefilement', $this->getTypeDefilement(), PDO::PARAM_STR);
+            $request->bindValue(':timeout', $this->getTimeout(), PDO::PARAM_INT);
+            $request->execute();
         }
         return $id;
-        return $request->rowCount();
     }
 
 	/**
 	 * Updates user information in the database, including their password and associated codes.
 	 *
-	 * If the user's role is 'enseignant' or 'directeuretude', it updates the first associated code.
-	 * Otherwise, it clears all associated codes for the user and then inserts the appropriate codes
+	 * It clears all associated codes for the user and then inserts the appropriate codes
 	 * based on the user's current code data.
+     *
+     * If the user's role is 'television', it updaates the type and the time of the slideshow of infomations
 	 *
 	 * @return int Returns the number of rows affected by the final executed database operation.
 	 */
@@ -98,28 +113,30 @@ class User extends Model implements Entity, JsonSerializable
 
         $request->execute();
 
-        if ($this->getRole() === 'enseignant' || $this->getRole() === 'directeuretude') {
+        $request = $database->prepare('DELETE FROM ecran_code_user WHERE user_id = :id');
+        $request->bindValue(':id', $this->getId(), PDO::PARAM_INT);
+        $request->execute();
 
-            $this->getCodes()[0]->update();
-
-        } else {
-            $request = $database->prepare('DELETE FROM ecran_code_user WHERE user_id = :id');
-
-            $request->bindValue(':id', $this->getId(), PDO::PARAM_INT);
-
-            $request->execute();
-
-            foreach ($this->getCodes() as $code) {
-                if ($code instanceof CodeAde && !is_null($code->getId())) {
-                    $request = $database->prepare('INSERT INTO ecran_code_user (user_id, code_ade_id) VALUES (:userId, :codeAdeId)');
-
-                    $request->bindValue(':userId', $this->getId(), PDO::PARAM_INT);
-                    $request->bindValue(':codeAdeId', $code->getId(), PDO::PARAM_INT);
-
-                    $request->execute();
-                }
+        foreach ($this->getCodes() as $code)
+        {
+            if ($code instanceof CodeAde && !is_null($code->getId()))
+            {
+                $request = $database->prepare('INSERT INTO ecran_code_user (user_id, code_ade_id) VALUES (:userId, :codeAdeId)');
+                $request->bindValue(':userId', $this->getId(), PDO::PARAM_INT);
+                $request->bindValue(':codeAdeId', $code->getId(), PDO::PARAM_INT);
+                $request->execute();
             }
         }
+
+        if ($this->getRole() === 'television')
+        {
+            $request = $database->prepare('UPDATE ecran_television SET type_defilement = :typeDefilement, timeout = :timeout WHERE id_user = :idUser');
+            $request->bindValue(':idUser', $this->getId(), PDO::PARAM_INT);
+            $request->bindValue(':typeDefilement', $this->getTypeDefilement(), PDO::PARAM_STR);
+            $request->bindValue(':timeout', $this->getTimeout(), PDO::PARAM_INT);
+            $request->execute();
+        }
+
         return $request->rowCount();
     }
 
@@ -142,6 +159,13 @@ class User extends Model implements Entity, JsonSerializable
         $request->bindValue(':id', $this->getId(), PDO::PARAM_INT);
 
         $request->execute();
+
+        if ($this->getRole() === 'television')
+        {
+            $request = $database->prepare('DELETE FROM ecran_television WHERE id_user = :idUser');
+            $request->bindValue(':idUser', $this->getId(), PDO::PARAM_INT);
+            $request->execute();
+        }
 
         return $count;
     }
@@ -482,5 +506,37 @@ class User extends Model implements Entity, JsonSerializable
             'id' => $this->id,
             'name' => $this->login
         );
+    }
+
+    /**
+     * @return string
+     */
+    public function getTypeDefilement(): string
+    {
+        return $this->typeDefilement;
+    }
+
+    /**
+     * @param string $typeDefilement
+     */
+    public function setTypeDefilement(string $typeDefilement): void
+    {
+        $this->typeDefilement = $typeDefilement;
+    }
+
+    /**
+     * @return int
+     * */
+    public function getTimeout(): int
+    {
+        return $this->timeout;
+    }
+
+    /**
+     * @param int $timeout
+     */
+    public function setTimeout(int $timeout): void
+    {
+        $this->timeout = $timeout;
     }
 }

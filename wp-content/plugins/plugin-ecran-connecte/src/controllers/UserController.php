@@ -56,7 +56,7 @@ class UserController extends Controller
 	        $modelInfo = new Information();
 	        $infos = $modelInfo->getAuthorListInformation($user->getId());
 	        foreach ($infos as $info) {
-		        $goodType = ['img', 'pdf', 'tab', 'event'];
+		        $goodType = ['img', 'pdf', 'event', 'LocCvideo', 'LocSvideo'];
 		        if (in_array($info->getType(), $goodType)) {
 			        $infoController = new InformationController();
 			        $infoController->deleteFile($info->getId());
