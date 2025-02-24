@@ -4,6 +4,7 @@ namespace Models;
 
 use JsonSerializable;
 use PDO;
+use SimplePie\Author;
 
 /**
  * Class Alert
@@ -21,9 +22,9 @@ class Alert extends Model implements Entity, JsonSerializable
     private int $id;
 
     /**
-     * @var int
+     * @var User
      */
-    private int $author;
+    private User $author;
 
     /**
      * @var string
@@ -166,13 +167,13 @@ class Alert extends Model implements Entity, JsonSerializable
 	 * @param int $begin The starting position for the query, defaults to 0.
 	 * @param int $numberElement The number of elements to retrieve, defaults to 25.
 	 *
-	 * @return array|Alert A list of alerts as an array of entities or an empty array if no results are found.
+	 * @return array A list of alerts as an array of entities or an empty array if no results are found.
 	 */
-    public function getList(int $begin = 0,int $numberElement = 25): array|Alert {
+    public function getList(int $begin = 0,int $numberElement = 25): array {
         $request = $this->getDatabase()->prepare("SELECT id, content, creation_date, expiration_date, author, administration_id FROM ecran_alert ORDER BY id ASC LIMIT :begin, :numberElement");
 
-        $request->bindValue(':begin', (int)$begin, PDO::PARAM_INT);
-        $request->bindValue(':numberElement', (int)$numberElement, PDO::PARAM_INT);
+        $request->bindValue(':begin', $begin, PDO::PARAM_INT);
+        $request->bindValue(':numberElement', $numberElement, PDO::PARAM_INT);
 
         $request->execute();
 
@@ -192,10 +193,10 @@ class Alert extends Model implements Entity, JsonSerializable
 	 * @return array An array of alerts associated with the specified author, or an empty array if none are found.
 	 */
     public function getAuthorListAlert(int $author, int $begin = 0, int $numberElement = 25): array {
-        $request = $this->getDatabase()->prepare("SELECT id, content, creation_date, expiration_date, author, administration_id FROM ecran_alert  WHERE author = :author ORDER BY id ASC LIMIT :begin, :numberElement");
+        $request = $this->getDatabase()->prepare("SELECT id, content, creation_date, expiration_date, author, administration_id FROM ecran_alert WHERE author = :author ORDER BY id ASC LIMIT :begin, :numberElement");
 
-        $request->bindValue(':begin', (int)$begin, PDO::PARAM_INT);
-        $request->bindValue(':numberElement', (int)$numberElement, PDO::PARAM_INT);
+        $request->bindValue(':begin', $begin, PDO::PARAM_INT);
+        $request->bindValue(':numberElement', $numberElement, PDO::PARAM_INT);
         $request->bindParam(':author', $author, PDO::PARAM_INT);
 
         $request->execute();
@@ -343,22 +344,17 @@ class Alert extends Model implements Entity, JsonSerializable
 	 */
     public function setEntity($data, bool $adminSite = false): Alert {
         $entity = new Alert();
-        $author = new User();
         $codeAde = new CodeAde();
+        $author = new User();
+        $author->get($data['author']);
 
         $entity->setId($data['id']);
         $entity->setContent($data['content']);
+        $entity->setAuthor($author);
         $entity->setCreationDate(date('Y-m-d', strtotime($data['creation_date'])));
         $entity->setExpirationDate(
             date('Y-m-d', strtotime($data['expiration_date']))
         );
-
-        if ($data['administration_id'] != null) {
-            $author->setLogin('Administration');
-            $entity->setAuthor($author);
-        } else {
-            $entity->setAuthor($author->get($data['author']));
-        }
 
         $codes = array();
         foreach ( $codeAde->getByAlert($data['id']) as $code ) {
@@ -386,14 +382,14 @@ class Alert extends Model implements Entity, JsonSerializable
     /**
      * @return User
      */
-    public function getAuthor(): int {
+    public function getAuthor(): User {
         return $this->author;
     }
 
     /**
-     * @param int $author
+     * @param User $author
      */
-    public function setAuthor(int $author): void {
+    public function setAuthor(User $author): void {
         $this->author = $author;
     }
 

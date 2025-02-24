@@ -366,15 +366,13 @@ class User extends Model implements Entity, JsonSerializable
      * @return User The populated User entity object with all properties set, including associated codes.
      */
     public function setEntity($data): User {
-        $entity = new User();
+        $this->setId($data['ID']);
 
-        $entity->setId($data['ID']);
-
-        $entity->setLogin($data['user_login']);
-        $entity->setPassword($data['user_pass']);
-        $entity->setEmail($data['user_email']);
-        $entity->setRole(get_user_by('ID', $data['ID'])->roles[0]);
-	    $entity->setDeptId(($data['dept_id']) ?: 0);
+        $this->setLogin($data['user_login']);
+        $this->setPassword($data['user_pass']);
+        $this->setEmail($data['user_email']);
+        $this->setRole(get_user_by('ID', $data['ID'])->roles[0]);
+        $this->setDeptId(($data['dept_id']) ?: 0);
 
         $request = $this->getDatabase()->prepare('SELECT id, title, code, type, dept_id FROM ecran_code_ade
     													JOIN ecran_code_user ON ecran_code_ade.id = ecran_code_user.code_ade_id
@@ -388,9 +386,9 @@ class User extends Model implements Entity, JsonSerializable
 
         $codes = $codeAde->setEntityList($request->fetchAll());
 
-        $entity->setCodes($codes);
+        $this->setCodes($codes);
 
-        return $entity;
+        return $this;
     }
 
 	/**

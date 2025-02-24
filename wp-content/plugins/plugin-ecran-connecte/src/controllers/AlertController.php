@@ -205,10 +205,10 @@ class AlertController extends Controller
             $pageNumber = $maxPage;
         }
         $current_user = wp_get_current_user();
-        if (in_array('administrator', $current_user->roles) || in_array('secretaire', $current_user->roles)) {
+        if (current_user_can('view_alerts')) {
             $alertList = $this->model->getList($begin, $number);
         } else {
-            $alertList = $this->model->getAuthorListAlert($current_user->ID, $begin, $number);
+            $alertList = $this->model->getAuthorListAlert($current_user->ID, $begin,  $number);
         }
         $name = 'Alert';
         $header = ['Contenu', 'Date de création', 'Date d\'expiration', 'Auteur', 'Modifier'];
@@ -216,10 +216,18 @@ class AlertController extends Controller
         $row = $begin;
 
         foreach ($alertList as $alert) {
-            $dataList[] = [$row+1, $this->view->buildCheckbox($name, $alert->getId()), $alert->getContent(), $alert->getCreationDate(), $alert->getExpirationDate(), $alert->getAuthor()->getLogin(), $this->view->buildLinkForModify(esc_url(get_permalink(get_page_by_title_V2('Modifier une alerte'))) . '?id=' . $alert->getId())];
             ++$row;
+
+            $dataList[] = [
+                $row, $this->view->buildCheckbox($name, $alert->getId()), $alert->getContent(), $alert->getCreationDate(),
+                $alert->getExpirationDate(), $alert->getAuthor()->getLogin(),
+                $this->view->buildLinkForModify(
+                    esc_url(get_permalink(get_page_by_title_V2('Modifier une alerte')) ) . '?id=' . $alert->getId()
+                )
+            ];
         }
 
+        // Suppression d'alertes sélectionnées
         $submit = filter_input(INPUT_POST, 'delete');
         if (isset($submit)) {
             if (isset($_REQUEST['checkboxStatusAlert'])) {
