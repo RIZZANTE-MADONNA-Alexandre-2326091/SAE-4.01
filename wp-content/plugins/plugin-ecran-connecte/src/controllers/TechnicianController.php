@@ -125,17 +125,17 @@ class TechnicianController extends UserController implements Schedule
 		$user = $this->model->getMycodes( [ $user ] )[0];
 
 		$string = "";
-		if ( sizeof( $user->getCodes() ) > 1 ) {
-			// Récupération des informations pertinentes pour le tri
-			$courses = [];
-			foreach ( $user->getCodes() as $code ) {
-				$path = $this->getFilePath( $code->getCode() );
-				if ( file_exists( $path ) ) {
-					$schedule = $this->displaySchedule( $code->getCode() );
-					if ( $schedule ) {
-						$parsedSchedule = $this->parseScheduleData( $schedule ); // Méthode pour extraire les infos heure/salle/étage
-						if ( $parsedSchedule ) {
-							$courses[] = $parsedSchedule;
+        if (sizeof($user->getCodes()) > 0) {
+            // Récupération des informations pertinentes pour le tri
+            $courses = [];
+            foreach ($user->getCodes() as $code) {
+                $path = $this->getFilePath($code->getCode());
+                if (file_exists($path)) {
+                    $schedule = $this->displaySchedule($code->getCode());
+                    if ($schedule) {
+                        $parsedSchedule = $this->parseScheduleData($schedule); // Méthode pour extraire les infos heure/salle/étage
+                        if ($parsedSchedule) {
+                            $courses[] = $parsedSchedule;
 						}
 					}
 				}
@@ -177,14 +177,11 @@ class TechnicianController extends UserController implements Schedule
 				$string .= $this->view->displayEndDiv();
 			}
 		} else {
-			if ( ! empty( $user->getCodes()[0] ) ) {
-				$string .= $this->displaySchedule( $user->getCodes()[0]->getCode() );
-			} else {
 				$string .= '<p>Aucun cours de prévu aujourd\'hui </p>';
-			}
-		}
+        }
 		return $string;
 	}
+
 
 	/**
 	 * Parses the schedule data from an HTML formatted string and extracts specific details such as time, room number, and floor.
@@ -219,4 +216,5 @@ class TechnicianController extends UserController implements Schedule
 
 		return null; // Retourner null si l'extraction échoue.
 	}
+
 }

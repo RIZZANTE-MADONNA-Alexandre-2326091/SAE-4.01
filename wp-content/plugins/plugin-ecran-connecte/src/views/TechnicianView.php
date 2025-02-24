@@ -66,4 +66,5 @@ class TechnicianView extends UserView
 	public function displayMidSlide(): string {
 		return '<div class="mySlides">';
 	}
+
 }
