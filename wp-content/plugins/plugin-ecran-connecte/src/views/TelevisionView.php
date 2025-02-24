@@ -41,6 +41,7 @@ class TelevisionView extends UserView
             	<input type="password" class="form-control" id="pwdConfTv" name="pwdConfirmTv" placeholder="Confirmer le Mot de passe" minlength="8" maxlength="25" required="" onkeyup=checkPwd("Tv")>
             	<small id="passwordHelpBlock" class="form-text text-muted">Votre mot de passe doit contenir entre 8 et 25 caractère</small>
             </div>
+            <!--Formulaire type de défilement des vidéos-->
             <div class="form-group">
                 <p class="lead">Choisissez le mode d\'affichage des vidéos classiques</p>
                 <label for="defilement">Défilement entre les emplois du temps</label>
@@ -49,6 +50,7 @@ class TelevisionView extends UserView
                 <label for="defilement">Sur-impréssion par-dessus les emplois du temps</label>
                 <input type="radio" name="defilement" value="suret"/>
             </div>
+            <!--Formulaire temps de défilement des vidéos-->
             <div class="form-group">
                 <label for="temps">Temps de défilement des informations</label>
                 <input type="number" name="temps" placeholder="Temps en secondes (par défaut 10s)">
@@ -84,6 +86,7 @@ class TelevisionView extends UserView
 
         $row = array();
         $count = 0;
+        //On affiche les valeurs de certains attributs pour les télévisions
         foreach ($users as $user) {
             ++$count;
             $row[] = [$count, $this->buildCheckbox($name, $user->getId()), $user->getLogin(), sizeof($user->getCodes()), $user->getTimeout() . ' s', $user->getTypeDefilement(), $this->buildLinkForModify($linkManageUser . '?id=' . $user->getId())];
@@ -109,6 +112,7 @@ class TelevisionView extends UserView
         <a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des utilisateurs'))) . '">< Retour</a>
         <h2>' . $user->getLogin() . '</h2>
          <form method="post" id="registerTvForm">
+            <!--Formulaire type de défilement des vidéos-->
             <div class="form-group">
                 <p class="lead">Choisissez le mode d\'affichage des vidéos classiques</p>
                 <label for="defilement">Défilement entre les emplois du temps</label>
@@ -117,6 +121,7 @@ class TelevisionView extends UserView
                 <label for="defilement">Sur-impréssion par-dessus les emplois du temps</label>
                 <input type="radio" name="defilement" value="suret"/>
             </div>
+            <!--Formulaire temps de défilement des vidéos-->
             <div class="form-group">
                 <label for="temps">Temps de défilement des informations</label>
                 <input type="number" name="temps" placeholder="Temps en secondes (par défaut 10s)">

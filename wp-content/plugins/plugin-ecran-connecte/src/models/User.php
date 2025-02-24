@@ -64,7 +64,8 @@ class User extends Model implements Entity, JsonSerializable
 	 *
 	 * @return string Returns the ID of the created user.
 	 */
-    public function insert(): string {
+    public function insert(): string
+    {
         // Take 7 lines to create an user with a specific role
         $userData = array(
             'user_login' => $this->getLogin(),
@@ -75,8 +76,10 @@ class User extends Model implements Entity, JsonSerializable
         $id = wp_insert_user($userData);
 
         // To review
-        if ($this->getRole() == 'television') {
-            foreach ($this->getCodes() as $code) {
+        if ($this->getRole() == 'television')
+        {
+            foreach ($this->getCodes() as $code)
+            {
 
                 $request = $this->getDatabase()->prepare('INSERT INTO ecran_code_user (user_id, code_ade_id) VALUES (:userId, :codeAdeId)');
 
@@ -85,6 +88,8 @@ class User extends Model implements Entity, JsonSerializable
 
                 $request->execute();
             }
+
+            //Ajoute les informations de la télévision dans la table ecran_television, id de l'utilisateur en clé étrangère, typeDefilement et timeout
             $request = $this->getDatabase()->prepare('INSERT INTO ecran_television (id_user, type_defilement, timeout) VALUES (:idUser, :typeDefilement, :timeout)');
             $request->bindParam(':idUser', $id, PDO::PARAM_INT);
             $request->bindValue(':typeDefilement', $this->getTypeDefilement(), PDO::PARAM_STR);
@@ -104,7 +109,8 @@ class User extends Model implements Entity, JsonSerializable
 	 *
 	 * @return int Returns the number of rows affected by the final executed database operation.
 	 */
-	public function update(): int {
+	public function update(): int
+    {
         $database = $this->getDatabase();
         $request = $database->prepare('UPDATE wp_users SET user_pass = :password WHERE ID = :id');
 
@@ -128,6 +134,9 @@ class User extends Model implements Entity, JsonSerializable
             }
         }
 
+        /*
+          Si l'utilisateur qui est modifié est une télévision, on modifie les valeurs des attributs de la table ecran_television en fonction de l'id de l'utilisateur qui est une clé étrangère
+        */
         if ($this->getRole() === 'television')
         {
             $request = $database->prepare('UPDATE ecran_television SET type_defilement = :typeDefilement, timeout = :timeout WHERE id_user = :idUser');
@@ -145,7 +154,8 @@ class User extends Model implements Entity, JsonSerializable
 	 *
 	 * @return int Returns the number of rows affected during the deletion of the user record.
 	 */
-    public function delete(): int {
+    public function delete(): int
+    {
         $database = $this->getDatabase();
         $request = $database->prepare('DELETE FROM wp_users WHERE ID = :id');
 
@@ -160,6 +170,9 @@ class User extends Model implements Entity, JsonSerializable
 
         $request->execute();
 
+        /*
+          Si l'utilisateur qui est modifié est une télévision, on supprime les valeurs des attributs de la table ecran_television en fonction de l'id de l'utilisateur qui est une clé étrangère
+        */
         if ($this->getRole() === 'television')
         {
             $request = $database->prepare('DELETE FROM ecran_television WHERE id_user = :idUser');
@@ -409,7 +422,8 @@ class User extends Model implements Entity, JsonSerializable
 	 *
 	 * @return array Processed list of entity objects.
 	 */
-    public function setEntityList($dataList): array {
+    public function setEntityList($dataList): array
+    {
         $listEntity = array();
         foreach ($dataList as $data) {
             $listEntity[] = $this->setEntity($data);
@@ -420,88 +434,101 @@ class User extends Model implements Entity, JsonSerializable
     /**
      * @return int
      */
-    public function getId(): int {
+    public function getId(): int
+    {
         return $this->id;
     }
 
     /**
      * @param int $id
      */
-    public function setId(int $id): void {
+    public function setId(int $id): void
+    {
         $this->id = $id;
     }
 
     /**
      * @return string
      */
-    public function getLogin(): string {
+    public function getLogin(): string
+    {
         return $this->login;
     }
 
     /**
      * @param string $login
      */
-    public function setLogin(string $login): void {
+    public function setLogin(string $login): void
+    {
         $this->login = $login;
     }
 
     /**
      * @return string
      */
-    public function getPassword(): string {
+    public function getPassword(): string
+    {
         return $this->password;
     }
 
     /**
      * @param string $password
      */
-    public function setPassword(string $password): void {
+    public function setPassword(string $password): void
+    {
         $this->password = $password;
     }
 
     /**
      * @return string
      */
-    public function getEmail(): string {
+    public function getEmail(): string
+    {
         return $this->email;
     }
 
     /**
      * @param string $email
      */
-    public function setEmail(string $email): void {
+    public function setEmail(string $email): void
+    {
         $this->email = $email;
     }
 
     /**
      * @return string
      */
-    public function getRole(): string {
+    public function getRole(): string
+    {
         return $this->role;
     }
 
     /**
      * @param string $role
      */
-    public function setRole(string $role): void {
+    public function setRole(string $role): void
+    {
         $this->role = $role;
     }
 
     /**
      * @return CodeAde[]
      */
-    public function getCodes(): array {
+    public function getCodes(): array
+    {
         return $this->codes;
     }
 
     /**
      * @param CodeAde[] $codes
      */
-    public function setCodes(array $codes): void {
+    public function setCodes(array $codes): void
+    {
         $this->codes = $codes;
     }
 
-    public function jsonSerialize(): mixed {
+    public function jsonSerialize(): mixed
+    {
         return array(
             'id' => $this->id,
             'name' => $this->login
