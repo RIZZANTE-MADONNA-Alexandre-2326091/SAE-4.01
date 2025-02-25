@@ -142,7 +142,7 @@ class DepartmentController extends Controller
 	 * @return bool Returns true if a duplicate department name is found, otherwise false.
 	 */
 	public function checkDuplicateDept(Department $department): bool{
-		$departments = $this->model->getDepartmentName($department->getName());
+		$departments = $this->model->getDepartmentByName($department->getName());
 
 		foreach($departments as $dept){
 			if( $department->getName() === $dept->getName()){

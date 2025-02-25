@@ -3,6 +3,7 @@
 namespace Controllers;
 
 use Models\CodeAde;
+use Models\Department;
 use Models\User;
 use Views\TelevisionView;
 
@@ -49,12 +50,17 @@ class TelevisionController extends UserController implements Schedule
 
         $codeAde = new CodeAde();
 
-        if (isset($action)) {
+        $currentUser = wp_get_current_user();
+        $deptModel = new Department();
+        $isAdmin = in_array('administrator', $currentUser->roles);
+        $currentDept = $isAdmin ? null : $deptModel->getUserInDept($currentUser->ID)->getId();
 
+        if (isset($action)) {
             $login = filter_input(INPUT_POST, 'loginTv');
             $password = filter_input(INPUT_POST, 'pwdTv');
             $passwordConfirm = filter_input(INPUT_POST, 'pwdConfirmTv');
-            $codes = $_POST['selectTv'];
+            $deptId = $isAdmin ? filter_input(INPUT_POST, 'deptIdTv') : $currentDept;
+            $codes = filter_input(INPUT_POST, 'selectTv', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
             $typeDefilement = $_POST['defilement'];
             $tempsDefilement = filter_input(INPUT_POST, 'temps');
 
@@ -66,27 +72,30 @@ class TelevisionController extends UserController implements Schedule
                 foreach ($codes as $code) {
                     if (is_numeric($code) && $code > 0) {
                         if (is_null($codeAde->getByCode($code)->getId())) {
-                            return 'error';
+                            return 'error'; // Code invalide;
                         } else {
                             $codesAde[] = $codeAde->getByCode($code);
                         }
                     }
                 }
 
+                // Configuration du modèle de télévision
                 $this->model->setLogin($login);
                 $this->model->setEmail($login . '@' . $login . '.fr');
                 $this->model->setPassword($password);
                 $this->model->setRole('television');
                 $this->model->setCodes($codesAde);
+                $this->model->setDeptId($deptId);
 
                 $this->model->setTypeDefilement($typeDefilement);
 
                 $this->model->setTimeout($tempsDefilement * 1000);
 
+                // Insertion du modèle dans la base de données
                 if (!$this->checkDuplicateUser($this->model) && $this->model->insert()) {
                     $this->view->displayInsertValidate();
                 } else {
-                    $this->view->displayErrorLogin();
+                    $this->view->displayErrorInsertion();
                 }
             } else {
                 $this->view->displayErrorCreation();
@@ -97,7 +106,9 @@ class TelevisionController extends UserController implements Schedule
         $groups = $codeAde->getAllFromType('group');
         $halfGroups = $codeAde->getAllFromType('halfGroup');
 
-        return $this->view->displayFormTelevision($years, $groups, $halfGroups);
+        $allDepts = $deptModel->getAll();
+
+        return $this->view->displayFormTelevision($years, $groups, $halfGroups, $allDepts, $isAdmin, $currentDept);
     }
 
 	/**
@@ -116,7 +127,7 @@ class TelevisionController extends UserController implements Schedule
         $action = filter_input(INPUT_POST, 'modifValidate');
 
         if (isset($action)) {
-            $codes = $_POST['selectTv'];
+            $codes = filter_input(INPUT_POST, 'selectTv', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
             $typeDefilement = $_POST['defilement'];
             $tempsDefilement = filter_input(INPUT_POST, 'temps');
 
@@ -153,7 +164,14 @@ class TelevisionController extends UserController implements Schedule
 	 */
     public function displayAllTv(): string {
         $users = $this->model->getUsersByRole('television');
-        return $this->view->displayAllTv($users);
+
+	    $deptModel = new Department();
+	    $userDeptList = array();
+	    foreach ($users as $user) {
+		    $userDeptList[] = $deptModel->getUserInDept($user->getId())->getName();
+	    }
+
+        return $this->view->displayAllTv($users, $userDeptList);
     }
 
 	/**
@@ -179,11 +197,11 @@ class TelevisionController extends UserController implements Schedule
                         if ($this->displaySchedule($code->getCode())) {
                             $string .= '<div class="list">';
                             $string .= $this->displaySchedule($code->getCode());
-                            $string .= '</div>';
+                            $string .= $this->view->displayEndDiv();
                         }
                     }
                 }
-                $string .= '</div></div>';
+                $string .= $this->view->displayEndDiv() . $this->view->displayEndDiv();
             } else {
                 $string .= $this->view->displayStartSlide();
                 foreach ($user->getCodes() as $code) {
@@ -202,7 +220,7 @@ class TelevisionController extends UserController implements Schedule
             if (!empty($user->getCodes()[0])) {
                 $string .= $this->displaySchedule($user->getCodes()[0]->getCode());
             } else {
-                $string .= '<div class="courstext">Vous n\'avez pas cours !</div>';
+                $string .= '<p>Vous n\'avez pas cours !</p>';
             }
         }
         return $string;

@@ -120,61 +120,60 @@ class View
         return $pagination;
     }
 
-	/**
-	 * Builds an HTML link for modification.
-	 *
-	 * @param string $link The URL to be used for the modification link.
-	 *
-	 * @return string The generated HTML anchor tag with the provided link.
-	 */
-    public function buildLinkForModify(string $link): string {
+    /**
+     * Create a link for modify an element
+     *
+     * @param $link
+     *
+     * @return string
+     */
+    public function buildLinkForModify($link) {
         return '<a href="' . $link . '">Modifier</a>';
     }
 
-	/**
-	 * Builds an HTML checkbox input element with the given name and ID.
-	 *
-	 * @param string $name The name attribute for the checkbox input.
-	 * @param mixed $id The value attribute for the checkbox input.
-	 *
-	 * @return string The generated HTML string for the checkbox input element.
-	 */
-    public function buildCheckbox($name, $id): string {
+    /**
+     * Create a checkbox
+     *
+     * @param $name
+     * @param $id
+     *
+     * @return string
+     */
+    public function buildCheckbox($name, $id) {
         return '<input type="checkbox" name="checkboxStatus' . $name . '[]" value="' . $id . '"/>';
     }
 
-	/**
-	 * Generates and returns the initial markup for a multi-selection navigation using tabs.
-	 *
-	 * @return string The HTML string for the starting structure of a tabbed navigation menu.
-	 */
-    public function displayStartMultiSelect(): string {
+    /**
+     * Create the begin of a multi select
+     *
+     * @return string
+     */
+    public function displayStartMultiSelect() {
         return '<nav>
           <div class="nav nav-tabs" id="nav-tab" role="tablist">';
     }
 
-	/**
-	 * Generates and returns an HTML string for a navigation tab link with specified attributes.
-	 *
-	 * @param string $id The unique identifier used for the tab element.
-	 * @param string $title The display text for the tab link.
-	 * @param bool $active Optional. Indicates if the tab is active. Defaults to false.
-	 *
-	 * @return string The generated HTML string for the navigation tab link.
-	 */
-    public function displayTitleSelect(string $id, string $title, bool $active = false): string {
+    /**
+     * Create one tab for the multi select
+     *
+     * @param $id           string id de l'onglet
+     * @param $title        string titre de l'onglet
+     * @param $active       bool affiche l'onglet (si c'est à true) lors du chargement de la page
+     * @return string
+     */
+    public function displayTitleSelect($id, $title, $active = false) {
         $string = '<a class="nav-item nav-link';
         if ($active) $string .= ' active';
         $string .= '" id="nav-' . $id . '-tab" data-toggle="tab" href="#nav-' . $id . '" role="tab" aria-controls="nav-' . $id . '" aria-selected="false">' . $title . '</a>';
         return $string;
     }
 
-	/**
-	 * Renders and returns the closing HTML structure for a navigation title and the opening of tab content.
-	 *
-	 * @return string The HTML string for ending a navigation title section and starting tab content.
-	 */
-    public function displayEndOfTitle(): string {
+    /**
+     * Close the creation of new tab
+     *
+     * @return string
+     */
+    public function displayEndOfTitle() {
         return '
             </div>
         </nav>
@@ -182,37 +181,35 @@ class View
         <div class="tab-content" id="nav-tabContent">';
     }
 
-	/**
-	 * Generates and displays a tab pane with the specified content and settings.
-	 *
-	 * @param string
-	 */
-    public function displayContentSelect(string $id, string $content, bool $active = false): string {
+    /**
+     * Create the content for one tab
+     *
+     * @param $id           string
+     * @param $content      string
+     * @param $active       bool
+     *
+     * @return string
+     */
+    public function displayContentSelect($id, $content, $active = false) {
         $string = '<div class="tab-pane fade show';
         if ($active) $string .= ' active';
         $string .= '" id="nav-' . $id . '" role="tabpanel" aria-labelledby="nav-' . $id . '-tab">' . $content . '</div>';
         return $string;
     }
 
-	/**
-	 * Refreshes the current page by outputting a meta refresh tag.
-	 *
-	 * @return void
-	 */
-    public function refreshPage(): void {
+    /**
+     * Refresh the page
+     */
+    public function refreshPage() {
         echo '<meta http-equiv="refresh" content="0">';
     }
 
-	/**
-	 * Builds and displays a modal dialog with specified title, content, and optional redirection.
-	 *
-	 * @param string $title The title text to be displayed in the modal header.
-	 * @param string $content The content to be displayed in the modal body.
-	 * @param string|null $redirect Optional URL for redirection upon closing the modal.
-	 *
-	 * @return void Outputs the generated modal HTML and JavaScript.
-	 */
-    public function buildModal(string $title, string $content, string $redirect = null): void {
+    /**
+     * @param $title
+     * @param $content
+     * @param null $redirect
+     */
+    public function buildModal($title, $content, $redirect = null) {
         $modal = '
 		<!-- MODAL -->
 		<div class="modal" id="myModal" tabindex="-1" role="dialog">
@@ -242,12 +239,32 @@ class View
         echo $modal;
     }
 
-	/**
-	 * Returns the closing div tag as a string.
-	 *
-	 * @return string The closing div tag.
-	 */
+    /**
+     * Returns the closing div tag as a string.
+     *
+     * @return string The closing div tag.
+     */
     public function displayEndDiv(): string {
+        return '</div>';
+    }
+
+
+    public function displayAllDept(array $departments, int $currentDept = null): string
+    {
+        $form = '';
+        foreach ($departments as $dept) {
+            $selected = ($dept->getId() == $currentDept) ? 'selected' : '';
+            $form .= '<option' . $selected . ' value="' . $dept->getId() . '">' . $dept->getName() . '</option>';
+        }
+        return $form;
+    }
+
+    /**
+     * Close a div.
+     *
+     * @return string
+     */
+    public function endDiv(): string {
         return '</div>';
     }
 
@@ -255,8 +272,9 @@ class View
 	 * Display a message indicating that the passwords are incorrect.
 	 *
 	 * @return void
-	 */
-    public function displayBadPassword(): void {
+     */
+    public function displayBadPassword(): void
+    {
         $this->buildModal('Mauvais mot de passe', '<p class=\'alert alert-danger\'>Les deux mots de passe ne sont pas correctes </p>');
     }
 
@@ -310,7 +328,7 @@ class View
 	 *
 	 * @return void
 	 */
-    public function displayModificationValidate($redirect = null): void {
+    public function displayModificationValidate($redirect = null) {
         $this->buildModal('Modification réussie', '<p class="alert alert-success"> La modification a été appliquée</p>', $redirect);
     }
 
@@ -334,13 +352,7 @@ class View
         $this->buildModal('Le formulaire n\'a pas été correctement remplie', '<p class="alert alert-danger">Le formulaire a été mal remplie, veuillez revoir les données rentrées et réessayez.</p>');
     }
 
-	/**
-	 * Displays a modal indicating that the addition operation has failed
-	 * due to an error during form submission.
-	 *
-	 * @return void
-	 */
-	public function errorMessageCantAdd(): void {
+    public function errorMessageCantAdd() {
         $this->buildModal('L\'ajout a échoué', '<p class="alert alert-danger">Une erreur s\'est produite lors de l\'envoie du formulaire, veuillez réessayer après avoir vérifié vos informations.</p>');
     }
 }

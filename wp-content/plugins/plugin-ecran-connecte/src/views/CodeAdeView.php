@@ -3,6 +3,7 @@
 namespace Views;
 
 use Models\CodeAde;
+use Models\Department;
 
 /**
  * Class CodeAdeView
@@ -19,7 +20,9 @@ class CodeAdeView extends View
 	 *
 	 * @return string The HTML form as a string.
 	 */
-    public function createForm(): string {
+    public function createForm(array $departments, bool $isAdmin = false, int $currentDept = null): string {
+        $disabled = $isAdmin ? '' : 'disabled';
+
         return '
         <form method="post">
             <div class="form-group">
@@ -43,6 +46,12 @@ class CodeAdeView extends View
                     <input class="form-check-input" type="radio" name="type" id="halfGroup" value="halfGroup">
                     <label class="form-check-label" for="halfGroup">Demi-groupe</label>
                 </div>
+            </div>
+            <div class="form-group">
+                <label for="department">Département</label>
+                <select name="dept" class="form-control" ' . $disabled . '>
+                		'. $this->displayAllDept($departments, $currentDept) .'
+                	</select>
             </div>
           <button type="submit" class="btn button_ecran" name="submit">Ajouter</button>
         </form>';
@@ -137,12 +146,14 @@ class CodeAdeView extends View
 
         $title = 'Codes Ade';
         $name = 'Code';
-        $header = ['Titre', 'Code', 'Type', 'Modifier'];
+        $header = ['Titre', 'Code', 'Type', 'Département', 'Modifier'];
 
         $codesAde = [$years, $groups, $halfGroups];
 
         $row = array();
         $count = 0;
+
+        $deptModel = new Department();
 
         foreach ($codesAde as $codeAde) {
             foreach ($codeAde as $code) {
@@ -154,7 +165,7 @@ class CodeAdeView extends View
                     $code->setType('Demi-groupe');
                 }
                 ++$count;
-                $row[] = [$count, $this->buildCheckbox($name, $code->getId()), $code->getTitle(), $code->getCode(), $code->getType(), $this->buildLinkForModify($linkManageCodeAde . '?id=' . $code->getId())];
+                $row[] = [$count, $this->buildCheckbox($name, $code->getId()), $code->getTitle(), $code->getCode(), $code->getType(), $deptModel->get($code->getDeptId())->getName() , $this->buildLinkForModify($linkManageCodeAde . '?id=' . $code->getId())];
             }
         }
 

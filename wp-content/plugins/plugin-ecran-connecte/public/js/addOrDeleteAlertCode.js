@@ -9,7 +9,11 @@ function addButtonAlert() {
     var presenceSupp = false;
 
     $.ajax({
-        url: '/wp-content/plugins/plugin-ecran-connecte/public/js/utils/allCodes.php',
+        url: '/wp-admin/admin-ajax.php',
+        type: 'POST',
+        data: {
+            action: 'get_all_codes'
+        }
     }).done(function (data) {
         let div = $('<div >', {
             class: 'row',

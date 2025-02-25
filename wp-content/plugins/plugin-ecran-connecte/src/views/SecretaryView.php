@@ -19,11 +19,11 @@ class SecretaryView extends UserView
 	 *
 	 * @return string The HTML content for the secretary account creation form.
 	 */
-    public function displayFormSecretary(): string {
+    public function displayFormSecretary($departements, $isAdmin, $currentDept): string {
         return '
         <h2> Compte secrétaire </h2>
         <p class="lead">Pour créer des secrétaires, remplissez ce formulaire avec les valeurs demandées.</p>
-        ' . $this->displayBaseForm('Secre');
+        ' . $this->displayBaseForm('Secre', $departements, $isAdmin, $currentDept);
     }
 
 	/**
@@ -109,22 +109,24 @@ class SecretaryView extends UserView
 	 * Display a list of all secretaries with their associated details.
 	 *
 	 * @param array $users An array of user objects representing secretaries.
+     * @param array $userDeptList
 	 *
 	 * @return string The rendered display of all secretaries.
 	 */
-    public function displayAllSecretary(array $users): string {
+    public function displayAllSecretary(array $users, array $userDeptList): string {
         $title = 'Secrétaires';
         $name = 'Secre';
-        $header = ['Login'];
+        $header = ['Login', 'Département'];
 
         $row = array();
         $count = 0;
         foreach ($users as $user) {
+            $row[] = [$count+1, $this->buildCheckbox($name, $user->getId()), $user->getLogin(), $userDeptList[$count]];
+
             ++$count;
-            $row[] = [$count, $this->buildCheckbox($name, $user->getId()), $user->getLogin()];
         }
 
-        return $this->displayAll($name, $title, $header, $row, 'Secre');
+        return $this->displayAll($name, $title, $header, $row, $name);
     }
 
 	/**

@@ -2,12 +2,9 @@
 
 namespace Controllers;
 
+use Models\Department;
 use Models\User;
 use Views\SecretaryView;
-
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 
 /**
  * Class SecretaryController
@@ -59,12 +56,19 @@ class SecretaryController extends UserController
     public function insert(): string {
         $action = filter_input(INPUT_POST, 'createSecre');
 
+	    $currentUser = wp_get_current_user();
+
+	    $deptModel = new Department();
+	    $isAdmin = in_array('administrator', $currentUser->roles);
+	    $currentDept = $isAdmin ? -1 : $deptModel->getUserInDept($currentUser->ID)->getId();
+
         if (isset($action)) {
 
             $login = filter_input(INPUT_POST, 'loginSecre');
             $password = filter_input(INPUT_POST, 'pwdSecre');
             $passwordConfirm = filter_input(INPUT_POST, 'pwdConfirmSecre');
             $email = filter_input(INPUT_POST, 'emailSecre');
+	        $deptId = $isAdmin ? filter_input(INPUT_POST, 'deptIdSecre') : $currentUser;
 
             if (is_string($login) && strlen($login) >= 4 && strlen($login) <= 25 &&
                 is_string($password) && strlen($password) >= 8 && strlen($password) <= 25 &&
@@ -74,6 +78,7 @@ class SecretaryController extends UserController
                 $this->model->setPassword($password);
                 $this->model->setEmail($email);
                 $this->model->setRole('secretaire');
+				$this->model->setDeptId($deptId);
 
                 if (!$this->checkDuplicateUser($this->model) && $this->model->insert()) {
                     $this->view->displayInsertValidate();
@@ -84,17 +89,28 @@ class SecretaryController extends UserController
                 $this->view->displayErrorCreation();
             }
         }
-        return $this->view->displayFormSecretary();
+
+		$departments = $deptModel->getAll();
+
+        return $this->view->displayFormSecretary($departments, $isAdmin, $currentDept);
     }
 
 	/**
 	 * Displays all secretaries by retrieving users with the role of 'secretaire' and rendering the appropriate view.
 	 *
-	 * @return string The result of the view's displayAllSecretary method.
+	 *
+     * @return string The result of the view's displayAllSecretary method.
 	 */
     public function displayAllSecretary(): string {
         $users = $this->model->getUsersByRole('secretaire');
-        return $this->view->displayAllSecretary($users);
+
+		$deptModel = new Department();
+		$userDeptList = array();
+		foreach ($users as $user) {
+			$userDeptList[] = $deptModel->getUserInDept($user->getId())->getName();
+		}
+
+        return $this->view->displayAllSecretary($users, $userDeptList);
     }
 
     /*** MANAGE USER ***/
@@ -197,6 +213,7 @@ class SecretaryController extends UserController
 	 */
     public function modifyUser(): string {
         $id = $_GET['id'];
+
         if (is_numeric($id) && $this->model->get($id)) {
             $user = $this->model->get($id);
 
@@ -205,12 +222,9 @@ class SecretaryController extends UserController
             if (in_array("television", $wordpressUser->roles)) {
                 $controller = new TelevisionController();
                 return $controller->modify($user);
-            } else {
-                return $this->view->displayNoUser();
             }
-        } else {
-            return $this->view->displayNoUser();
         }
+        return $this->view->displayNoUser();
     }
 
 	/**

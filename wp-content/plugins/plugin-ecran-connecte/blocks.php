@@ -208,6 +208,7 @@ function block_code_modify()
 }
 add_action( 'init', 'block_code_modify' );
 
+
 /*
  * DEPARTMENT BLOCKS
  */
@@ -425,9 +426,6 @@ function schedule_render_callback()
         } else if (in_array("administrator", $current_user->roles) || in_array("adminDept", $current_user->roles) || in_array("secretaire", $current_user->roles)) {
             $controller = new SecretaryController();
             return $controller->displayMySchedule();
-        } else {
-            $user = new UserView();
-            return $user->displayHome();
         }
     }
 }
