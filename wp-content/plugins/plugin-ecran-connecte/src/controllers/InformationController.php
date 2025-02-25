@@ -50,6 +50,8 @@ class InformationController extends Controller
     public function create(): string
     {
         $current_user = wp_get_current_user();
+        $author = new User();
+        $author->get($current_user->ID);
 
         // All forms
 
@@ -79,7 +81,7 @@ class InformationController extends Controller
 
         // Set the base of all information
         $information->setTitle($title);
-        $information->setAuthor($current_user->ID);
+        $information->setAuthor($author);
         $information->setCreationDate($creationDate);
         $information->setExpirationDate($endDate);
         $information->setAdminId(null);
@@ -266,10 +268,12 @@ class InformationController extends Controller
         }
 
         $current_user = wp_get_current_user();
+        $user = new User();
+        $user = $user->get($current_user->ID);
         $information = $this->model->get($id);
 
-        if (!(in_array('administrator', $current_user->roles) || in_array('secretaire', $current_user->roles)
-            || $information->getAuthor()->getId() == $current_user->ID))
+        if (!(('administrator' === $user->getRole()) || ('secretaire' === $user->getRole())
+            || $information->getAuthor()->getId() == $user->getID()))
         {
             return $this->view->noInformation();
         }
@@ -377,20 +381,6 @@ class InformationController extends Controller
                         else
                         {
                             $this->view->buildModal('Vidéo non valide', '<p>Ce fichier est une vidéo non valide, veuillez choisir une autre vidéo</p>');
-                        }
-                    }
-                    else if ($information->getType() == 'tab')
-                    {
-                        $explodeName = explode('.', $filename);
-                        $goodExtension = ['xls', 'xlsx', 'ods'];
-                        if (in_array(end($explodeName), $goodExtension))
-                        {
-                            $this->deleteFile($information->getId());
-                            $this->registerFile($filename, $_FILES["contentFile"]['tmp_name'], $information);
-                        }
-                        else
-                        {
-                            $this->view->buildModal('Tableau non valide', '<p>Ce fichier est un tableau non valide, veuillez choisir un autre tableau</p>');
                         }
                     }
                 }
@@ -507,13 +497,15 @@ class InformationController extends Controller
             $pageNumber = $maxPage;
         }
         $current_user = wp_get_current_user();
+        $user = new User();
+        $user->get($current_user->ID);
         if (in_array('administrator', $current_user->roles) || in_array('secretaire', $current_user->roles))
         {
             $informationList = $this->model->getList($begin, $number);
         }
         else
         {
-            $informationList = $this->model->getAuthorListInformation($current_user->ID, $begin, $number);
+            $informationList = $this->model->getAuthorListInformation($user, $begin, $number);
         }
 
         $name = 'Info';
@@ -652,7 +644,7 @@ class InformationController extends Controller
 	/**
 	 * Check if the end date of an information has passed and performs deletion if necessary.
 	 *
-	 * @param int|string $id The unique identifier of the information.
+	 * @param int $id The unique identifier of the information.
 	 * @param string $endDate The expiration date of the information in 'Y-m-d' format.
 	 *
 	 * @return void
@@ -679,15 +671,15 @@ class InformationController extends Controller
         $informations = $this->model->getList();
         $currentUser = wp_get_current_user();
         $user = new User();
+        $user = $user->get($currentUser->ID);
         $this->view->displayStartSlideshow();
         foreach ($informations as $information)
         {
             $endDate = date('Y-m-d', strtotime($information->getExpirationDate()));
             if (!$this->endDateCheckInfo($information->getId(), $endDate))
             {
-                if (in_array('television', $currentUser->roles))
+                if ('television' === $user->getRole())
                 {
-                    $user->get($currentUser->ID);
                     $typeDefilement = $user->getTypeDefilement();
                     $timeout = $user->getTimeout();
                 }
@@ -785,64 +777,5 @@ class InformationController extends Controller
             }
         }
         return $this->view->endDiv();
-    }
-
-	/**
-	 * Reads the content of a spreadsheet file and processes it into a formatted HTML table structure.
-	 * The content is divided into multiple tables, each containing a maximum of 10 rows.
-	 *
-	 * @param string $content The relative path to the spreadsheet file.
-	 *
-	 * @return array An array of HTML strings, where each string represents a table with 10 rows (or fewer).
-	 */
-    public function readSpreadSheet(string $content): array
-    {
-        $file = $_SERVER['DOCUMENT_ROOT'] . $content;
-
-	    $array     = explode( ".", $file );
-	    $extension = ucfirst(strtolower(end( $array )));
-        $reader    = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($extension);
-        $reader->setReadDataOnly(true);
-        $spreadsheet = $reader->load($file);
-
-        $worksheet = $spreadsheet->getActiveSheet();
-        $highestRow = $worksheet->getHighestRow();
-
-        $contentList = array();
-        $content = "";
-        $mod = 0;
-        for ($i = 0; $i < $highestRow; ++$i)
-        {
-            $mod = $i % 10;
-            if ($mod == 0)
-            {
-                $content .= '<table class ="table table-bordered tablesize">';
-            }
-            foreach ($worksheet->getRowIterator($i + 1, 1) as $row)
-            {
-                $content .= '<tr scope="row">';
-                $cellIterator = $row->getCellIterator();
-                $cellIterator->setIterateOnlyExistingCells(false);
-                foreach ($cellIterator as $cell)
-                {
-                    $content .= '<td class="text-center">' .
-                        $cell->getValue() .
-                        '</td>';
-                }
-                $content .= '</tr>';
-            }
-            if ($mod == 9)
-            {
-                $content .= '</table>';
-                array_push($contentList, $content);
-                $content = "";
-            }
-        }
-        if ($mod != 9 && $i > 0)
-        {
-            $content .= '</table>';
-            array_push($contentList, $content);
-        }
-        return $contentList;
     }
 }

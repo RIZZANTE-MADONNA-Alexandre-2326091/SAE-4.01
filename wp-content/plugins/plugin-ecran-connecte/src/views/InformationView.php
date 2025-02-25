@@ -108,61 +108,6 @@ class InformationView extends View
     }
 
     /**
-     * Display a form to create an information with a table
-     *
-     * @param string|null $title
-     * @param string|null $content
-     * @param string|null $endDate
-     * @param string $type
-     *
-     * @return string
-     * @throws \PhpOffice\PhpSpreadsheet\Exception
-     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
-     */
-    public function displayFormTab(string $title = null, string $content = null,
-                                   string $endDate = null, string $type = "createTab"): string
-    {
-        $dateMin = date('Y-m-d', strtotime("+1 day"));
-
-        $form = '<form method="post" enctype="multipart/form-data">
-						<div class="form-group">
-			                <label for="title">Titre <span class="text-muted">(Optionnel)</span></label>
-			                <input id="title" class="form-control" type="text" name="title" placeholder="Inserer un titre" maxlength="60" value="' . $title . '">
-			            </div>';
-
-        if ($content != null)
-        {
-            $info = new InformationController();
-            $list = $info->readSpreadSheet(TV_UPLOAD_PATH . $content);
-            foreach ($list as $table)
-            {
-                $form .= $table;
-            }
-        }
-
-        $form .= '
-			<div class="form-group">
-                <label for="contentFile">Ajout du fichier Xls (ou xlsx)</label>
-                <input class="form-control-file" id="contentFile" type="file" name="contentFile" />
-                <input type="hidden" name="MAX_FILE_SIZE" value="5000000" />
-                <small id="tabHelp" class="form-text text-muted">Nous vous conseillons de ne pas dépasser trois colonnes.</small>
-                <small id="tabHelp" class="form-text text-muted">Nous vous conseillons également de ne pas mettre trop de contenu dans une cellule.</small>
-            </div>
-            <div class="form-group">
-				<label for="expirationDate">Date d\'expiration</label>
-				<input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' . $dateMin . '" value="' . $endDate . '" required >
-			</div>
-			<button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
-
-        if ($type == 'submit')
-        {
-            $form .= '<button type="submit" class="btn delete_button_ecran" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette information ?\');">Supprimer</button>';
-        }
-
-        return $form . '</form>';
-    }
-
-    /**
      * Display a form to create an information with a PDF
      *
      * @param string|null $title
@@ -459,10 +404,6 @@ class InformationView extends View
         {
             return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormImg($title, $content, $endDate, 'submit');
         }
-        elseif ($type == "tab")
-        {
-            return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormTab($title, $content, $endDate, 'submit');
-        }
         elseif ($type == "pdf")
         {
             return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormPDF($title, $content, $endDate, 'submit');
@@ -520,6 +461,7 @@ class InformationView extends View
         }
 
         $url = TV_UPLOAD_PATH;
+        $extension = '';
         if ($adminSite)
         {
             $url = URL_WEBSITE_VIEWER . TV_UPLOAD_PATH;

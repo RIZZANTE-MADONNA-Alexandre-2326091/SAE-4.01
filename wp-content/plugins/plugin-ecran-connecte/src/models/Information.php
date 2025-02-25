@@ -19,42 +19,42 @@ class Information extends Model implements Entity, JsonSerializable
     /**
      * @var int
      */
-    private $id;
+    private int $id;
 
     /**
-     * @var string
+     * @var ?string
      */
-    private $title;
+    private ?string $title;
 
     /**
      * @var User
      */
-    private $author;
+    private User $author;
 
     /**
      * @var string
      */
-    private $creationDate;
+    private string $creationDate;
 
     /**
-     * @var string
+     * @var ?string
      */
-    private $expirationDate;
+    private ?string $expirationDate;
 
     /**
-     * @var string
+     * @var ?string
      */
-    private $content;
+    private ?string $content;
 
     /**
      * @var string (Text | Image | PDF | Event | Video Youtube ou local (short ou classique) | RSS)
      */
-    private $type;
+    private string $type;
 
     /**
-     * @var int
+     * @var ?int
      */
-    private $adminId;
+    private ?int $adminId;
 
     /**
      * Insert an information in the database
@@ -71,7 +71,7 @@ class Information extends Model implements Entity, JsonSerializable
         $request->bindValue(':creationDate', $this->getCreationDate(), PDO::PARAM_STR);
         $request->bindValue(':expirationDate', $this->getExpirationDate(), PDO::PARAM_STR);
         $request->bindValue(':type', $this->getType(), PDO::PARAM_STR);
-        $request->bindValue(':userId', $this->getAuthor(), PDO::PARAM_INT);
+        $request->bindValue(':userId', $this->getAuthor()->getId(), PDO::PARAM_INT);
         $request->bindValue(':administration_id', $this->getAdminId(), PDO::PARAM_INT);
 
         try {
@@ -123,7 +123,7 @@ class Information extends Model implements Entity, JsonSerializable
      *
      * @return Information|bool
      */
-    public function get($id): bool
+    public function get($id): Information|bool
     {
         $request = $this->getDatabase()->prepare("SELECT id, title, content, creation_date, expiration_date, author, type, administration_id FROM ecran_information WHERE id = :id LIMIT 1");
 
@@ -163,17 +163,19 @@ class Information extends Model implements Entity, JsonSerializable
     /**
      * Return the list of information created by an user
      *
-     * @param $author
+     * @param User $author
      * @param int $begin
      * @param int $numberElement
      *
      * @return Information|array
      */
-    public function getAuthorListInformation($author, int $begin = 0, int $numberElement = 25)
+    public function getAuthorListInformation(User $author, int $begin = 0, int $numberElement = 25)
     {
         $request = $this->getDatabase()->prepare('SELECT id, title, content, creation_date, expiration_date, author, type, administration_id FROM ecran_information WHERE author = :author ORDER BY expiration_date LIMIT :begin, :numberElement');
 
-        $request->bindParam(':author', $author, PDO::PARAM_INT);
+        $id = $author->getId();
+
+        $request->bindParam(':author', $id, PDO::PARAM_INT);
         $request->bindValue(':begin', $begin, PDO::PARAM_INT);
         $request->bindValue(':numberElement', $numberElement, PDO::PARAM_INT);
 
@@ -312,15 +314,15 @@ class Information extends Model implements Entity, JsonSerializable
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
     /**
-     * @param $id
+     * @param int $id
      */
-    public function setId($id)
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
@@ -328,15 +330,15 @@ class Information extends Model implements Entity, JsonSerializable
     /**
      * @return string
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
 
     /**
-     * @param $title
+     * @param ?string $title
      */
-    public function setTitle($title)
+    public function setTitle(?string $title): void
     {
         $this->title = $title;
     }
@@ -344,15 +346,15 @@ class Information extends Model implements Entity, JsonSerializable
     /**
      * @return User
      */
-    public function getAuthor()
+    public function getAuthor(): User
     {
         return $this->author;
     }
 
     /**
-     * @param $author
+     * @param User $author
      */
-    public function setAuthor($author)
+    public function setAuthor(User $author): void
     {
         $this->author = $author;
     }
@@ -360,15 +362,15 @@ class Information extends Model implements Entity, JsonSerializable
     /**
      * @return string
      */
-    public function getCreationDate()
+    public function getCreationDate(): string
     {
         return $this->creationDate;
     }
 
     /**
-     * @param mixed $creationDate
+     * @param string $creationDate
      */
-    public function setCreationDate($creationDate)
+    public function setCreationDate(string $creationDate): void
     {
         $this->creationDate = $creationDate;
     }
@@ -376,15 +378,15 @@ class Information extends Model implements Entity, JsonSerializable
     /**
      * @return string
      */
-    public function getExpirationDate()
+    public function getExpirationDate(): string
     {
         return $this->expirationDate;
     }
 
     /**
-     * @param $expirationDate
+     * @param ?string $expirationDate
      */
-    public function setExpirationDate($expirationDate)
+    public function setExpirationDate(?string $expirationDate): void
     {
         $this->expirationDate = $expirationDate;
     }
@@ -392,15 +394,15 @@ class Information extends Model implements Entity, JsonSerializable
     /**
      * @return string
      */
-    public function getContent()
+    public function getContent(): string
     {
         return $this->content;
     }
 
     /**
-     * @param $content
+     * @param ?string $content
      */
-    public function setContent($content)
+    public function setContent(?string $content): void
     {
         $this->content = $content;
     }
@@ -408,31 +410,31 @@ class Information extends Model implements Entity, JsonSerializable
     /**
      * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
 
     /**
-     * @param $type
+     * @param ?string $type
      */
-    public function setType($type)
+    public function setType(?string $type): void
     {
         $this->type = $type;
     }
 
     /**
-     * @return int
+     * @return ?int
      */
-    public function getAdminId()
+    public function getAdminId(): ?int
     {
         return $this->adminId;
     }
 
     /**
-     * @param int $adminId
+     * @param ?int $adminId
      */
-    public function setAdminId($adminId)
+    public function setAdminId(?int $adminId): void
     {
         $this->adminId = $adminId;
     }
