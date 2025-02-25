@@ -89,6 +89,10 @@ class TelevisionController extends UserController implements Schedule
 
                 $this->model->setTypeDefilement($typeDefilement);
 
+                if ($tempsDefilement === null)
+                {
+                    $tempsDefilement = 10;
+                }
                 $this->model->setTimeout($tempsDefilement * 1000);
 
                 // Insertion du modèle dans la base de données
@@ -141,6 +145,10 @@ class TelevisionController extends UserController implements Schedule
             }
 
             $user->setTypeDefilement($typeDefilement);
+            if ($tempsDefilement === null)
+            {
+                $tempsDefilement = 10;
+            }
             $user->setTimeout($tempsDefilement * 1000);
 
             $user->setCodes($codesAde);

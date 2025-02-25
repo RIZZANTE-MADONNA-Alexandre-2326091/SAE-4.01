@@ -107,10 +107,10 @@ class TelevisionView extends UserView
             <div class="form-group">
                 <p class="lead">Choisissez le mode d\'affichage des vidéos classiques</p>
                 <label for="defilement">Défilement entre les emplois du temps</label>
-                <input type="radio" name="defilement" value="defil"/>
+                <input type="radio" name="defilement" value="defil" required="required"/>
                 <br>
                 <label for="defilement">Sur-impréssion par-dessus les emplois du temps</label>
-                <input type="radio" name="defilement" value="suret"/>
+                <input type="radio" name="defilement" value="suret" required="required"/>
             </div>
             <!--Formulaire temps de défilement des vidéos-->
             <div class="form-group">
