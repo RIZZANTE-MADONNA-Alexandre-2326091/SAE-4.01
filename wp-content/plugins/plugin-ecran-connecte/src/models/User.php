@@ -150,6 +150,7 @@ class User extends Model implements Entity, JsonSerializable
 
                 $request->execute();
             }
+        }
 
         /*
           Si l'utilisateur qui est modifié est une télévision, on modifie les valeurs des attributs de la table ecran_television en fonction de l'id de l'utilisateur qui est une clé étrangère
@@ -599,5 +600,4 @@ class User extends Model implements Entity, JsonSerializable
     {
         $this->timeout = $timeout;
     }
-
 }
