@@ -57,7 +57,6 @@ class User extends Model implements Entity, JsonSerializable
      * @return string
      */
     public function insert(): string {
-        // Take 7 lines to create an user with a specific role
         $userData = array(
             'user_login' => $this->getLogin(),
             'user_pass' => $this->getPassword(),
@@ -67,24 +66,17 @@ class User extends Model implements Entity, JsonSerializable
 
         $id = wp_insert_user($userData);
 
-	    // Add to table ecran_dept_user
-	    $database = $this->getDatabase();
+        $database = $this->getDatabase();
+        $request = $database->prepare('INSERT INTO ecran_dept_user (dept_id, user_id) VALUES (:dept_id, :user_id)');
+        $request->bindValue(':dept_id', $this->getDeptId(), PDO::PARAM_INT);
+        $request->bindParam(':user_id', $id, PDO::PARAM_INT);
+        $request->execute();
 
-	    $request = $database->prepare('INSERT INTO ecran_dept_user (dept_id, user_id) VALUES (:dept_id, :user_id)');
-	    $request->bindValue(':dept_id', $this->getDeptId(), PDO::PARAM_INT);
-	    $request->bindParam(':user_id', $id, PDO::PARAM_INT);
-
-	    $request->execute();
-
-        // To review
         if ($this->getRole() == 'television') {
             foreach ($this->getCodes() as $code) {
-
                 $request = $this->getDatabase()->prepare('INSERT INTO ecran_code_user (user_id, code_ade_id) VALUES (:userId, :codeAdeId)');
-
                 $request->bindParam(':userId', $id, PDO::PARAM_INT);
                 $request->bindValue(':codeAdeId', $code->getId(), PDO::PARAM_INT);
-
                 $request->execute();
             }
         }
@@ -100,33 +92,35 @@ class User extends Model implements Entity, JsonSerializable
 	 *
 	 * @return int Returns the number of rows affected by the final executed database operation.
 	 */
-	public function update(): int {
+    public function update(): int {
         $database = $this->getDatabase();
-        $request = $database->prepare('UPDATE wp_users SET user_pass = :password WHERE ID = :id');
+        $database->beginTransaction();
 
-        $request->bindValue(':id', $this->getId(), PDO::PARAM_INT);
-        $request->bindValue(':password', $this->getPassword(), PDO::PARAM_STR);
+        try {
+            $request = $database->prepare('UPDATE wp_users SET user_pass = :password WHERE ID = :id');
+            $request->bindValue(':id', $this->getId(), PDO::PARAM_INT);
+            $request->bindValue(':password', $this->getPassword(), PDO::PARAM_STR);
+            $request->execute();
 
-        $request->execute();
+            $request = $database->prepare('DELETE FROM ecran_code_user WHERE user_id = :id');
+            $request->bindValue(':id', $this->getId(), PDO::PARAM_INT);
+            $request->execute();
 
-        $request = $database->prepare('DELETE FROM ecran_code_user WHERE user_id = :id');
-
-        $request->bindValue(':id', $this->getId(), PDO::PARAM_INT);
-
-        $request->execute();
-
-        foreach ($this->getCodes() as $code) {
-            if ($code instanceof CodeAde && !is_null($code->getId())) {
-                $request = $database->prepare('INSERT INTO ecran_code_user (user_id, code_ade_id) VALUES (:userId, :codeAdeId)');
-
-                $request->bindValue(':userId', $this->getId(), PDO::PARAM_INT);
-                $request->bindValue(':codeAdeId', $code->getId(), PDO::PARAM_INT);
-
-                $request->execute();
+            foreach ($this->getCodes() as $code) {
+                if ($code instanceof CodeAde && !is_null($code->getId())) {
+                    $request->bindValue(':userId', $this->getId(), PDO::PARAM_INT);
+                    $request->bindValue(':codeAdeId', $code->getId(), PDO::PARAM_INT);
+                    $request->execute();
+                }
             }
-        }
 
-        return $request->rowCount();
+            $database->commit();
+            return $request->rowCount();
+        } catch (Exception $e) {
+            $database->rollBack();
+            error_log($e->getMessage());
+            throw new Exception("An error occurred while updating the user.");
+        }
     }
 
 	/**
@@ -137,16 +131,12 @@ class User extends Model implements Entity, JsonSerializable
     public function delete(): int {
         $database = $this->getDatabase();
         $request = $database->prepare('DELETE FROM wp_users WHERE ID = :id');
-
         $request->bindValue(':id', $this->getId(), PDO::PARAM_INT);
-
         $request->execute();
         $count = $request->rowCount();
 
         $request = $database->prepare('DELETE FROM wp_usermeta WHERE user_id = :id');
-
         $request->bindValue(':id', $this->getId(), PDO::PARAM_INT);
-
         $request->execute();
 
         return $count;
@@ -161,11 +151,9 @@ class User extends Model implements Entity, JsonSerializable
 	 */
     public function get($id): User | false {
         $request = $this->getDatabase()->prepare('SELECT wp.ID, user_login, user_pass, user_email, edu.dept_id FROM wp_users wp
-                                             			LEFT JOIN ecran_dept_user edu ON edu.user_id = wp.ID
-                                             			WHERE wp.ID = :id LIMIT 1');
-
+                                                LEFT JOIN ecran_dept_user edu ON edu.user_id = wp.ID
+                                                WHERE wp.ID = :id LIMIT 1');
         $request->bindParam(':id', $id, PDO::PARAM_INT);
-
         $request->execute();
 
         if ($request->rowCount() > 0) {
@@ -367,7 +355,6 @@ class User extends Model implements Entity, JsonSerializable
      */
     public function setEntity($data): User {
         $this->setId($data['ID']);
-
         $this->setLogin($data['user_login']);
         $this->setPassword($data['user_pass']);
         $this->setEmail($data['user_email']);
@@ -375,22 +362,17 @@ class User extends Model implements Entity, JsonSerializable
         $this->setDeptId(($data['dept_id']) ?: 0);
 
         $request = $this->getDatabase()->prepare('SELECT id, title, code, type, dept_id FROM ecran_code_ade
-    													JOIN ecran_code_user ON ecran_code_ade.id = ecran_code_user.code_ade_id
-                             							WHERE ecran_code_user.user_id = :id');
-
+                 JOIN ecran_code_user ON ecran_code_ade.id = ecran_code_user.code_ade_id
+                                    WHERE ecran_code_user.user_id = :id');
         $request->bindValue(':id', $data['ID']);
-
         $request->execute();
 
         $codeAde = new CodeAde();
-
         $codes = $codeAde->setEntityList($request->fetchAll());
-
         $this->setCodes($codes);
 
         return $this;
     }
-
 	/**
 	 * @param array $dataList List of data entries to be converted into entity objects.
 	 *
