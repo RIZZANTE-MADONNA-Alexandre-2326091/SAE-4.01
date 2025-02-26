@@ -7,6 +7,8 @@
         <?php if (! function_exists('dynamic_sidebar') || ! dynamic_sidebar('Colonne Droite')) :
             the_widget('WidgetInformation');
         endif; ?>
+        <img src="/wp-content/themes/theme-ecran-connecte/assets/media/barre-couleur.png" alt="Multicolor Band" class="multicolor-band">
+
     </aside>
 <?php endif; ?>
 

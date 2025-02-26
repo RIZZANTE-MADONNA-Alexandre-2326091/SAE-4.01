@@ -1,7 +1,8 @@
 /* SIDEBAR */
 .sidebar {
     min-width: 25%;
-    background-color: #660099;
+    background-color: #1f63de;
+    height: 100vh;
 }
 
 .sidebar-logo {

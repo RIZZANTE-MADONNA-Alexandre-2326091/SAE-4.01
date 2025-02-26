@@ -11,11 +11,11 @@ use Models\Department;
  */
 class DepartmentView extends View
 {
-    /**
-     * Display a creation form for a department
-     *
-     * @return string
-     */
+	/**
+	 * Display a form for adding a department
+	 *
+	 * @return string
+	 */
     public function displayFormDepartment(): string {
         return '
             <form method="post">
@@ -28,7 +28,7 @@ class DepartmentView extends View
     }
 
 	/**
-	 * Form for modify a department.
+	 * Display a form for modifying a department
 	 *
 	 * @return string
 	 */
@@ -46,11 +46,11 @@ class DepartmentView extends View
         </form>';
     }
 
-    /**
-     * Display a form for deleting a department
-     *
-     * @return string
-     */
+	/**
+	 * Generates and returns the HTML form for deleting a department.
+	 *
+	 * @return string The HTML string representing the delete department form.
+	 */
     public function displayDeleteDepartment(): string {
         return '
             <form method="post" id="deleteDepartment">
@@ -71,7 +71,9 @@ class DepartmentView extends View
 	}
 
 	/**
-	 * @return string
+	 * Generates and returns the HTML content for displaying all departments with explanations and actions available to the user.
+	 *
+	 * @return string The HTML string representing the context display for all departments.
 	 */
 	public function contextDisplayAll(): string{
 		return '
@@ -91,7 +93,9 @@ class DepartmentView extends View
 	}
 
 	/**
-	 * @return string
+	 * Generates and returns the HTML content displayed when a department is not found.
+	 *
+	 * @return string The HTML string indicating that the department does not exist, with navigation options.
 	 */
 	public function noDepartment(): string{
 		return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des départements'))) . '">< Retour</a>
@@ -102,14 +106,14 @@ class DepartmentView extends View
 		</div>';
 	}
 
-    /**
-     * Display a list of departments
-     *
-     * @param $departments Department[]
-     *
-     * @return string
-     */
-   public function displayAllDept($departments): string {
+	/**
+	 * Generates and returns an HTML table displaying all departments with options to modify them.
+	 *
+	 * @param array $departments An array of department objects, each containing details such as ID and name.
+	 *
+	 * @return string The HTML string representing the table of departments.
+	 */
+   public function displayAllDept(array $departments): string {
 	   $page = get_page_by_title_V2('Modifier un département');
 	   $linkManageDept = get_permalink($page->ID);
 
@@ -130,50 +134,64 @@ class DepartmentView extends View
 	    return $this->displayAll($name, $title, $header, $row);
     }
 
-    /**
-     * Display a success message for department creation
-     */
+	/**
+	 * Displays a success modal indicating that the department creation was successful.
+	 *
+	 * @return void
+	 */
     public function displayCreationSuccess(): void {
         $this->buildModal('Création réussie', '<div class="alert alert-success">Le département a été créé avec succès !</div>');
     }
 
-    /**
-     * Display an error message for department creation failure
-     */
+	/**
+	 * Displays a modal with an error message indicating the failure of department creation.
+	 *
+	 * @return void
+	 */
     public function displayCreationError(): void {
         $this->buildModal('Échec de la création', '<div class="alert alert-danger">Une erreur s\'est produite lors de la création du département. Veuillez réessayer.</div>');
     }
 
-    /**
-     * Display a success message for department deletion
-     */
+	/**
+	 * Displays a modal indicating the success of a deletion operation.
+	 *
+	 * @return void This method does not return any value.
+	 */
     public function displayDeletionSuccess(): void {
         $this->buildModal('Suppression réussie', '<div class="alert alert-success">Le département a été supprimé avec succès.</div>');
     }
 
-    /**
-     * Display an error message for department deletion failure
-     */
+	/**
+	 * Displays a modal indicating an error occurred during the department deletion process.
+	 *
+	 * @return void This method does not return any value.
+	 */
     public function displayDeletionError(): void {
         $this->buildModal('Échec de la suppression', '<div class="alert alert-danger">Impossible de supprimer le département. Veuillez réessayer.</div>');
     }
 
 	/**
-	 * Display an error message for department modification failure
-	 **/
+	 * Displays a success modal indicating that the modification has been successfully completed.
+	 *
+	 * @return void
+	 */
 	public function displayModificationSucces(): void {
 		$this->buildModal('Modification réussie', '<div class="alert alert-danger">Le département a été modifié avec succès.</div>');
 	}
 
 	/**
-	 * Display an error message for department modification failure
-	 **/
+	 * Displays a modal indicating the failure of a department modification.
+	 *
+	 * @return void
+	 */
 	public function displayModificationError(): void {
 		$this->buildModal('Échec de la modification', '<div class="alert alert-danger">Impossible de modifier le département. Veuillez réessayer.</div>');
 	}
 
 	/**
-	 * Error message if name exits
+	 * Displays an error message indicating that the department name already exists.
+	 *
+	 * @return void
 	 */
 	public function displayErrorDoubleName(): void {
 		echo '<p class="alert alert-danger"> Ce nom de département existe déjà</p>';

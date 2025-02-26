@@ -46,16 +46,21 @@ FONT
 
 
 body {
-    background-color: #ddccff;
+    background-color: #cdeafc;
     font-family: AMUMonumentGrotesk, sans-serif;
 }
 
+.table-success, .table-success>td, .table-success>th {
+    background-color: #85eab4;
+}
+
 .welcome-text {
-    color: #660099;
+    color: #1f63de;
     font-size: 55px;
     font-weight: 500;
     margin-bottom: -1px;
     margin-top: 12px;
+    letter-spacing: -0.05rem;
 }
 
 .courstext {
@@ -64,11 +69,14 @@ body {
     margin: 6px;
 }
 
+.img-fluid {
+    filter: brightness(0) saturate(100%) invert(33%) sepia(31%) saturate(6915%) hue-rotate(212deg) brightness(89%) contrast(94%);
+}
+
 .container {
 	max-width:65%;
-    background-color: #ddccff;
+    background-color: #cdeafc;
     border-radius: 5px;
-    min-height: 85vh;
     margin-bottom: 10px;
 }
 
@@ -81,11 +89,7 @@ body {
 }
 
 a, a:hover, a:active {
-    color: #00558b;
-}
-
-a:link {
-    color: white;
+    color: #1f63de;
 }
 
 a:hover {
@@ -93,16 +97,17 @@ a:hover {
 }
 
 .button_presentation_ecran {
-    background-color: #660099;
+    background-color: #1f63de;
     color: white;
+    border-radius: 30px;
 }
 
 .dropdown-menu {
-    background-color: #660099;
+    background-color: #1f63de;
 }
 
 .dropdown-item:hover {
-    background-color: #cc7af5;
+    background-color: #7ba4fa;
 }
 
 td {
@@ -114,7 +119,7 @@ td {
 }
 
 .class-title {
-    background-color: #660099;
+    background-color: #1f63de;
     color: white;
     padding: 10px 20px 10px 20px;
     display: inline-block;

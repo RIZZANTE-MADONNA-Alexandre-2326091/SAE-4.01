@@ -13,18 +13,18 @@ namespace Views;
 class View
 {
 
-    /**
-     * Display a table, showing all element from a database
-     *
-     * @param $name
-     * @param $title
-     * @param $dataHeader
-     * @param $dataList
-     * @param string $idTable
-     *
-     * @return string
-     */
-    public function displayAll($name, $title, $dataHeader, $dataList, $idTable = '') {
+	/**
+	 * Generates and displays an HTML table with a search functionality and sorting options.
+	 *
+	 * @param string $name The name of the table, used for toggling checkboxes.
+	 * @param string $title The title displayed above the table.
+	 * @param array $dataHeader An array of column headers for the table.
+	 * @param array $dataList A two-dimensional array containing the data to be displayed in the table.
+	 * @param string $idTable An optional table ID for DOM manipulation (default is an empty string).
+	 *
+	 * @return string The HTML structure of the table.
+	 */
+    public function displayAll(string $name, string $title, array $dataHeader, array $dataList, string $idTable = ''): string {
         $name = '\'' . $name . '\'';
         $table = '
 		<h2>' . $title . '</h2>
@@ -61,7 +61,17 @@ class View
         return $table;
     }
 
-    public function pageNumber($pageNumber, $currentPage, $url, $numberElement = null) {
+	/**
+	 * Generate a pagination component based on the current page, total pages, and other parameters.
+	 *
+	 * @param int $pageNumber The total number of pages available.
+	 * @param int $currentPage The current active page in the pagination.
+	 * @param string $url The base URL for the pagination links.
+	 * @param mixed|null $numberElement An optional parameter to append as a query parameter in the pagination links.
+	 *
+	 * @return string The generated HTML string for the pagination component.
+	 */
+	public function pageNumber(int $pageNumber, int $currentPage, string $url, mixed $numberElement = null): string {
         $pagination = '
         <nav aria-label="Page navigation example">
             <ul class="pagination">';
@@ -230,27 +240,52 @@ class View
     }
 
     /**
-     * Close a div
+     * Returns the closing div tag as a string.
      *
-     * @return string
+     * @return string The closing div tag.
      */
-    public function displayEndDiv() {
+    public function displayEndDiv(): string {
         return '</div>';
     }
 
-    /**
-     * Display a message if the two password are different
-     */
-    public function displayBadPassword() {
-        $this->buildModal('Mauvais mot de passe', '<p class=\'alert alert-danger\'>Les deux mots de passe ne sont pas corrects </p>');
+
+    public function displayAllDept(array $departments, int $currentDept = null): string
+    {
+        $form = '';
+        foreach ($departments as $dept) {
+            $selected = ($dept->getId() == $currentDept) ? 'selected' : '';
+            $form .= '<option' . $selected . ' value="' . $dept->getId() . '">' . $dept->getName() . '</option>';
+        }
+        return $form;
     }
 
     /**
-     * Display a message if an user already exist
+     * Close a div.
      *
-     * @param $doubles  array de login
+     * @return string
      */
-    public function displayErrorDouble($doubles) {
+    public function endDiv(): string {
+        return '</div>';
+    }
+
+	/**
+	 * Display a message indicating that the passwords are incorrect.
+	 *
+	 * @return void
+     */
+    public function displayBadPassword(): void
+    {
+        $this->buildModal('Mauvais mot de passe', '<p class=\'alert alert-danger\'>Les deux mots de passe ne sont pas correctes </p>');
+    }
+
+	/**
+	 * Display an error message for duplicate entries during registration.
+	 *
+	 * @param array $doubles An array of entries that caused a problem during registration, typically due to duplicate login or email.
+	 *
+	 * @return void
+	 */
+    public function displayErrorDouble(array $doubles): void {
         $content = "";
         foreach ($doubles as $double) {
             $content .= '<p class="alert alert-danger">' . $double . ' a rencontré un problème lors de l\'enregistrement, veuillez vérifiez son login et son email !</p>';
@@ -258,46 +293,66 @@ class View
         $this->buildModal('Erreur durant l\'inscription', $content);
     }
 
-    /**
-     * Display a message if the inscription is a success
-     */
-    public function displayInsertValidate() {
+	/**
+	 * Display a message indicating successful registration.
+	 *
+	 * @return void
+	 */
+    public function displayInsertValidate(): void {
         $this->buildModal('Inscription validée', '<p class=\'alert alert-success\'>Votre inscription a été validée.</p>');
     }
 
-    /**
-     * Display a message if the extension of the file is wrong
-     */
-    public function displayWrongExtension() {
+	/**
+	 * Display a message indicating that the file has a wrong extension.
+	 *
+	 * @return void
+	 */
+    public function displayWrongExtension(): void {
         $this->buildModal('Mauvais fichier !', '<p class="alert alert-danger"> Mauvaise extension de fichier !</p>');
     }
 
-    /**
-     * Display a message if the file isn't a good file
-     */
-    public function displayWrongFile() {
+	/**
+	 * Displays a modal indicating that the user has uploaded the wrong file
+	 * or changed the column names in the Excel file.
+	 *
+	 * @return void
+	 */
+    public function displayWrongFile(): void {
         $this->buildModal('Mauvais fichier !', '<p class="alert alert-danger"> Vous utilisez un mauvais fichier excel / ou vous avez changé le nom des colonnes</p>');
     }
 
-    /**
-     * Display a message if the modification is a success
-     */
+	/**
+	 * Displays a modal indicating that the modification has been successfully applied.
+	 *
+	 * @param string|null $redirect An optional URL to redirect to after applying the modification.
+	 *
+	 * @return void
+	 */
     public function displayModificationValidate($redirect = null) {
         $this->buildModal('Modification réussie', '<p class="alert alert-success"> La modification a été appliquée</p>', $redirect);
     }
 
-    /**
-     * Display a message if the creation of an user has failed
-     */
-    public function displayErrorInsertion() {
+	/**
+	 * Displays a modal indicating an error during the registration process,
+	 * such as the login or email address already being in use.
+	 *
+	 * @return void
+	 */
+    public function displayErrorInsertion(): void {
         $this->buildModal('Erreur lors de l\'inscription', '<p class="alert alert-danger"> Le login ou l\'adresse mail est déjà utilisé(e) </p>');
     }
 
-    public function errorMessageInvalidForm() {
-        $this->buildModal('Le formulaire n\'a pas été correctement remplie', '<p class="alert alert-danger">Le formulaire a été mal rempli, veuillez revoir les données rentrées et réessayez.</p>');
+	/**
+	 * Displays a modal indicating that the form has not been correctly completed
+	 * and prompts the user to review the entered data and try again.
+	 *
+	 * @return void
+	 */
+	public function errorMessageInvalidForm(): void {
+        $this->buildModal('Le formulaire n\'a pas été correctement remplie', '<p class="alert alert-danger">Le formulaire a été mal remplie, veuillez revoir les données rentrées et réessayez.</p>');
     }
 
     public function errorMessageCantAdd() {
-        $this->buildModal('L\'ajout a échoué', '<p class="alert alert-danger">Une erreur s\'est produite lors de l\'envoi du formulaire, veuillez réessayer après avoir vérifié vos informations.</p>');
+        $this->buildModal('L\'ajout a échoué', '<p class="alert alert-danger">Une erreur s\'est produite lors de l\'envoie du formulaire, veuillez réessayer après avoir vérifié vos informations.</p>');
     }
 }

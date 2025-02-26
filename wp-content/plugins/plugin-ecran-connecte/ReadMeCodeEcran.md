@@ -17,7 +17,7 @@ Toutes les fonctionnalités sont générées via le dossier "src".
 
 Il y a cinq classes pour les utilisateurs :  
 
-User qui est la classe principale puis les classes qui héritent de cette dernière (Television, Secretary, Technician, StudyDirector).  
+User qui est la classe principale puis les classes qui héritent de cette dernière (Television, Secretary, Technician, AdminDept, Tablet).  
 
 Ils sont tous liés à la même entité (model) : User  
 
@@ -41,6 +41,4 @@ Les informations sont affichées comme dans un diaporama les une après les autr
 
 Les classes utilisées sont : AlertController, Alert & AlertView.  
 La librairie "JQuery Ticker" est aussi utilisée.  
-Fichier javascript : alertTicker.js  
-
-Lors de la création d'une alerte, on appelle OneSignal pour pouvoir envoyer une notification push (A (re)faire).  
+Fichier javascript : alertTicker.js 

@@ -4,9 +4,8 @@ Ce plugin permet d'avoir accès aux emplois du temps d'ADE. Il télécharge l'em
 
 L'emploi du temps est affiché automatiquement en fonction de la personne connectée.
 
-Voici les différents Readme écrits par Nicolas Rohrbach :
+Voici les différents Readme écrits par Nicolas Rohrbach et les étudiants de deuxième année au BUT Informatique de Ais- :
 - [Readme d'installation](ReadMeInstallationEcran.md)
-- [Readme de la configuration des notifications](ReadMeNotifications.md)  
 - [Readme du fonctionnement](ReadMeEcranConnecte.md)  
 - [Readme du code](ReadMeCodeEcran.md)
 

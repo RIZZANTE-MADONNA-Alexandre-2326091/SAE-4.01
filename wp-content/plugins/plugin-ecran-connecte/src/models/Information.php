@@ -4,6 +4,7 @@ namespace Models;
 
 use JsonSerializable;
 use PDO;
+use PDOException;
 
 /**
  * Class Information
@@ -60,10 +61,10 @@ class Information extends Model implements Entity, JsonSerializable
      *
      * @return string
      */
-    public function insert()
+    public function insert(): string
     {
         $database = $this->getDatabase();
-        $request = $database->prepare("INSERT INTO ecran_information (title, content, creation_date, expiration_date, type, author, administration_id) VALUES (:title, :content, :creationDate, :expirationDate, :type, :userId, :administration_id) ");
+        $request = $database->prepare("INSERT INTO ecran_information (title, content, creation_date, expiration_date, type, author, administration_id) VALUES (:title, :content, :creationDate, :expirationDate, :type, :userId, :administration_id)");
 
         $request->bindValue(':title', $this->getTitle(), PDO::PARAM_STR);
         $request->bindValue(':content', $this->getContent(), PDO::PARAM_STR);
@@ -71,11 +72,15 @@ class Information extends Model implements Entity, JsonSerializable
         $request->bindValue(':expirationDate', $this->getExpirationDate(), PDO::PARAM_STR);
         $request->bindValue(':type', $this->getType(), PDO::PARAM_STR);
         $request->bindValue(':userId', $this->getAuthor(), PDO::PARAM_INT);
-        $request->bindValue('administration_id', $this->getAdminId(), PDO::PARAM_INT);
+        $request->bindValue(':administration_id', $this->getAdminId(), PDO::PARAM_INT);
 
-        $request->execute();
-
-        return $database->lastInsertId();
+        try {
+            $request->execute();
+            return $database->lastInsertId();
+        } catch (PDOException $e) {
+            error_log('Insert Error: ' . $e->getMessage());
+            return false;
+        }
     }
 
     /**
@@ -83,7 +88,7 @@ class Information extends Model implements Entity, JsonSerializable
      *
      * @return int
      */
-    public function update()
+    public function update(): int
     {
         $request = $this->getDatabase()->prepare("UPDATE ecran_information SET title = :title, content = :content, expiration_date = :expirationDate WHERE id = :id");
 
@@ -100,7 +105,7 @@ class Information extends Model implements Entity, JsonSerializable
     /**
      * Delete an information in the database
      */
-    public function delete()
+    public function delete(): int
     {
         $request = $this->getDatabase()->prepare('DELETE FROM ecran_information WHERE id = :id');
 
@@ -116,9 +121,9 @@ class Information extends Model implements Entity, JsonSerializable
      *
      * @param $id
      *
-     * @return Information|bool
+     * @return array|false
      */
-    public function get($id)
+    public function get($id): array|false
     {
         $request = $this->getDatabase()->prepare("SELECT id, title, content, creation_date, expiration_date, author, type, administration_id FROM ecran_information WHERE id = :id LIMIT 1");
 
@@ -137,9 +142,9 @@ class Information extends Model implements Entity, JsonSerializable
      * @param int $begin
      * @param int $numberElement
      *
-     * @return Information[]
+     * @return array
      */
-    public function getList($begin = 0, $numberElement = 25)
+    public function getList($begin = 0, $numberElement = 25): array
     {
         $request = $this->getDatabase()->prepare("SELECT id, title, content, creation_date, expiration_date, author, type, administration_id FROM ecran_information ORDER BY id ASC LIMIT :begin, :numberElement");
 
@@ -175,7 +180,7 @@ class Information extends Model implements Entity, JsonSerializable
         $request->execute();
 
         return $this->setEntityList($request->fetchAll(PDO::FETCH_ASSOC));
-    } //getAuthorListInformation()
+    }
 
     public function countAll()
     {
@@ -249,9 +254,9 @@ class Information extends Model implements Entity, JsonSerializable
      *
      * @param $dataList
      *
-     * @return array|Information
+     * @return array
      */
-    public function setEntityList($dataList, $adminSite = false)
+    public function setEntityList($dataList, $adminSite = false): array
     {
         $listEntity = array();
         foreach ($dataList as $data)
@@ -267,9 +272,9 @@ class Information extends Model implements Entity, JsonSerializable
      *
      * @param $data
      *
-     * @return $this
+     * @return Information
      */
-    public function setEntity($data, $adminSite = false)
+    public function setEntity($data, $adminSite = false): Information
     {
         $entity = new Information();
         $author = new User();
@@ -339,15 +344,15 @@ class Information extends Model implements Entity, JsonSerializable
     /**
      * @return User
      */
-    public function getAuthor()
+    public function getAuthor(): User
     {
         return $this->author;
     }
 
     /**
-     * @param $author
+     * @param User $author
      */
-    public function setAuthor($author)
+    public function setAuthor(User $author): void
     {
         $this->author = $author;
     }

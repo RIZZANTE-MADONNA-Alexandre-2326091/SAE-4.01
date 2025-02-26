@@ -3,6 +3,7 @@
 namespace Controllers;
 
 use Models\CodeAde;
+use Models\Department;
 use Models\User;
 use Views\TelevisionView;
 
@@ -19,12 +20,12 @@ class TelevisionController extends UserController implements Schedule
     /**
      * @var User
      */
-    private $model;
+    private User $model;
 
     /**
      * @var TelevisionView
      */
-    private $view;
+    private TelevisionView $view;
 
     /**
      * Constructor of TelevisionController
@@ -35,22 +36,31 @@ class TelevisionController extends UserController implements Schedule
         $this->view = new TelevisionView();
     }
 
-    /**
-     * Insert a television in the database
-     *
-     * @return string
-     */
-    public function insert() {
+	/**
+	 * Handles the insertion of a new television user and processes associated codes.
+	 *
+	 * Validates all input data including login, password and codes, and ensures the user does not already exist.
+	 * If validation passes, the new user is created, and a success message is displayed.
+	 * In case of any error, an appropriate error message is returned.
+	 *
+	 * @return string A response indicating the result of the action. Either 'error', renders a form, or displays a success/error message.
+	 */
+    public function insert(): string {
         $action = filter_input(INPUT_POST, 'createTv');
 
         $codeAde = new CodeAde();
 
-        if (isset($action)) {
+        $currentUser = wp_get_current_user();
+        $deptModel = new Department();
+        $isAdmin = in_array('administrator', $currentUser->roles);
+        $currentDept = $isAdmin ? null : $deptModel->getUserInDept($currentUser->ID)->getId();
 
+        if (isset($action)) {
             $login = filter_input(INPUT_POST, 'loginTv');
             $password = filter_input(INPUT_POST, 'pwdTv');
             $passwordConfirm = filter_input(INPUT_POST, 'pwdConfirmTv');
-            $codes = $_POST['selectTv'];
+            $deptId = $isAdmin ? filter_input(INPUT_POST, 'deptIdTv') : $currentDept;
+            $codes = filter_input(INPUT_POST, 'selectTv', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
 
             if (is_string($login) && strlen($login) >= 4 && strlen($login) <= 25 &&
                 is_string($password) && strlen($password) >= 8 && strlen($password) <= 25 &&
@@ -60,23 +70,26 @@ class TelevisionController extends UserController implements Schedule
                 foreach ($codes as $code) {
                     if (is_numeric($code) && $code > 0) {
                         if (is_null($codeAde->getByCode($code)->getId())) {
-                            return 'error';
+                            return 'error'; // Code invalide;
                         } else {
                             $codesAde[] = $codeAde->getByCode($code);
                         }
                     }
                 }
 
+                // Configuration du modèle de télévision
                 $this->model->setLogin($login);
                 $this->model->setEmail($login . '@' . $login . '.fr');
                 $this->model->setPassword($password);
                 $this->model->setRole('television');
                 $this->model->setCodes($codesAde);
+                $this->model->setDeptId($deptId);
 
+                // Insertion du modèle dans la base de données
                 if (!$this->checkDuplicateUser($this->model) && $this->model->insert()) {
                     $this->view->displayInsertValidate();
                 } else {
-                    $this->view->displayErrorLogin();
+                    $this->view->displayErrorInsertion();
                 }
             } else {
                 $this->view->displayErrorCreation();
@@ -87,17 +100,19 @@ class TelevisionController extends UserController implements Schedule
         $groups = $codeAde->getAllFromType('group');
         $halfGroups = $codeAde->getAllFromType('halfGroup');
 
-        return $this->view->displayFormTelevision($years, $groups, $halfGroups);
+        $allDepts = $deptModel->getAll();
+
+        return $this->view->displayFormTelevision($years, $groups, $halfGroups, $allDepts, $isAdmin, $currentDept);
     }
 
-    /**
-     * Modify a television
-     *
-     * @param $user User
-     *
-     * @return string
-     */
-    public function modify($user) {
+	/**
+	 * Modify user data and handle the modification process
+	 *
+	 * @param user $user The user object that will be modified
+	 *
+	 * @return string The HTML content for the modification form or an error message
+	 */
+    public function modify(user $user): string {
         $page = get_page_by_title_V2('Gestion des utilisateurs');
         $linkManageUser = get_permalink($page->ID);
 
@@ -106,7 +121,7 @@ class TelevisionController extends UserController implements Schedule
         $action = filter_input(INPUT_POST, 'modifValidate');
 
         if (isset($action)) {
-            $codes = $_POST['selectTv'];
+	        $codes = filter_input(INPUT_POST, 'selectTv', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
 
             $codesAde = array();
             foreach ($codes as $code) {
@@ -123,7 +138,6 @@ class TelevisionController extends UserController implements Schedule
                 $this->view->displayModificationValidate($linkManageUser);
             }
         }
-
         $years = $codeAde->getAllFromType('year');
         $groups = $codeAde->getAllFromType('group');
         $halfGroups = $codeAde->getAllFromType('halfGroup');
@@ -131,22 +145,31 @@ class TelevisionController extends UserController implements Schedule
         return $this->view->modifyForm($user, $years, $groups, $halfGroups);
     }
 
-    /**
-     * Display all televisions in a table
-     *
-     * @return string
-     */
-    public function displayAllTv() {
+	/**
+	 * Retrieves and displays all users with the role of 'television'.
+	 *
+	 * @return string The rendered view displaying all television users.
+	 */
+    public function displayAllTv(): string {
         $users = $this->model->getUsersByRole('television');
-        return $this->view->displayAllTv($users);
+
+	    $deptModel = new Department();
+	    $userDeptList = array();
+	    foreach ($users as $user) {
+		    $userDeptList[] = $deptModel->getUserInDept($user->getId())->getName();
+	    }
+
+        return $this->view->displayAllTv($users, $userDeptList);
     }
 
-    /**
-     * Display a list a schedule
-     *
-     * @return mixed|string
-     */
-    public function displayMySchedule() {
+	/**
+	 * Displays the current user's schedule based on their codes and theme settings.
+	 * Generates and formats the schedule dynamically based on the number of codes
+	 * and the selected scrolling option from the theme configuration.
+	 *
+     * @return string The rendered schedule, typically a string, or a default message if no schedule is available.
+	 */
+    public function displayMySchedule(): string {
         $current_user = wp_get_current_user();
         $user = $this->model->get($current_user->ID);
         $user = $this->model->getMycodes([$user])[0];
@@ -162,11 +185,11 @@ class TelevisionController extends UserController implements Schedule
                         if ($this->displaySchedule($code->getCode())) {
                             $string .= '<div class="list">';
                             $string .= $this->displaySchedule($code->getCode());
-                            $string .= '</div>';
+                            $string .= $this->view->displayEndDiv();
                         }
                     }
                 }
-                $string .= '</div></div>';
+                $string .= $this->view->displayEndDiv() . $this->view->displayEndDiv();
             } else {
                 $string .= $this->view->displayStartSlide();
                 foreach ($user->getCodes() as $code) {
@@ -185,7 +208,7 @@ class TelevisionController extends UserController implements Schedule
             if (!empty($user->getCodes()[0])) {
                 $string .= $this->displaySchedule($user->getCodes()[0]->getCode());
             } else {
-                $string .= '<div class="courstext">Vous n\'avez pas cours !</div>';
+                $string .= '<p>Vous n\'avez pas cours !</p>';
             }
         }
         return $string;
