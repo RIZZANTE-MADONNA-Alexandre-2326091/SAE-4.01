@@ -170,16 +170,20 @@ class TelevisionController extends UserController implements Schedule
 	 *
 	 * @return string The rendered view displaying all television users.
 	 */
-    public function displayAllTv(): string {
+    public function displayAllTv(): string
+    {
         $users = $this->model->getUsersByRole('television');
 
 	    $deptModel = new Department();
 	    $userDeptList = array();
-	    foreach ($users as $user) {
+        $userData = array();
+	    foreach ($users as $user)
+        {
+            $userData[] = $user->getTypeOfTelevision($user->getId());
 		    $userDeptList[] = $deptModel->getUserInDept($user->getId())->getName();
 	    }
 
-        return $this->view->displayAllTv($users, $userDeptList);
+        return $this->view->displayAllTv($users, $userData, $userDeptList);
     }
 
 	/**

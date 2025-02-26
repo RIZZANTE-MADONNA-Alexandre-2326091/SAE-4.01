@@ -396,6 +396,28 @@ class User extends Model implements Entity, JsonSerializable
         return $result['code'];
     }
 
+    /**
+     * Return data for a television user
+     * @param int $idUser
+     * @return array|null
+     */
+    public function getTypeOfTelevision(int $idUser): array|null
+    {
+        $user = new User();
+        $user = $user->get($idUser);
+        if ($user->getRole() === 'television')
+        {
+            $request = $this->getDatabase()->prepare('SELECT id_user, type_defilement, timeout FROM ecran_television
+                                                            JOIN wp_users ON wp_users.ID = ecran_television.id_user
+                                                            WHERE id_user = :id_user LIMIT 1');
+            $request->bindParam(':id_user', $idUser, PDO::PARAM_INT);
+            $request->execute();
+
+            return $request->fetch();
+        }
+        return null;
+    }
+
 	public function getDeptAdmin( int $id){
 		$request = $this->getDatabase()->prepare('SELECT dept_id FROM ecran_dept_user WHERE dept_id = :id LIMIT 1');
 
@@ -415,7 +437,8 @@ class User extends Model implements Entity, JsonSerializable
      *
      * @return User The populated User entity object with all properties set, including associated codes.
      */
-    public function setEntity($data): User {
+    public function setEntity($data): User
+    {
         $entity = new User();
 
         $entity->setId($data['ID']);

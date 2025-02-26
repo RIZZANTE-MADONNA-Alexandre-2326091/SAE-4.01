@@ -43,6 +43,20 @@ class TelevisionView extends UserView
             	<input type="password" class="form-control" id="pwdConfTv" name="pwdConfirmTv" placeholder="Confirmer le Mot de passe" minlength="8" maxlength="25" required="" onkeyup=checkPwd("Tv")>
             	<small id="passwordHelpBlock" class="form-text text-muted">Votre mot de passe doit contenir entre 8 et 25 caractère</small>
             </div>
+            <!--Formulaire type de défilement des vidéos-->
+            <div class="form-group">
+                <h3>Choisissez le mode d\'affichage des vidéos classiques</h3>
+                <label for="defilement">Défilement entre les emplois du temps</label>
+                <input type="radio" name="defilement" value="defil" required="required"/>
+                <br>
+                <label for="defilement">Sur-impréssion par-dessus les emplois du temps</label>
+                <input type="radio" name="defilement" value="suret" required="required"/>
+            </div>
+            <!--Formulaire temps de défilement des vidéos-->
+            <div class="form-group">
+                <label for="temps">Temps de défilement des informations</label>
+                <input type="number" name="temps" placeholder="Temps en secondes (par défaut 10s)">
+            </div>
             <div class="form-group">
             	<label>Premier emploi du temps</label>' .
             $this->buildSelectCode($years, $groups, $halfGroups) . '
@@ -59,10 +73,12 @@ class TelevisionView extends UserView
 	 * about the user login, number of schedules, and modification options.
 	 *
 	 * @param array $users An array of user objects, where each object contains user details such as ID, login, and codes.
+     * @param array $userData
 	 *
 	 * @return string A formatted string representation of televisions and their associated user information.
 	 */
-    public function displayAllTv(array $users, $userDeptList): string {
+    public function displayAllTv(array $users, array $userData, $userDeptList): string
+    {
         $page = get_page_by_title_V2('Modifier un utilisateur');
         $linkManageUser = get_permalink($page->ID);
 
@@ -73,11 +89,23 @@ class TelevisionView extends UserView
         $row = array();
         $count = 0;
         //On affiche les valeurs de certains attributs pour les télévisions
-        foreach ($users as $user) {
+        foreach ($users as $user)
+        {
+            $typeDefilement = '';
+            $timeout = 0;
+            foreach ($userData as $data)
+            {
+                if ($data[0] === $user->getId())
+                {
+                    $typeDefilement = $data[1];
+                    $timeout = $data[2];
+                    $timeout = strval($timeout / 1000);
+                }
+            }
             $row[] = [$count+1,
                 $this->buildCheckbox($name, $user->getId()),
                 $user->getLogin(), sizeof($user->getCodes()),
-                $userDeptList[$count], $user->getTimeout() . ' s', $user->getTypeDefilement(),
+                $userDeptList[$count], $timeout . ' s', $typeDefilement,
                 $this->buildLinkForModify($linkManageUser . '?id=' . $user->getId())];
 
             ++$count;
