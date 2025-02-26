@@ -4,7 +4,6 @@ namespace Controllers;
 
 use Models\Alert;
 use Models\CodeAde;
-use Models\User;
 use Views\AlertView;
 
 /**
@@ -75,11 +74,9 @@ class AlertController extends Controller
 
             if (is_string($content) && strlen($content) >= 4 && strlen($content) <= 280 && $this->isRealDate($endDate) && $creationDateString < $endDateString) {
                 $current_user = wp_get_current_user();
-                $author = new User();
-                $author->get($current_user->ID);
 
                 // Set the alert
-                $this->model->setAuthor($author);
+                $this->model->setAuthorId($current_user->ID);
                 $this->model->setContent($content);
                 $this->model->setCreationDate($creationDate);
                 $this->model->setExpirationDate($endDate);
@@ -121,30 +118,25 @@ class AlertController extends Controller
 	 */
     public function modify(): string {
         $id = $_GET['id'];
-        $current_user = wp_get_current_user();
-        error_log("Modify method called with ID: $id");
 
         if (!is_numeric($id) || !$this->model->get($id)) {
-            error_log("Invalid alert ID or alert not found.");
             return $this->view->noAlert();
         }
+
+        $current_user = wp_get_current_user();
         $alert = $this->model->get($id);
 
         if (!in_array('administrator', $current_user->roles) && !in_array('secretaire', $current_user->roles) && $alert->getAuthor()->getId() != $current_user->ID) {
-            error_log("User does not have permission to modify this alert.");
             return $this->view->alertNotAllowed();
         }
-
-        if ($alert->getAdminId()) {
-            error_log("Alert modification not allowed for admin alerts.");
-            return $this->view->alertNotAllowed();
-        }
+//        if ($alert->getAdminId()) {
+//            return $this->view->alertNotAllowed();
+//        }
 
         $codeAde = new CodeAde();
 
         $submit = filter_input(INPUT_POST, 'submit');
         if (isset($submit)) {
-            error_log("Form submitted for alert modification.");
             // Get value
             $content = filter_input(INPUT_POST, 'content');
             $expirationDate = filter_input(INPUT_POST, 'expirationDate');
@@ -155,12 +147,10 @@ class AlertController extends Controller
             $codesAde = array();
             foreach ($codes as $code) {
                 if ($code != 'all' && $code != 0) {
-                    $codeAdeInstance = $codeAde->getByCode($code);
-                    if (is_null($codeAdeInstance->getId())) {
-                        error_log("Invalid code: $code");
+                    if (is_null($codeAde->getByCode($code)->getId())) {
                         $this->view->errorMessageInvalidForm();
                     } else {
-                        $codesAde[] = $codeAdeInstance;
+                        $codesAde[] = $codeAde->getByCode($code);
                     }
                 } else if ($code == 'all') {
                     $alert->setForEveryone(1);
@@ -172,32 +162,23 @@ class AlertController extends Controller
             $alert->setExpirationDate($expirationDate);
             $alert->setCodes($codesAde);
 
-            try {
-                if ($alert->update()) {
-                    error_log("Alert updated successfully.");
-                    return $this->view->displayModifyValidate();
-                } else {
-                    error_log("No changes made to the alert.");
-                    return $this->view->errorMessageCantAdd();
-                }
-            } catch (Exception $e) {
-                error_log("Exception during alert update: " . $e->getMessage());
-                return $this->view->errorMessageCantAdd();
+            if ($alert->update()) {
+                $this->view->displayModifyValidate();
+            } else {
+                $this->view->errorMessageCantAdd();
             }
         }
 
         $delete = filter_input(INPUT_POST, 'delete');
         if (isset($delete)) {
-            error_log("Delete action triggered for alert ID: $id");
             $alert->delete();
-            return $this->view->displayModifyValidate();
+            $this->view->displayModifyValidate();
         }
 
         $years = $codeAde->getAllFromType('year');
         $groups = $codeAde->getAllFromType('group');
         $halfGroups = $codeAde->getAllFromType('halfGroup');
 
-        error_log("Rendering modify form for alert ID: $id");
         return $this->view->modifyForm($alert, $years, $groups, $halfGroups);
     }
 
@@ -208,7 +189,7 @@ class AlertController extends Controller
 	 *
 	 * @return string The built HTML string containing the alerts table, controls, and pagination.
 	 */
-	public function displayAll(): string {
+    public function displayAll(): string {
         $numberAllEntity = $this->model->countAll();
         $url = $this->getPartOfUrl();
         $number = filter_input(INPUT_GET, 'number');
@@ -228,7 +209,7 @@ class AlertController extends Controller
         if (current_user_can('view_alerts')) {
             $alertList = $this->model->getList($begin, $number);
         } else {
-            $alertList = $this->model->getAuthorListAlert($current_user->ID, $begin,  $number);
+            $alertList = $this->model->getAuthorListAlert($current_user->ID, $begin, $number);
         }
         $name = 'Alert';
         $header = ['Contenu', 'Date de création', 'Date d\'expiration', 'Auteur', 'Modifier'];
@@ -247,7 +228,6 @@ class AlertController extends Controller
             ];
         }
 
-        // Suppression d'alertes sélectionnées
         $submit = filter_input(INPUT_POST, 'delete');
         if (isset($submit)) {
             if (isset($_REQUEST['checkboxStatusAlert'])) {
