@@ -6,7 +6,7 @@ use Models\Department;
 use Models\User;
 use Views\TabletView;
 
-class TabletController extends UserController
+class php extends UserController
 {
     private $model;
     private $view;

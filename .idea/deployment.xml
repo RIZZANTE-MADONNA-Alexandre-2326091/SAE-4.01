@@ -6,12 +6,8 @@
       <paths name="sae">
         <serverdata>
           <mappings>
-            <mapping deploy="/www" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="www" local="$PROJECT_DIR$" web="/" />
           </mappings>
-          <excludedPaths>
-            <excludedPath local="true" path="$PROJECT_DIR$/wp-admin" />
-            <excludedPath path="/www/wp-admin" />
-          </excludedPaths>
         </serverdata>
       </paths>
     </serverData>
