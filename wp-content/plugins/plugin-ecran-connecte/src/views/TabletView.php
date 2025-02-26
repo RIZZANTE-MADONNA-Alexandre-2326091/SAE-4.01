@@ -1,10 +1,11 @@
 <?php
-
 namespace Views;
+
+use Models\CodeAde;
 
 class TabletView extends UserView
 {
-    public function displayFormTablet(array $departments, $isAdmin = null, $currentDept = null) {
+    public function displayFormTablet(array $departments, $isAdmin = null, $currentDept = null, array $years, array $groups, array $halfGroups) {
         $disabled = $isAdmin ? '' : 'disabled';
 
         return '
@@ -28,6 +29,11 @@ class TabletView extends UserView
                     ' . $this->displayAllDept($departments, $currentDept) . '
                 </select>
             </div>
+            <div class="form-group">
+                <label>Premier emploi du temps</label>' .
+            $this->buildSelectCode($years, $groups, $halfGroups) . '
+            </div>
+            <input type="button" class="btn button_ecran" id="addSchedule" onclick="addButtonTablet()" value="Ajouter des emplois du temps">
             <button type="submit" class="btn button_ecran" id="validTablet" name="createTablet">Créer</button>
         </form>';
     }
@@ -41,11 +47,32 @@ class TabletView extends UserView
         return $output;
     }
 
-    public function displayTabletTitleAndLogout() {
-        return '
-        <h2>Tablette</h2>
-        <form method="post" action="' . wp_logout_url() . '">
-            <button type="submit" class="btn button_ecran">Se déconnecter</button>
-        </form>';
+    public function buildSelectCode(array $years, array $groups, array $halfGroups, CodeAde $code = null, int $count = 0): string {
+        $select = '<select class="form-control firstSelect" id="selectId' . $count . '" name="selectTablet[]" required="">';
+
+        if (!is_null($code)) {
+            $select .= '<option value="' . $code->getCode() . '">' . $code->getTitle() . '</option>';
+        }
+
+        $select .= '<option value="0">Aucun</option>
+                    <optgroup label="Année">';
+
+        foreach ($years as $year) {
+            $select .= '<option value="' . $year->getCode() . '">' . $year->getTitle() . '</option>';
+        }
+        $select .= '</optgroup><optgroup label="Groupe">';
+
+        foreach ($groups as $group) {
+            $select .= '<option value="' . $group->getCode() . '">' . $group->getTitle() . '</option>';
+        }
+        $select .= '</optgroup><optgroup label="Demi groupe">';
+
+        foreach ($halfGroups as $halfGroup) {
+            $select .= '<option value="' . $halfGroup->getCode() . '">' . $halfGroup->getTitle() . '</option>';
+        }
+        $select .= '</optgroup>
+            </select>';
+
+        return $select;
     }
 }

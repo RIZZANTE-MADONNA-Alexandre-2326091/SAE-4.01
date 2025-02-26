@@ -36,15 +36,15 @@ class TelevisionController extends UserController implements Schedule
         $this->view = new TelevisionView();
     }
 
-	/**
-	 * Handles the insertion of a new television user and processes associated codes.
-	 *
-	 * Validates all input data including login, password and codes, and ensures the user does not already exist.
-	 * If validation passes, the new user is created, and a success message is displayed.
-	 * In case of any error, an appropriate error message is returned.
-	 *
-	 * @return string A response indicating the result of the action. Either 'error', renders a form, or displays a success/error message.
-	 */
+    /**
+     * Handles the insertion of a new television user and processes associated codes.
+     *
+     * Validates all input data including login, password and codes, and ensures the user does not already exist.
+     * If validation passes, the new user is created, and a success message is displayed.
+     * In case of any error, an appropriate error message is returned.
+     *
+     * @return string A response indicating the result of the action. Either 'error', renders a form, or displays a success/error message.
+     */
     public function insert(): string {
         $action = filter_input(INPUT_POST, 'createTv');
 
@@ -69,23 +69,22 @@ class TelevisionController extends UserController implements Schedule
                 $codesAde = array();
                 foreach ($codes as $code) {
                     if (is_numeric($code) && $code > 0) {
-                        if (is_null($codeAde->getByCode($code)->getId())) {
-                            return 'error'; // Code invalide;
+                        $codeAdeInstance = $codeAde->getByCode($code);
+                        if (is_null($codeAdeInstance->getId())) {
+                            return 'error'; // Invalid code
                         } else {
-                            $codesAde[] = $codeAde->getByCode($code);
+                            $codesAde[] = $codeAdeInstance;
                         }
                     }
                 }
 
-                // Configuration du modèle de télévision
                 $this->model->setLogin($login);
-                $this->model->setEmail($login . '@' . $login . '.fr');
                 $this->model->setPassword($password);
+                $this->model->setEmail($login . '@' . $login . '.fr');
                 $this->model->setRole('television');
-                $this->model->setCodes($codesAde);
                 $this->model->setDeptId($deptId);
+                $this->model->setCodes($codesAde);
 
-                // Insertion du modèle dans la base de données
                 if (!$this->checkDuplicateUser($this->model) && $this->model->insert()) {
                     $this->view->displayInsertValidate();
                 } else {
@@ -105,13 +104,13 @@ class TelevisionController extends UserController implements Schedule
         return $this->view->displayFormTelevision($years, $groups, $halfGroups, $allDepts, $isAdmin, $currentDept);
     }
 
-	/**
-	 * Modify user data and handle the modification process
-	 *
-	 * @param user $user The user object that will be modified
-	 *
-	 * @return string The HTML content for the modification form or an error message
-	 */
+    /**
+     * Modify user data and handle the modification process
+     *
+     * @param user $user The user object that will be modified
+     *
+     * @return string The HTML content for the modification form or an error message
+     */
     public function modify(user $user): string {
         $page = get_page_by_title_V2('Gestion des utilisateurs');
         $linkManageUser = get_permalink($page->ID);
@@ -121,7 +120,7 @@ class TelevisionController extends UserController implements Schedule
         $action = filter_input(INPUT_POST, 'modifValidate');
 
         if (isset($action)) {
-	        $codes = filter_input(INPUT_POST, 'selectTv', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
+            $codes = filter_input(INPUT_POST, 'selectTv', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
 
             $codesAde = array();
             foreach ($codes as $code) {
@@ -146,30 +145,30 @@ class TelevisionController extends UserController implements Schedule
         return $this->view->modifyForm($user, $years, $groups, $halfGroups);
     }
 
-	/**
-	 * Retrieves and displays all users with the role of 'television'.
-	 *
-	 * @return string The rendered view displaying all television users.
-	 */
+    /**
+     * Retrieves and displays all users with the role of 'television'.
+     *
+     * @return string The rendered view displaying all television users.
+     */
     public function displayAllTv(): string {
         $users = $this->model->getUsersByRole('television');
 
-	    $deptModel = new Department();
-	    $userDeptList = array();
-	    foreach ($users as $user) {
-		    $userDeptList[] = $deptModel->getUserInDept($user->getId())->getName();
-	    }
+        $deptModel = new Department();
+        $userDeptList = array();
+        foreach ($users as $user) {
+            $userDeptList[] = $deptModel->getUserInDept($user->getId())->getName();
+        }
 
         return $this->view->displayAllTv($users, $userDeptList);
     }
 
-	/**
-	 * Displays the current user's schedule based on their codes and theme settings.
-	 * Generates and formats the schedule dynamically based on the number of codes
-	 * and the selected scrolling option from the theme configuration.
-	 *
+    /**
+     * Displays the current user's schedule based on their codes and theme settings.
+     * Generates and formats the schedule dynamically based on the number of codes
+     * and the selected scrolling option from the theme configuration.
+     *
      * @return string The rendered schedule, typically a string, or a default message if no schedule is available.
-	 */
+     */
     public function displayMySchedule(): string {
         $current_user = wp_get_current_user();
         $user = $this->model->get($current_user->ID);
@@ -179,7 +178,7 @@ class TelevisionController extends UserController implements Schedule
         if (sizeof($user->getCodes()) > 1) {
             if (get_theme_mod('ecran_connecte_schedule_scroll', 'vert') == 'vert') {
                 $string .= '<div class="ticker1">
-						<div class="innerWrap tv-schedule">';
+      <div class="innerWrap tv-schedule">';
                 foreach ($user->getCodes() as $code) {
                     $path = $this->getFilePath($code->getCode());
                     if (file_exists($path)) {
