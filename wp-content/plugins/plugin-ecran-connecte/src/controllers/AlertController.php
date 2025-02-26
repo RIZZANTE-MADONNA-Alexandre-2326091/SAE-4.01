@@ -76,7 +76,7 @@ class AlertController extends Controller
                 $current_user = wp_get_current_user();
 
                 // Set the alert
-                $this->model->setAuthor($current_user->ID);
+                $this->model->setAuthorId($current_user->ID);
                 $this->model->setContent($content);
                 $this->model->setCreationDate($creationDate);
                 $this->model->setExpirationDate($endDate);
@@ -122,15 +122,16 @@ class AlertController extends Controller
         if (!is_numeric($id) || !$this->model->get($id)) {
             return $this->view->noAlert();
         }
+
         $current_user = wp_get_current_user();
         $alert = $this->model->get($id);
+
         if (!in_array('administrator', $current_user->roles) && !in_array('secretaire', $current_user->roles) && $alert->getAuthor()->getId() != $current_user->ID) {
             return $this->view->alertNotAllowed();
         }
-
-        if ($alert->getAdminId()) {
-            return $this->view->alertNotAllowed();
-        }
+//        if ($alert->getAdminId()) {
+//            return $this->view->alertNotAllowed();
+//        }
 
         $codeAde = new CodeAde();
 
@@ -188,7 +189,7 @@ class AlertController extends Controller
 	 *
 	 * @return string The built HTML string containing the alerts table, controls, and pagination.
 	 */
-	public function displayAll(): string {
+    public function displayAll(): string {
         $numberAllEntity = $this->model->countAll();
         $url = $this->getPartOfUrl();
         $number = filter_input(INPUT_GET, 'number');
@@ -208,7 +209,7 @@ class AlertController extends Controller
         if (current_user_can('view_alerts')) {
             $alertList = $this->model->getList($begin, $number);
         } else {
-            $alertList = $this->model->getAuthorListAlert($current_user->ID, $begin,  $number);
+            $alertList = $this->model->getAuthorListAlert($current_user->ID, $begin, $number);
         }
         $name = 'Alert';
         $header = ['Contenu', 'Date de création', 'Date d\'expiration', 'Auteur', 'Modifier'];
@@ -227,7 +228,6 @@ class AlertController extends Controller
             ];
         }
 
-        // Suppression d'alertes sélectionnées
         $submit = filter_input(INPUT_POST, 'delete');
         if (isset($submit)) {
             if (isset($_REQUEST['checkboxStatusAlert'])) {
