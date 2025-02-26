@@ -98,6 +98,14 @@ class TelevisionView extends UserView
                 if ($data[0] === $user->getId())
                 {
                     $typeDefilement = $data[1];
+                    if ($typeDefilement === 'suret')
+                    {
+                        $typeDefilement = 'Par-dessus les emplois du temps';
+                    }
+                    else if ($typeDefilement === 'defil')
+                    {
+                        $typeDefilement = 'Défilement dans les emplois du temps';
+                    }
                     $timeout = $data[2];
                     $timeout = strval($timeout / 1000);
                 }
@@ -105,7 +113,7 @@ class TelevisionView extends UserView
             $row[] = [$count+1,
                 $this->buildCheckbox($name, $user->getId()),
                 $user->getLogin(), sizeof($user->getCodes()),
-                $userDeptList[$count], $timeout . ' s', $typeDefilement,
+                $userDeptList[$count], $timeout . ' secondes', $typeDefilement,
                 $this->buildLinkForModify($linkManageUser . '?id=' . $user->getId())];
 
             ++$count;

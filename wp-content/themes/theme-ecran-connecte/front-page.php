@@ -15,10 +15,10 @@
         endif; ?>
         </div>
         <?php $current_user = wp_get_current_user();
-        if(in_array('etudiant', $current_user->roles) || in_array('television', $current_user->roles)) :
+        if(in_array('television', $current_user->roles)) :
             get_sidebar();
         endif;
-        if(in_array('etudiant', $current_user->roles) || in_array('television', $current_user->roles)) : ?>
+        if(in_array('television', $current_user->roles)) : ?>
             </div>
         </div>
         <?php else: ?>

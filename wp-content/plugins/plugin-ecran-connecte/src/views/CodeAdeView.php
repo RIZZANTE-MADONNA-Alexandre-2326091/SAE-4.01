@@ -222,11 +222,11 @@ class CodeAdeView extends View
 	/**
 	 * Displays an error message indicating no content is available and provides a link to return.
 	 *
-	 * @return void
+	 * @return string
 	 */
-    public function errorNobody(): void {
+    public function errorNobody(): string {
         $page = get_page_by_title_V2('Gestion des codes ADE');
         $linkManageCode = get_permalink($page->ID);
-        echo '<p>Il n\'y a rien par ici</p><a href="' . $linkManageCode . '">Retour</a>';
+        return '<p>Il n\'y a rien par ici</p><a href="' . $linkManageCode . '">Retour</a>';
     }
 }

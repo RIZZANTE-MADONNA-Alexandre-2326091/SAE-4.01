@@ -651,12 +651,27 @@ class InformationView extends View
         $this->buildModal('Vidéo non valide', '<p>Ce fichier est une vidéo non valide, veuillez choisir une autre vidéo</p>');
     }
 
+    /**
+     * Display if the information is null
+     * @return string The error box to display
+     * */
+    public function displayNullInformation(): string
+    {
+        return '
+		<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>
+		<div>
+			<h3>Votre information est nulle</h3>
+			<p>Le contenu ou la date d\'expiration de votre information est nul. Veuillez modifier les informations correctement.</p>
+			<a href="' . esc_url(get_permalink(get_page_by_title_V2('Créer une information'))) . '">Créer une information</a>
+		</div>';
+    }
+
     public function informationNotAllowed(): string
     {
         return '
 		<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>
 		<div>
-			<h3>Vous ne pouvez pas modifier cette alerte</h3>
+			<h3>Vous ne pouvez pas modifier cette information</h3>
 			<p>Cette information appartient à quelqu\'un d\'autre, vous ne pouvez donc pas modifier cette information.</p>
 			<a href="' . esc_url(get_permalink(get_page_by_title_V2('Créer une information'))) . '">Créer une information</a>
 		</div>';

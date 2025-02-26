@@ -54,8 +54,6 @@ class InformationController extends Controller
         $author->get($current_user->ID);
 
         // All forms
-
-
         $actionText = filter_input(INPUT_POST, 'createText');
         $actionImg = filter_input(INPUT_POST, 'createImg');
         $actionPDF = filter_input(INPUT_POST, 'createPDF');
@@ -89,137 +87,187 @@ class InformationController extends Controller
 
         if (isset($actionText))
         {                      // If the information is a text
-            $information->setContent($content);
-            $information->setType("text");
-
-            // Try to insert the information
-            if ($information->insert())
+            if ($content === '' || $endDate === '')
             {
-                $this->view->displayCreateValidate();
+                $this->view->displayErrorInsertionInfo();
             }
             else
             {
-                $this->view->displayErrorInsertionInfo();
+
+                $information->setContent($content);
+                $information->setType("text");
+
+                // Try to insert the information
+                if ($information->insert())
+                {
+                    $this->view->displayCreateValidate();
+                }
+                else
+                {
+                    $this->view->displayErrorInsertionInfo();
+                }
             }
         }
         if (isset($actionImg))
         {                     // If the information is an image
-            $type = "img";
-            $information->setType($type);
-            $filename = $_FILES['contentFile']['name'];
-            $fileTmpName = $_FILES['contentFile']['tmp_name'];
-            $explodeName = explode('.', $filename);
-            $goodExtension = ['jpg', 'jpeg', 'gif', 'png', 'svg'];
-            if (in_array(end($explodeName), $goodExtension))
+            if ($content === '' || $endDate === '')
             {
-                $this->registerFile($filename, $fileTmpName, $information);
+                $this->view->displayErrorInsertionInfo();
             }
             else
             {
-                $this->view->buildModal('Image non valide', '<p>Ce fichier est une image non valide, veuillez choisir une autre image</p>');
-            }
-        }
-        if (isset($actionPDF))
-        {
-            $type = "pdf";
-            $information->setType($type);
-            $filename = $_FILES['contentFile']['name'];
-            $explodeName = explode('.', $filename);
-            if (end($explodeName) == 'pdf')
-            {
+                $type = "img";
+                $information->setType($type);
+                $filename = $_FILES['contentFile']['name'];
                 $fileTmpName = $_FILES['contentFile']['tmp_name'];
-                $this->registerFile($filename, $fileTmpName, $information);
-            }
-            else
-            {
-                $this->view->buildModal('PDF non valide', '<p>Ce fichier est un tableau non PDF, veuillez choisir un autre PDF</p>');
-            }
-        }
-        if (isset($actionEvent))
-        {                       // If the information is an event
-            $type = 'event';
-            $information->setType($type);
-            $countFiles = count($_FILES['contentFile']['name']);
-            for ($i = 0; $i < $countFiles; $i++)
-            {
-                $this->model->setId(null);
-                $filename = $_FILES['contentFile']['name'][$i];
-                $fileTmpName = $_FILES['contentFile']['tmp_name'][$i];
                 $explodeName = explode('.', $filename);
-                $goodExtension = ['jpg', 'jpeg', 'gif', 'png', 'svg', 'pdf'];
+                $goodExtension = ['jpg', 'jpeg', 'gif', 'png', 'svg'];
                 if (in_array(end($explodeName), $goodExtension))
                 {
                     $this->registerFile($filename, $fileTmpName, $information);
                 }
+                else
+                {
+                    $this->view->buildModal('Image non valide', '<p>Ce fichier est une image non valide, veuillez choisir une autre image</p>');
+                }
             }
         }
-        if(isset($actionVideoYT))
+        if (isset($actionPDF))
         {
+            if ($content === '' || $endDate === '')
+            {
+                $this->view->displayErrorInsertionInfo();
+            }
+            else
+            {
+                $type = "pdf";
+                $information->setType($type);
+                $filename = $_FILES['contentFile']['name'];
+                $explodeName = explode('.', $filename);
+                if (end($explodeName) == 'pdf')
+                {
+                    $fileTmpName = $_FILES['contentFile']['tmp_name'];
+                    $this->registerFile($filename, $fileTmpName, $information);
+                }
+                else
+                {
+                    $this->view->buildModal('PDF non valide', '<p>Ce fichier est un tableau non PDF, veuillez choisir un autre PDF</p>');
+                }
+            }
+        }
+        if (isset($actionEvent))
+        {                       // If the information is an event
+            if ($content === '' || $endDate === '')
+            {
+                $this->view->displayErrorInsertionInfo();
+            }
+            else
+            {
+                $type = 'event';
+                $information->setType($type);
+                $countFiles = count($_FILES['contentFile']['name']);
+                for ($i = 0; $i < $countFiles; $i++)
+                {
+                    $this->model->setId(null);
+                    $filename = $_FILES['contentFile']['name'][$i];
+                    $fileTmpName = $_FILES['contentFile']['tmp_name'][$i];
+                    $explodeName = explode('.', $filename);
+                    $goodExtension = ['jpg', 'jpeg', 'gif', 'png', 'svg', 'pdf'];
+                    if (in_array(end($explodeName), $goodExtension))
+                    {
+                        $this->registerFile($filename, $fileTmpName, $information);
+                    }
+                }
+            }
+        }
+        if(isset($actionVideoYT)) {
             // If the information is a Youtube video
-            $type = 'YTvideo';
-            if (str_contains($content, 'https://www.youtube.com/shorts/'))
-            {
-                $information->setType($type . 'sh');
-            }
-            else if (str_contains($content, 'https://www.youtube.com/watch?v='))
-            {
-                $information->setType($type . 'w');
+            if ($content === '' || $endDate === '') {
+                $this->view->displayErrorInsertionInfo();
             }
             else
             {
-                $this->view->displayErrorInsertionInfo();
-            }
-            $information->setContent($content);
+                $type = 'YTvideo';
+                if (str_contains($content, 'https://www.youtube.com/shorts/'))
+                {
+                    $information->setType($type . 'sh');
+                }
+                else if (str_contains($content, 'https://www.youtube.com/watch?v='))
+                {
+                    $information->setType($type . 'w');
+                }
+                else
+                {
+                    $this->view->displayErrorInsertionInfo();
+                }
+                $information->setContent($content);
 
-            // Try to insert the information
-            if ($information->insert())
-            {
-                $this->view->displayCreateValidate();
-            }
-            else
-            {
-                $this->view->displayErrorInsertionInfo();
+                // Try to insert the information
+                if ($information->insert())
+                {
+                    $this->view->displayCreateValidate();
+                }
+                else
+                {
+                    $this->view->displayErrorInsertionInfo();
+                }
             }
         }
         if (isset($actionVideoCLocal) || isset($actionVideoSLocal))
         {
-            $type = '';
-            if (isset($actionVideoCLocal))
+            if ($content === '' || $endDate === '')
             {
-                $type = 'LocCvideo';
-            } else if (isset($actionVideoSLocal))
-            {
-                $type = 'LocSvideo';
-            }
-            $information->setType($type);
-            $filename = $_FILES['contentFile']['name'];
-            $fileTmpName = $_FILES['contentFile']['tmp_name'];
-            $explodeName = explode('.', $filename);
-            $goodExtension = ['mp4'];
-            if (in_array(end($explodeName), $goodExtension))
-            {
-                $this->registerFile($filename, $fileTmpName, $information);
-            } else if ($_FILES['contentFile']['size'] > 1073741824)
-            {
-                $this->view->displayVideoExceedsMaxSize();
+                $this->view->displayErrorInsertionInfo();
             }
             else
             {
-                $this->view->displayNotConformVideo();
+                $type = '';
+                if (isset($actionVideoCLocal))
+                {
+                    $type = 'LocCvideo';
+                }
+                else if (isset($actionVideoSLocal))
+                {
+                    $type = 'LocSvideo';
+                }
+                $information->setType($type);
+                $filename = $_FILES['contentFile']['name'];
+                $fileTmpName = $_FILES['contentFile']['tmp_name'];
+                $explodeName = explode('.', $filename);
+                $goodExtension = ['mp4'];
+                if (in_array(end($explodeName), $goodExtension))
+                {
+                    $this->registerFile($filename, $fileTmpName, $information);
+                }
+                else if ($_FILES['contentFile']['size'] > 1073741824)
+                {
+                    $this->view->displayVideoExceedsMaxSize();
+                }
+                else
+                {
+                    $this->view->displayNotConformVideo();
+                }
             }
         }
 
         if (isset($actionRSS))
         {
-            $information->setContent($content);
-            $information->setType("rss");
-            if ($information->insert())
+            if ($content === '' || $endDate === '')
             {
-                $this->view->displayCreateValidate();
+                $this->view->displayErrorInsertionInfo();
             }
             else
             {
-                $this->view->displayErrorInsertionInfo();
+                $information->setContent($content);
+                $information->setType("rss");
+                if ($information->insert())
+                {
+                    $this->view->displayCreateValidate();
+                }
+                else
+                {
+                    $this->view->displayErrorInsertionInfo();
+                }
             }
         }
 
@@ -292,6 +340,11 @@ class InformationController extends Controller
 
             $information->setTitle($title);
             $information->setExpirationDate($endDate);
+
+            if ($content === '' || $endDate === '')
+            {
+                return $this->view->displayNullInformation();
+            }
 
             if ($information->getType() == 'text')
             {

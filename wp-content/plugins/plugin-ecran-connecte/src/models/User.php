@@ -276,8 +276,10 @@ class User extends Model implements Entity, JsonSerializable
 	 *
 	 * @return array Modified array of user objects with their associated codes set.
 	 */
-    public function getMyCodes(array $users): array {
-        foreach ($users as $user) {
+    public function getMyCodes(array $users): array
+    {
+        foreach ($users as $user)
+        {
             $request = $this->getDatabase()->prepare('SELECT code.id, type, title, code FROM ecran_code_ade code, ecran_code_user user
                                   							WHERE user.user_id = :id AND user.code_ade_id = code.id ORDER BY code.id LIMIT 100');
 
@@ -288,9 +290,12 @@ class User extends Model implements Entity, JsonSerializable
             $request->execute();
 
             $code = new CodeAde();
-            if ($request->rowCount() <= 0) {
+            if ($request->rowCount() <= 0)
+            {
                 $codes = [];
-            } else {
+            }
+            else
+            {
                 $codes = $code->setEntityList($request->fetchAll());
             }
 
