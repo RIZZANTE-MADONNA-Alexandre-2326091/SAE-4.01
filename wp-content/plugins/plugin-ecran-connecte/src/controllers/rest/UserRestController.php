@@ -132,7 +132,7 @@ class UserRestController extends WP_REST_Controller
         $alert = new Alert();
 
         // Set alert data
-        $alert->setAuthor(wp_get_current_user()->ID);
+        $alert->setAuthorId(wp_get_current_user()->ID);
         $alert->setContent($request->get_param('content'));
         $alert->setCreationDate(date('Y-m-d'));
         $alert->setExpirationDate($request->get_param('expiration-date'));

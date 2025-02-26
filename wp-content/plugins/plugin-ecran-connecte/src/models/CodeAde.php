@@ -67,16 +67,27 @@ class CodeAde extends Model implements Entity, JsonSerializable
 	 * @return int Number of rows affected by the update operation
 	 */
     public function update(): int {
-        $request = $this->getDatabase()->prepare('UPDATE ecran_code_ade SET title = :title, code = :code, type = :type WHERE id = :id');
+        $database = $this->getDatabase();
+        $database->beginTransaction();
 
-        $request->bindValue(':id', $this->getId(), PDO::PARAM_INT);
-        $request->bindValue(':title', $this->getTitle(), PDO::PARAM_STR);
-        $request->bindValue(':code', $this->getCode(), PDO::PARAM_STR);
-        $request->bindValue(':type', $this->getType(), PDO::PARAM_STR);
+        try {
+            $request = $database->prepare('UPDATE ecran_code_ade SET title = :title, code = :code, type = :type WHERE id = :id');
 
-        $request->execute();
+            $request->bindValue(':id', $this->getId(), PDO::PARAM_INT);
+            $request->bindValue(':title', $this->getTitle(), PDO::PARAM_STR);
+            $request->bindValue(':code', $this->getCode(), PDO::PARAM_STR);
+            $request->bindValue(':type', $this->getType(), PDO::PARAM_STR);
 
-        return $request->rowCount();
+            $request->execute();
+            $count = $request->rowCount();
+
+            $database->commit();
+            return $count;
+        } catch (Exception $e) {
+            $database->rollBack();
+            error_log($e->getMessage());
+            throw new Exception("An error occurred while updating the code.");
+        }
     }
 
 	/**
@@ -85,7 +96,8 @@ class CodeAde extends Model implements Entity, JsonSerializable
 	 * @return int The number of rows affected by the delete operation
 	 */
     public function delete(): int {
-        $request = $this->getDatabase()->prepare('DELETE FROM ecran_code_ade WHERE id = :id');
+        $database = $this->getDatabase();
+        $request = $database->prepare('DELETE FROM ecran_code_ade WHERE id = :id');
 
         $request->bindValue(':id', $this->getId(), PDO::PARAM_INT);
 
@@ -135,7 +147,7 @@ class CodeAde extends Model implements Entity, JsonSerializable
 	 *
 	 * @return array The list of matching entities retrieved from the database.
 	 */
-    public function checkCode(string $title,string $code): array {
+    public function checkCode(string $title, string $code): array {
         $request = $this->getDatabase()->prepare('SELECT id, title, code, type, dept_id FROM ecran_code_ade WHERE title = :title OR code = :code LIMIT 2');
 
         $request->bindParam(':title', $title, PDO::PARAM_STR);
@@ -145,6 +157,7 @@ class CodeAde extends Model implements Entity, JsonSerializable
 
         return $this->setEntityList($request->fetchAll(PDO::FETCH_ASSOC));
     }
+
 
 	/**
 	 * Retrieves all entries from the database matching the given type.

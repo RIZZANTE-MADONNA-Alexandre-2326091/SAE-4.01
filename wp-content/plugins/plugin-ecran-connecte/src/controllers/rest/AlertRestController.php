@@ -6,7 +6,6 @@ include __DIR__ . '/../utils/OneSignalPush.php';
 
 use Models\Alert;
 use Models\CodeAde;
-use Utils\OneSignalPush;
 use WP_Error;
 use WP_REST_Controller;
 use WP_REST_Request;
@@ -122,48 +121,6 @@ class AlertRestController extends WP_REST_Controller
         $alert = new Alert();
 
         return new WP_REST_Response($alert->getList(), 200);
-    }
-
-    /**
-     * Creates a single alert.
-     *
-     * @param WP_REST_Request $request Full details about the request.
-     * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
-     */
-    public function create_item($request) {
-        // Get an instance of the alert manager
-        $alert = new Alert();
-
-        // Set alert data
-        $alert->setAuthor(wp_get_current_user()->ID);
-        $alert->setContent($request->get_param('content'));
-        $alert->setCreationDate(date('Y-m-d'));
-        $alert->setExpirationDate($request->get_param('expiration-date'));
-
-        // Set ADE codes to the alert
-        $ade_codes = $this->find_ade_codes($alert, $request->get_json_params()['codes']);
-
-        if (is_null($ade_codes))
-            return new WP_REST_Response(array('message' => 'An invalid code was specified'), 400);
-
-        $alert->setCodes($ade_codes);
-
-        // Try to insert the ADE code
-        if (($insert_id = $alert->insert())) {
-            // Send the push notification
-            $oneSignalPush = new OneSignalPush();
-
-            if ($alert->isForEveryone()) {
-                $oneSignalPush->sendNotification(null, $alert->getContent());
-            } else {
-                $oneSignalPush->sendNotification($ade_codes, $alert->getContent());
-            }
-
-            // Return the inserted alert ID
-            return new WP_REST_Response(array('id' => $insert_id), 200);
-        }
-
-        return new WP_REST_Response(array('message' => 'Could not insert the alert'), 400);
     }
 
     /**

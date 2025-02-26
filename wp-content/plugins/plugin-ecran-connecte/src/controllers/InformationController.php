@@ -50,8 +50,6 @@ class InformationController extends Controller
     public function create(): string
     {
         $current_user = wp_get_current_user();
-        $author = new User();
-        $author->get($current_user->ID);
 
         // All forms
         $actionText = filter_input(INPUT_POST, 'createText');
@@ -459,17 +457,17 @@ class InformationController extends Controller
     }
 
 
-	/**
-	 * Handles the registration and upload of a file, associates it with an entity,
-	 * and updates the entity with the file content information.
-	 *
-	 * @param string $filename The original name of the file being uploaded.
-	 * @param string $tmpName The temporary file path where the uploaded file is stored.
-	 * @param object $entity The entity object to which the file content is associated.
-	 *
-	 * @return void
-	 */
-    public function registerFile( string $filename, string $tmpName, object $entity): void
+    /**
+     * Handles the registration and upload of a file, associates it with an entity,
+     * and updates the entity with the file content information.
+     *
+     * @param string $filename The original name of the file being uploaded.
+     * @param string $tmpName The temporary file path where the uploaded file is stored.
+     * @param object $entity The entity object to which the file content is associated.
+     *
+     * @return void
+     */
+    public function registerFile(string $filename, string $tmpName, object $entity): void
     {
         $id = 'temporary';
         $extension_upload = strtolower(substr(strrchr($filename, '.'), 1));
@@ -515,13 +513,13 @@ class InformationController extends Controller
         }
     }
 
-	/**
-	 * Deletes a file from the server based on the provided ID.
-	 *
-	 * @param int $id The unique identifier of the file to be deleted.
-	 *
-	 * @return void
-	 */
+    /**
+     * Deletes a file from the server based on the provided ID.
+     *
+     * @param int $id The unique identifier of the file to be deleted.
+     *
+     * @return void
+     */
     public function deleteFile(int $id): void
     {
         $this->model = $this->model->get($id);
@@ -694,14 +692,14 @@ class InformationController extends Controller
     }
 
 
-	/**
-	 * Check if the end date of an information has passed and performs deletion if necessary.
-	 *
-	 * @param int $id The unique identifier of the information.
-	 * @param string $endDate The expiration date of the information in 'Y-m-d' format.
-	 *
-	 * @return void
-	 */
+    /**
+     * Check if the end date of an information has passed and performs deletion if necessary.
+     *
+     * @param int $id The unique identifier of the information.
+     * @param string $endDate The expiration date of the information in 'Y-m-d' format.
+     *
+     * @return void
+     */
     public function endDateCheckInfo($id, $endDate): void
     {
         if ($endDate <= date("Y-m-d"))
@@ -719,8 +717,7 @@ class InformationController extends Controller
 	 *
 	 * @return void
 	 */
-    public function informationMain(): void
-    {
+    public function informationMain(): void {
         $informations = $this->model->getList();
         $currentUser = wp_get_current_user();
         $user = new User();
@@ -748,16 +745,16 @@ class InformationController extends Controller
         $this->view->endDiv();
     }
 
-	/**
-	 * Synchronizes and updates the local information database with the information
-	 * retrieved from the admin website. Existing information is compared and updated
-	 * based on title, content, and expiration date. If an information entry no longer
-	 * exists on the admin site, it is deleted from the local database. New information
-	 * from the admin website is added to the local database if it doesn't already exist.
-	 *
-	 * @return void
-	 */
-	public function registerNewInformation(): void
+    /**
+     * Synchronizes and updates the local information database with the information
+     * retrieved from the admin website. Existing information is compared and updated
+     * based on title, content, and expiration date. If an information entry no longer
+     * exists on the admin site, it is deleted from the local database. New information
+     * from the admin website is added to the local database if it doesn't already exist.
+     *
+     * @return void
+     */
+    public function registerNewInformation(): void
     {
         $informationList = $this->model->getFromAdminWebsite();
         $myInformationList = $this->model->getAdminWebsiteInformation();
@@ -802,13 +799,13 @@ class InformationController extends Controller
         }
     }
 
-	/**
-	 * Handles the display of event slides by retrieving a list of event information,
-	 * iterating through each event, and rendering content based on its type.
-	 * Supports displaying images or embedding PDFs dynamically in the slideshow.
-	 *
-	 * @return string
-	 */
+    /**
+     * Handles the display of event slides by retrieving a list of event information,
+     * iterating through each event, and rendering content based on its type.
+     * Supports displaying images or embedding PDFs dynamically in the slideshow.
+     *
+     * @return string
+     */
     public function displayEvent(): string
     {
         $events = $this->model->getListInformationEvent();
