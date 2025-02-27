@@ -16,10 +16,10 @@ class UserView extends View
 	 *
 	 * @return string The HTML string of the generated form.
 	 */
-    protected function displayBaseForm(string $name, array $departments, bool $isAdmin = false, int $currentDept = null):string {
+    protected function displayBaseForm(string $name, array $departments = null, bool $isAdmin = false, int $currentDept = null):string {
         $disabled = $isAdmin ? '' : 'disabled';
 
-        return '
+        $form = '
             <form method="post" class="cadre">
             	<div class="form-group">
                 	<label for="login' . $name . '">Login</label>
@@ -29,14 +29,16 @@ class UserView extends View
                 <div class="form-group">
                 	<label for="email' . $name . '">Email</label>
                 	<input class="form-control" type="email" name="email' . $name . '" placeholder="Email" required="">
-                </div>
-                <div class="form-group">
+                </div>';
+        if($departments != null) {
+            $form .= '<div class="form-group">
                 	<label for="dept' . $name . '">Département</label>
                 	<select name="deptId' . $name . '" class="form-control" ' . $disabled . '>
                 		'. $this->displayAllDept($departments, $currentDept) .'
                 	</select>
-				</div>
-                <div class="form-group">
+				</div>';
+        }
+        $form .= '<div class="form-group">
                 	<label for="pwd' . $name . '">Mot de passe</label>
                 	<input class="form-control" minlength="8" maxlength="25" type="password" id="pwd' . $name . '" name="pwd' . $name . '" placeholder="Mot de passe" minlength="8" maxlength="25" required="" onkeyup=checkPwd("' . $name . '")>
                     <input class="form-control" minlength="8" maxlength="25" type="password" id="pwdConf' . $name . '" name="pwdConfirm' . $name . '" placeholder="Confirmer le Mot de passe" minlength="8" maxlength="25" required="" onkeyup=checkPwd("' . $name . '")>
@@ -44,6 +46,8 @@ class UserView extends View
                 </div>
                 <button type="submit" class="btn button_ecran" id="valid' . $name . '" name="create' . $name . '">Créer</button>
             </form>';
+
+        return $form;
     }
 
 	/**

@@ -244,8 +244,8 @@ $result = add_role(
 );
 
 $result = add_role(
-    'communiquant',
-    __('Communiquant'),
+    'communicant',
+    __('Communicant'),
     array(
         'read' => true,  // true allows this capability
         'edit_posts' => true,

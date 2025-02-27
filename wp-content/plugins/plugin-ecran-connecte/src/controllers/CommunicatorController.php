@@ -1,9 +1,9 @@
 <?php
 
-namespace controllers;
+namespace Controllers;
 
 use Models\User;
-use views\CommunicatorView;
+use Views\CommunicatorView;
 
 /**
  * Class CommunicatorController
@@ -44,16 +44,42 @@ class CommunicatorController extends UserController
      */
     function insert() : string
     {
-        return 'coucou';
+        $action = filter_input(INPUT_POST, 'createCommunicator');
+
+        if (isset($action)) {
+            $login = filter_input(INPUT_POST, 'loginCommunicator');
+            $password = filter_input(INPUT_POST, 'pwdCommunicator');
+            $passwordConfirm = filter_input(INPUT_POST, 'pwdConfirmCommunicator');
+            $email = filter_input(INPUT_POST, 'emailCommunicator');
+
+            if (is_string($login) && strlen($login) >= 4 && strlen($login) <= 25 &&
+                is_string($password) && strlen($password) >= 8 && strlen($password) <= 25 &&
+                $password === $passwordConfirm && is_email($email)) {
+
+                $this->model->setLogin($login);
+                $this->model->setPassword($password);
+                $this->model->setEmail($email);
+                $this->model->setRole('communicant');
+
+                if (!$this->checkDuplicateUser($this->model) && $this->model->insert()) {
+                    $this->view->displayInsertValidate();
+                } else {
+                    $this->view->displayErrorInsertion();
+                }
+            } else {
+                $this->view->displayErrorCreation();
+            }
+        }
+        return $this->view->displayFormCommunicator();
     }
 
     function modify()
     {
-
+        //Todo
     }
 
     function displayAllCommunicator()
     {
-
+        //Todo
     }
 }
