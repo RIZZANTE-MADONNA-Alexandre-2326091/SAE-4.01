@@ -84,11 +84,10 @@ class AlertController extends Controller
 
             if (is_string($content) && strlen($content) >= 4 && strlen($content) <= 280 && $this->isRealDate($endDate) && $creationDateString < $endDateString) {
 
-                $author = new User();
-                $author->get($currentUser->ID);
+                $author = $currentUser->ID;
 
                 // Set the alert
-                $this->model->setAuthor($author);
+                $this->model->setAuthorId($author);
                 $this->model->setContent($content);
                 $this->model->setCreationDate($creationDate);
                 $this->model->setExpirationDate($endDate);
