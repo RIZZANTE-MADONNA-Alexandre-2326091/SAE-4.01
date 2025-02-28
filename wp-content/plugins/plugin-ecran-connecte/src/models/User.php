@@ -2,6 +2,7 @@
 
 namespace Models;
 
+use Exception;
 use JsonSerializable;
 use PDO;
 use WP_User;
@@ -46,17 +47,32 @@ class User extends Model implements Entity, JsonSerializable
      */
     private $codes;
 
+    /**
+     * @var string Type of videos slideshow for a television
+     */
+    private $typeDefilement;
+
+    /**
+     * @var int Time of timeout for each information, by default 10 seconds
+     * */
+    private $timeout;
+
 	/**
 	 * @var int
 	 */
 	private $deptId;
 
-	/**
-     * Insert an user in the database.
-     *
-     * @return string
-     */
-    public function insert(): string {
+    /**
+	 * Insert an user in the database.
+	 *
+	 * This method creates a user with the provided login, password, email, and role. If the role is 'television',
+	 * it associates certain codes with the user by inserting records into the `ecran_code_user` table.
+	 *
+	 * @return string Returns the ID of the created user.
+	 */
+    public function insert(): string
+    {
+        // Take 7 lines to create an user with a specific role
         $userData = array(
             'user_login' => $this->getLogin(),
             'user_pass' => $this->getPassword(),
@@ -66,37 +82,53 @@ class User extends Model implements Entity, JsonSerializable
 
         $id = wp_insert_user($userData);
 
+        // Add to table ecran_dept_user
         $database = $this->getDatabase();
         $request = $database->prepare('INSERT INTO ecran_dept_user (dept_id, user_id) VALUES (:dept_id, :user_id)');
         $request->bindValue(':dept_id', $this->getDeptId(), PDO::PARAM_INT);
         $request->bindParam(':user_id', $id, PDO::PARAM_INT);
         $request->execute();
 
-        if ($this->getRole() == 'television') {
-            foreach ($this->getCodes() as $code) {
+        // To review
+        if ($this->getRole() == 'television')
+        {
+            foreach ($this->getCodes() as $code)
+            {
                 $request = $this->getDatabase()->prepare('INSERT INTO ecran_code_user (user_id, code_ade_id) VALUES (:userId, :codeAdeId)');
                 $request->bindParam(':userId', $id, PDO::PARAM_INT);
                 $request->bindValue(':codeAdeId', $code->getId(), PDO::PARAM_INT);
                 $request->execute();
             }
+
+            //Ajoute les informations de la télévision dans la table ecran_television, id de l'utilisateur en clé étrangère, typeDefilement et timeout
+            $request = $this->getDatabase()->prepare('INSERT INTO ecran_television (id_user, type_defilement, timeout) VALUES (:idUser, :typeDefilement, :timeout)');
+            $request->bindParam(':idUser', $id, PDO::PARAM_INT);
+            $request->bindValue(':typeDefilement', $this->getTypeDefilement(), PDO::PARAM_STR);
+            $request->bindValue(':timeout', $this->getTimeout(), PDO::PARAM_INT);
+            $request->execute();
         }
 
         return $database->lastInsertId();
     }
 
-	/**
-	 * Updates user information in the database, including their password and associated codes.
-	 *
-	 * It clears all associated codes for the user and then inserts the appropriate codes
-	 * based on the user's current code data.
-	 *
-	 * @return int Returns the number of rows affected by the final executed database operation.
-	 */
-    public function update(): int {
+    /**
+     * Updates user information in the database, including their password and associated codes.
+     *
+     * It clears all associated codes for the user and then inserts the appropriate codes
+     * based on the user's current code data.
+     *
+     * If the user's role is 'television', it updaates the type and the time of the slideshow of infomations
+     *
+     * @return int Returns the number of rows affected by the final executed database operation.
+     * @throws Exception
+     */
+	public function update(): int
+    {
         $database = $this->getDatabase();
         $database->beginTransaction();
 
-        try {
+        try
+        {
             $request = $database->prepare('UPDATE wp_users SET user_pass = :password WHERE ID = :id');
             $request->bindValue(':id', $this->getId(), PDO::PARAM_INT);
             $request->bindValue(':password', $this->getPassword(), PDO::PARAM_STR);
@@ -106,17 +138,34 @@ class User extends Model implements Entity, JsonSerializable
             $request->bindValue(':id', $this->getId(), PDO::PARAM_INT);
             $request->execute();
 
-            foreach ($this->getCodes() as $code) {
-                if ($code instanceof CodeAde && !is_null($code->getId())) {
+            foreach ($this->getCodes() as $code)
+            {
+                if ($code instanceof CodeAde && !is_null($code->getId()))
+                {
+                    $request = $database->prepare('INSERT INTO ecran_code_user (user_id, code_ade_id) VALUES (:userId, :codeAdeId)');
                     $request->bindValue(':userId', $this->getId(), PDO::PARAM_INT);
                     $request->bindValue(':codeAdeId', $code->getId(), PDO::PARAM_INT);
                     $request->execute();
                 }
             }
 
+            /*
+              Si l'utilisateur qui est modifié est une télévision, on modifie les valeurs des attributs de la table ecran_television en fonction de l'id de l'utilisateur qui est une clé étrangère
+            */
+            if ($this->getRole() === 'television')
+            {
+                $request = $database->prepare('UPDATE ecran_television SET type_defilement = :typeDefilement, timeout = :timeout WHERE id_user = :idUser');
+                $request->bindValue(':idUser', $this->getId(), PDO::PARAM_INT);
+                $request->bindValue(':typeDefilement', $this->getTypeDefilement(), PDO::PARAM_STR);
+                $request->bindValue(':timeout', $this->getTimeout(), PDO::PARAM_INT);
+                $request->execute();
+            }
+
             $database->commit();
             return $request->rowCount();
-        } catch (Exception $e) {
+        }
+        catch (Exception $e)
+        {
             $database->rollBack();
             error_log($e->getMessage());
             throw new Exception("An error occurred while updating the user.");
@@ -128,7 +177,8 @@ class User extends Model implements Entity, JsonSerializable
 	 *
 	 * @return int Returns the number of rows affected during the deletion of the user record.
 	 */
-    public function delete(): int {
+    public function delete(): int
+    {
         $database = $this->getDatabase();
         $request = $database->prepare('DELETE FROM wp_users WHERE ID = :id');
         $request->bindValue(':id', $this->getId(), PDO::PARAM_INT);
@@ -138,6 +188,16 @@ class User extends Model implements Entity, JsonSerializable
         $request = $database->prepare('DELETE FROM wp_usermeta WHERE user_id = :id');
         $request->bindValue(':id', $this->getId(), PDO::PARAM_INT);
         $request->execute();
+
+        /*
+          Si l'utilisateur qui est modifié est une télévision, on supprime les valeurs des attributs de la table ecran_television en fonction de l'id de l'utilisateur qui est une clé étrangère
+        */
+        if ($this->getRole() === 'television')
+        {
+            $request = $database->prepare('DELETE FROM ecran_television WHERE id_user = :idUser');
+            $request->bindValue(':idUser', $this->getId(), PDO::PARAM_INT);
+            $request->execute();
+        }
 
         return $count;
     }
@@ -149,14 +209,16 @@ class User extends Model implements Entity, JsonSerializable
 	 *
 	 * @return User|false Returns a User object if the user is found, otherwise returns false.
 	 */
-    public function get($id): User | false {
+    public function get($id): User | false
+    {
         $request = $this->getDatabase()->prepare('SELECT wp.ID, user_login, user_pass, user_email, edu.dept_id FROM wp_users wp
                                                 LEFT JOIN ecran_dept_user edu ON edu.user_id = wp.ID
                                                 WHERE wp.ID = :id LIMIT 1');
         $request->bindParam(':id', $id, PDO::PARAM_INT);
         $request->execute();
 
-        if ($request->rowCount() > 0) {
+        if ($request->rowCount() > 0)
+        {
             return $this->setEntity($request->fetch());
         }
         return false;
@@ -191,7 +253,8 @@ class User extends Model implements Entity, JsonSerializable
 	 *
 	 * @return User[]|void The list of users matching the specified role, or void if no users are found.
 	 */
-    public function getUsersByRole($role) {
+    public function getUsersByRole($role)
+    {
         $request = $this->getDatabase()->prepare('SELECT wpu.ID as ID, user_login, user_pass, user_email, edu.dept_id 
                                                         FROM wp_users wpu JOIN wp_usermeta meta ON wpu.ID = meta.user_id  
                                                         JOIN ecran_dept_user edu ON edu.user_id = wpu.ID AND meta.meta_value = :role 
@@ -214,8 +277,10 @@ class User extends Model implements Entity, JsonSerializable
 	 *
 	 * @return array Modified array of user objects with their associated codes set.
 	 */
-    public function getMyCodes(array $users): array {
-        foreach ($users as $user) {
+    public function getMyCodes(array $users): array
+    {
+        foreach ($users as $user)
+        {
             $request = $this->getDatabase()->prepare('SELECT code.id, type, title, code FROM ecran_code_ade code, ecran_code_user user
                                   							WHERE user.user_id = :id AND user.code_ade_id = code.id ORDER BY code.id LIMIT 100');
 
@@ -226,9 +291,12 @@ class User extends Model implements Entity, JsonSerializable
             $request->execute();
 
             $code = new CodeAde();
-            if ($request->rowCount() <= 0) {
+            if ($request->rowCount() <= 0)
+            {
                 $codes = [];
-            } else {
+            }
+            else
+            {
                 $codes = $code->setEntityList($request->fetchAll());
             }
 
@@ -334,6 +402,28 @@ class User extends Model implements Entity, JsonSerializable
         return $result['code'];
     }
 
+    /**
+     * Return data for a television user
+     * @param int $idUser
+     * @return array|null
+     */
+    public function getTypeOfTelevision(int $idUser): array|null
+    {
+        $user = new User();
+        $user = $user->get($idUser);
+        if ($user->getRole() === 'television')
+        {
+            $request = $this->getDatabase()->prepare('SELECT id_user, type_defilement, timeout FROM ecran_television
+                                                            JOIN wp_users ON wp_users.ID = ecran_television.id_user
+                                                            WHERE id_user = :id_user LIMIT 1');
+            $request->bindParam(':id_user', $idUser, PDO::PARAM_INT);
+            $request->execute();
+
+            return $request->fetch();
+        }
+        return null;
+    }
+
 	public function getDeptAdmin( int $id){
 		$request = $this->getDatabase()->prepare('SELECT dept_id FROM ecran_dept_user WHERE dept_id = :id LIMIT 1');
 
@@ -353,34 +443,38 @@ class User extends Model implements Entity, JsonSerializable
      *
      * @return User The populated User entity object with all properties set, including associated codes.
      */
-    public function setEntity($data): User {
-        $this->setId($data['ID']);
-        $this->setLogin($data['user_login']);
-        $this->setPassword($data['user_pass']);
-        $this->setEmail($data['user_email']);
-        $this->setRole(get_user_by('ID', $data['ID'])->roles[0]);
-        $this->setDeptId(($data['dept_id']) ?: 0);
+    public function setEntity($data): User
+    {
+        $entity = new User();
+        $entity->setId($data['ID']);
+        $entity->setLogin($data['user_login']);
+        $entity->setPassword($data['user_pass']);
+        $entity->setEmail($data['user_email']);
+        $entity->setRole(get_user_by('ID', $data['ID'])->roles[0]);
+        $entity->setDeptId(($data['dept_id']) ?: 0);
 
         $request = $this->getDatabase()->prepare('SELECT id, title, code, type, dept_id FROM ecran_code_ade
-                 JOIN ecran_code_user ON ecran_code_ade.id = ecran_code_user.code_ade_id
-                                    WHERE ecran_code_user.user_id = :id');
+                                                JOIN ecran_code_user ON ecran_code_ade.id = ecran_code_user.code_ade_id
+                                                WHERE ecran_code_user.user_id = :id');
         $request->bindValue(':id', $data['ID']);
         $request->execute();
 
         $codeAde = new CodeAde();
         $codes = $codeAde->setEntityList($request->fetchAll());
-        $this->setCodes($codes);
+        $entity->setCodes($codes);
 
-        return $this;
+        return $entity;
     }
 	/**
 	 * @param array $dataList List of data entries to be converted into entity objects.
 	 *
 	 * @return array Processed list of entity objects.
 	 */
-    public function setEntityList($dataList): array {
+    public function setEntityList($dataList): array
+    {
         $listEntity = array();
-        foreach ($dataList as $data) {
+        foreach ($dataList as $data)
+        {
             $listEntity[] = $this->setEntity($data);
         }
         return $listEntity;
@@ -389,84 +483,96 @@ class User extends Model implements Entity, JsonSerializable
     /**
      * @return int
      */
-    public function getId(): int {
+    public function getId(): int
+    {
         return $this->id;
     }
 
     /**
      * @param int $id
      */
-    public function setId(int $id): void {
+    public function setId(int $id): void
+    {
         $this->id = $id;
     }
 
     /**
      * @return string
      */
-    public function getLogin(): string {
+    public function getLogin(): string
+    {
         return $this->login;
     }
 
     /**
      * @param string $login
      */
-    public function setLogin(string $login): void {
+    public function setLogin(string $login): void
+    {
         $this->login = $login;
     }
 
     /**
      * @return string
      */
-    public function getPassword(): string {
+    public function getPassword(): string
+    {
         return $this->password;
     }
 
     /**
      * @param string $password
      */
-    public function setPassword(string $password): void {
+    public function setPassword(string $password): void
+    {
         $this->password = $password;
     }
 
     /**
      * @return string
      */
-    public function getEmail(): string {
+    public function getEmail(): string
+    {
         return $this->email;
     }
 
     /**
      * @param string $email
      */
-    public function setEmail(string $email): void {
+    public function setEmail(string $email): void
+    {
         $this->email = $email;
     }
 
     /**
      * @return string
      */
-    public function getRole(): string {
+    public function getRole(): string
+    {
         return $this->role;
     }
 
     /**
      * @param string $role
      */
-    public function setRole(string $role): void {
+    public function setRole(string $role): void
+    {
         $this->role = $role;
     }
 
     /**
      * @return CodeAde[]
      */
-    public function getCodes(): array {
+    public function getCodes(): array
+    {
         return $this->codes;
     }
 
     /**
      * @param CodeAde[] $codes
      */
-    public function setCodes(array $codes): void {
+    public function setCodes(array $codes): void
+    {
         $this->codes = $codes;
     }
 
@@ -478,11 +584,43 @@ class User extends Model implements Entity, JsonSerializable
 		$this->deptId = $deptId;
 	}
 
-    public function jsonSerialize(): mixed {
+    public function jsonSerialize(): mixed
+    {
         return array(
             'id' => $this->id,
             'name' => $this->login
         );
     }
 
+    /**
+     * @return string
+     */
+    public function getTypeDefilement(): string
+    {
+        return $this->typeDefilement;
+    }
+
+    /**
+     * @param string $typeDefilement
+     */
+    public function setTypeDefilement(string $typeDefilement): void
+    {
+        $this->typeDefilement = $typeDefilement;
+    }
+
+    /**
+     * @return int
+     * */
+    public function getTimeout(): int
+    {
+        return $this->timeout;
+    }
+
+    /**
+     * @param int $timeout
+     */
+    public function setTimeout(int $timeout): void
+    {
+        $this->timeout = $timeout;
+    }
 }

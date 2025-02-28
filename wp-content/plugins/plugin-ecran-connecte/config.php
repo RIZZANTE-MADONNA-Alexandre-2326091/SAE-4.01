@@ -224,6 +224,19 @@ function installDatabaseEcran(): void
     	) $charset_collate;";
 
 	dbDelta($sql);
+
+    $table_name = 'ecran_television';
+
+    $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+            id INT(11) NOT NULL AUTO_INCREMENT,
+            id_user BIGINT(20) NOT NULL,
+            type_defilement CHAR(5) NOT NULL,
+            timeout INT(11) NOT NULL DEFAULT 10000,
+            PRIMARY KEY (id, id_user),
+            FOREIGN KEY (id_user) REFERENCES wp_users(ID) ON DELETE CASCADE
+            ) $charset_collate;";
+
+    dbDelta($sql);
 }
 
 add_action('plugins_loaded', 'installDatabaseEcran');

@@ -39,19 +39,19 @@ class InformationController extends Controller
         $this->view = new InformationView();
     }
 
-    /**
-     * Handles the creation of information based on user input, including setting metadata,
-     * uploading files, and managing different content types (text, images, tables, PDFs, events).
-     * It also displays the corresponding forms and validation UI components.
-     *
-     * @return string A rendered HTML selector for information creation forms, including type and content options.
-     * @throws Exception If an error occurs during file registration or database insertion.
-     */
+	/**
+	 * Handles the creation of information based on user input, including setting metadata,
+	 * uploading files, and managing different content types (text, images, tables, PDFs, events).
+	 * It also displays the corresponding forms and validation UI components.
+	 *
+	 * @return string A rendered HTML selector for information creation forms, including type and content options.
+	 * @throws Exception If an error occurs during file registration or database insertion.
+	 */
     public function create(): string
     {
         $current_user = wp_get_current_user();
         $author = new User();
-        $author->get($current_user);
+        $author = $author->get($current_user->ID);
 
         // All forms
         $actionText = filter_input(INPUT_POST, 'createText');
@@ -77,149 +77,148 @@ class InformationController extends Controller
 
         $information = $this->model;
 
-        // Set the base of all information
-        $information->setTitle($title);
-        $information->setAuthorId($author->ID);
-        $information->setCreationDate($creationDate);
-        $information->setExpirationDate($endDate);
-        $information->setAdminId(null);
-
-
-        if (isset($actionText))
-        {                      // If the information is a text
-            $information->setContent($content);
-            $information->setType("text");
-
-            // Try to insert the information
-            if ($information->insert())
-            {
-                $this->view->displayCreateValidate();
-            }
-            else
-            {
-                $this->view->displayErrorInsertionInfo();
-            }
-        }
-        if (isset($actionImg))
-        {                     // If the information is an image
-            $type = "img";
-            $information->setType($type);
-            $filename = $_FILES['contentFile']['name'];
-            $fileTmpName = $_FILES['contentFile']['tmp_name'];
-            $explodeName = explode('.', $filename);
-            $goodExtension = ['jpg', 'jpeg', 'gif', 'png', 'svg'];
-            if (in_array(end($explodeName), $goodExtension))
-            {
-                $this->registerFile($filename, $fileTmpName, $information);
-            }
-            else
-            {
-                $this->view->buildModal('Image non valide', '<p>Ce fichier est une image non valide, veuillez choisir une autre image</p>');
-            }
-        }
-        if (isset($actionPDF))
+        if ((!empty($content) || !is_null($_FILES['contentFile'])) && !empty($endDate))
         {
-            $type = "pdf";
-            $information->setType($type);
-            $filename = $_FILES['contentFile']['name'];
-            $explodeName = explode('.', $filename);
-            if (end($explodeName) == 'pdf')
-            {
+            // Set the base of all information
+            $information->setTitle($title);
+            $information->setAuthor($author);
+            $information->setCreationDate($creationDate);
+            $information->setExpirationDate($endDate);
+            $information->setAdminId(null);
+
+            if (isset($actionText))
+            {                      // If the information is a text
+                $information->setContent($content);
+                $information->setType("text");
+
+                // Try to insert the information
+                if ($information->insert())
+                {
+                    $this->view->displayCreateValidate();
+                }
+                else
+                {
+                    $this->view->displayErrorInsertionInfo();
+                }
+            }
+            if (isset($actionImg))
+            {                     // If the information is an image
+                $type = "img";
+                $information->setType($type);
+                $filename = $_FILES['contentFile']['name'];
                 $fileTmpName = $_FILES['contentFile']['tmp_name'];
-                $this->registerFile($filename, $fileTmpName, $information);
-            }
-            else
-            {
-                $this->view->buildModal('PDF non valide', '<p>Ce fichier est un tableau non PDF, veuillez choisir un autre PDF</p>');
-            }
-        }
-        if (isset($actionEvent))
-        {                       // If the information is an event
-            $type = 'event';
-            $information->setType($type);
-            $countFiles = count($_FILES['contentFile']['name']);
-            for ($i = 0; $i < $countFiles; $i++)
-            {
-                $this->model->setId(null);
-                $filename = $_FILES['contentFile']['name'][$i];
-                $fileTmpName = $_FILES['contentFile']['tmp_name'][$i];
                 $explodeName = explode('.', $filename);
-                $goodExtension = ['jpg', 'jpeg', 'gif', 'png', 'svg', 'pdf'];
+                $goodExtension = ['jpg', 'jpeg', 'gif', 'png', 'svg'];
+
                 if (in_array(end($explodeName), $goodExtension))
                 {
                     $this->registerFile($filename, $fileTmpName, $information);
                 }
+                else
+                {
+                    $this->view->buildModal('Image non valide', '<p>Ce fichier est une image non valide, veuillez choisir une autre image</p>');
+                }
             }
-        }
-        if(isset($actionVideoYT))
-        {                      // If the information is a Youtube video
-            $type = 'YTvideo';
-            if (str_contains($content, 'https://www.youtube.com/shorts/'))
-            {
-                $information->setType($type . 'sh');
-            }
-            else if (str_contains($content, 'https://www.youtube.com/watch?v='))
-            {
-                $information->setType($type . 'w');
-            }
-            else
-            {
-                $this->view->displayErrorInsertionInfo();
-            }
-            $information->setContent($content);
+            if (isset($actionPDF))
+            {                       // If the information is an PDF file
+                $type = "pdf";
+                $information->setType($type);
+                $filename = $_FILES['contentFile']['name'];
+                $explodeName = explode('.', $filename);
 
-            // Try to insert the information
-            if ($information->insert())
-            {
-                $this->view->displayCreateValidate();
+                if (end($explodeName) == 'pdf')
+                {
+                    $this->registerFile($filename, $fileTmpName, $information);
+                }
             }
-            else
-            {
-                $this->view->displayErrorInsertionInfo();
-            }
-        }
-        if (isset($actionVideoCLocal) || isset($actionVideoSLocal))
-        {
-            $type = '';
-            if (isset($actionVideoCLocal))
-            {
-                $type = 'LocCvideo';
-            } else if (isset($actionVideoSLocal))
-            {
-                $type = 'LocSvideo';
-            }
-            $information->setType($type);
-            $filename = $_FILES['contentFile']['name'];
-            $fileTmpName = $_FILES['contentFile']['tmp_name'];
-            $explodeName = explode('.', $filename);
-            $goodExtension = ['mp4'];
-            if (in_array(end($explodeName), $goodExtension))
-            {
-                $this->registerFile($filename, $fileTmpName, $information);
-            } else if ($_FILES['contentFile']['size'] > 1073741824)
-            {
-                $this->view->displayVideoExceedsMaxSize();
-            }
-            else
-            {
-                $this->view->displayNotConformVideo();
-            }
-        }
+            if (isset($actionEvent))
+            {                       // If the information is an event
+                $type = 'event';
+                $information->setType($type);
+                $countFiles = count($_FILES['contentFile']['name']);
 
-        if (isset($actionRSS))
-        {
-            $information->setContent($content);
-            $information->setType("rss");
-            if ($information->insert())
-            {
-                $this->view->displayCreateValidate();
+                for ($i = 0; $i < $countFiles; $i++)
+                {
+                    $this->model->setId(null);
+                    $filename = $_FILES['contentFile']['name'][$i];
+                    $fileTmpName = $_FILES['contentFile']['tmp_name'][$i];
+                    $explodeName = explode('.', $filename);
+                    $goodExtension = ['jpg', 'jpeg', 'gif', 'png', 'svg', 'pdf'];
+                    if (in_array(end($explodeName), $goodExtension))
+                    {
+                        $this->registerFile($filename, $fileTmpName, $information);
+                    }
+                }
             }
-            else
+            if (isset($actionVideoYT))
+            {                         // If the information is a Youtube video
+                $type = 'YTvideo';
+                if (str_contains($content, 'https://www.youtube.com/shorts/'))
+                {
+                    $information->setType($type . 'sh');
+                }
+                else if (str_contains($content, 'https://www.youtube.com/watch?v='))
+                {
+                    $information->setType($type . 'w');
+                }
+                else
+                {
+                    $this->view->displayErrorInsertionInfo();
+                }
+                $information->setContent($content);
+
+                // Try to insert the information
+                if ($information->insert())
+                {
+                    $this->view->displayCreateValidate();
+                }
+                else
+                {
+                    $this->view->displayErrorInsertionInfo();
+                }
+            }
+            if (isset($actionVideoCLocal) || isset($actionVideoSLocal))
             {
-                $this->view->displayErrorInsertionInfo();
+                $type = '';
+                if (isset($actionVideoCLocal))
+                {
+                    $type = 'LocCvideo';
+                } else if (isset($actionVideoSLocal))
+                {
+                    $type = 'LocSvideo';
+                }
+                $information->setType($type);
+                $filename = $_FILES['contentFile']['name'];
+                $fileTmpName = $_FILES['contentFile']['tmp_name'];
+                $explodeName = explode('.', $filename);
+                $goodExtension = ['mp4'];
+                if (in_array(end($explodeName), $goodExtension))
+                {
+                    $this->registerFile($filename, $fileTmpName, $information);
+                }
+                else if ($_FILES['contentFile']['size'] > 1073741824)
+                {
+                    $this->view->displayVideoExceedsMaxSize();
+                }
+                else
+                {
+                    $this->view->displayNotConformVideo();
+                }
+            }
+            if (isset($actionRSS))
+            {
+                $information->setContent($content);
+                $information->setType("rss");
+                if ($information->insert())
+                {
+                    $this->view->displayCreateValidate();
+                }
+                else
+                {
+                    $this->view->displayErrorInsertionInfo();
+                }
             }
         }
-
         // Return a selector with all forms
         return
             $this->view->displayStartMultiSelect() .
@@ -244,17 +243,17 @@ class InformationController extends Controller
             $this->view->contextCreateInformation();
     }
 
-    /**
-     * Modify an information entry.
-     *
-     * This method retrieves, validates, and updates an information entry based on user input. It ensures
-     * the user has the appropriate permissions and verifies file uploads (if applicable) for specific
-     * content types such as images, PDFs, or spreadsheets.
-     *
-     * @return string Returns various views including the modification form, validation messages,
-     *               or an error message based on the action and its outcome.
-     * @throws Exception Throws exceptions for invalid file operations or unexpected errors.
-     */
+	/**
+	 * Modify an information entry.
+	 *
+	 * This method retrieves, validates, and updates an information entry based on user input. It ensures
+	 * the user has the appropriate permissions and verifies file uploads (if applicable) for specific
+	 * content types such as images, PDFs, or spreadsheets.
+	 *
+	 * @return string Returns various views including the modification form, validation messages,
+	 *               or an error message based on the action and its outcome.
+	 * @throws Exception Throws exceptions for invalid file operations or unexpected errors.
+	 */
     public function modify(): string
     {
         $id = $_GET['id'];
@@ -414,11 +413,11 @@ class InformationController extends Controller
      *
      * @param string $filename The original name of the file being uploaded.
      * @param string $tmpName The temporary file path where the uploaded file is stored.
-     * @param object $entity The entity object to which the file content is associated.
+     * @param Information $entity The entity object to which the file content is associated.
      *
      * @return void
      */
-    public function registerFile( string $filename, string $tmpName, object $entity): void
+    public function registerFile(string $filename, string $tmpName, Information $entity): void
     {
         $id = 'temporary';
         $extension_upload = strtolower(substr(strrchr($filename, '.'), 1));
@@ -428,7 +427,8 @@ class InformationController extends Controller
         if ($result = move_uploaded_file($tmpName, $name))
         {
             $entity->setContent('temporary content');
-            if ($entity->getId() == null)
+            $idEntity = $entity->getId();
+            if (!isset($idEntity))
             {
                 $id = $entity->insert();
             }
