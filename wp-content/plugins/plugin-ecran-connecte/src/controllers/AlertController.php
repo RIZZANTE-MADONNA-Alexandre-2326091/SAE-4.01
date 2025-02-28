@@ -4,6 +4,7 @@ namespace Controllers;
 
 use Models\Alert;
 use Models\CodeAde;
+use Models\Department;
 use Models\User;
 use Views\AlertView;
 
@@ -49,6 +50,14 @@ class AlertController extends Controller
     public function insert(): string {
         $codeAde = new CodeAde();
         $action = filter_input(INPUT_POST, 'submit');
+
+        $currentUser = wp_get_current_user();
+        $deptId = 0;
+        if(in_array('adminDept', $currentUser->roles)|| in_array('secretaire', $currentUser->roles)) {
+            $deptModel = new Department();
+            $deptId = $deptModel->getUserInDept($currentUser->ID)->getId();
+        }
+
         if (isset($action)) {
             $codes = $_POST['selectAlert'];
             $content = filter_input(INPUT_POST, 'content');
@@ -74,9 +83,9 @@ class AlertController extends Controller
             }
 
             if (is_string($content) && strlen($content) >= 4 && strlen($content) <= 280 && $this->isRealDate($endDate) && $creationDateString < $endDateString) {
-                $current_user = wp_get_current_user();
+
                 $author = new User();
-                $author->get($current_user->ID);
+                $author->get($currentUser->ID);
 
                 // Set the alert
                 $this->model->setAuthor($author);
@@ -100,7 +109,9 @@ class AlertController extends Controller
         $groups = $codeAde->getAllFromType('group');
         $halfGroups = $codeAde->getAllFromType('halfGroup');
 
-        return $this->view->creationForm($years, $groups, $halfGroups);
+        var_dump($deptId);
+
+        return $this->view->creationForm($years, $groups, $halfGroups, $deptId);
     }
 
     /**

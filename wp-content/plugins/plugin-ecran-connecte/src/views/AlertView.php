@@ -26,10 +26,11 @@ class AlertView extends View
 	 * @param array $years Array of available years.
 	 * @param array $groups Array of available groups.
 	 * @param array $halfGroups Array of available half-groups.
+     * @param int $deptId The ID of the department to which the user will be associated.
 	 *
 	 * @return string Array containing the HTML code for the form.
 	 */
-    public function creationForm(array $years, array $groups, array $halfGroups): string {
+    public function creationForm(array $years, array $groups, array $halfGroups, int $deptId): string {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
 
         return '
@@ -44,9 +45,9 @@ class AlertView extends View
 			</div>
             <div class="form-group">
                 <label for="selectAlert">Année, groupe, demi-groupes concernés</label>
-                ' . $this->buildSelectCode($years, $groups, $halfGroups) . '
+                ' . $this->buildSelectCode($years, $groups, $halfGroups, null, 0, 0, $deptId) . '
             </div>
-            <input type="button" id="plus" onclick="addButtonAlert()" class="btn button_ecran" value="+">
+            <input type="button" id="plus" onclick="addButtonAlert(' . $deptId . ')" class="btn button_ecran" value="+">
             <button type="submit" id="valider" class="btn button_ecran" name="submit">Valider</button>
         </form>
         <a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des alertes'))) . '">Voir les alertes</a>' . $this->contextCreateAlert();
@@ -190,13 +191,13 @@ class AlertView extends View
 	 * @param array $years An array of year objects, where each object is expected to have methods `getCode()` and `getTitle()` to fetch year code and title.
 	 * @param array $groups An array of group objects, where each object is expected to have methods `getCode()` and `getTitle()` to fetch group
 	 */
-    public function buildSelectCode(array $years,array $groups,array $halfGroups,array $code = null, int $count = 0, int $forEveryone = 0): string {
+    public function buildSelectCode(array $years,array $groups,array $halfGroups,array $code = null, int $count = 0, int $forEveryone = 0, int $deptId): string {
         $select = '<select class="form-control firstSelect" id="selectId' . $count . '" name="selectAlert[]" required="">';
 
         if ($forEveryone) {
             $select .= '<option value="all" selected>Tous</option>';
         } elseif (!is_null($code)) {
-            $select .= '<option value="' . $code->getCode() . '" selected>' . $code->getTitle() . '</option>';
+                $select .= '<option value="' . $code->getCode() . '" selected>' . $code->getTitle() . '</option>';
         }
 
         $select .= '<option value="all">Tous</option>
@@ -204,17 +205,20 @@ class AlertView extends View
             		<optgroup label="Année">';
 
         foreach ($years as $year) {
-            $select .= '<option value="' . $year->getCode() . '">' . $year->getTitle() . '</option >';
+            if($deptId == 0 || $year->getDeptId() == $deptId)
+                $select .= '<option value="' . $year->getCode() . '">' . $year->getTitle() . '</option >';
         }
         $select .= '</optgroup><optgroup label="Groupe">';
 
         foreach ($groups as $group) {
-            $select .= '<option value="' . $group->getCode() . '">' . $group->getTitle() . '</option>';
+            if($deptId == 0 || $group->getDeptId() == $deptId)
+                $select .= '<option value="' . $group->getCode() . '">' . $group->getTitle() . '</option>';
         }
         $select .= '</optgroup><optgroup label="Demi groupe">';
 
         foreach ($halfGroups as $halfGroup) {
-            $select .= '<option value="' . $halfGroup->getCode() . '">' . $halfGroup->getTitle() . '</option>';
+            if($deptId == 0 || $halfGroup->getDeptId() == $deptId)
+                $select .= '<option value="' . $halfGroup->getCode() . '">' . $halfGroup->getTitle() . '</option>';
         }
         $select .= '</optgroup>
 			</select>';

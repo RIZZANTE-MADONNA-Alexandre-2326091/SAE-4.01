@@ -3,16 +3,19 @@ let countRow = 0;
 /**
  * Create a new select to add a new group for the alert
  */
-function addButtonAlert() {
+function addButtonAlert(deptId) {
     console.log(countRow);
     countRow = countRow + 1;
     var presenceSupp = false;
+
+    console.log(deptId);
 
     $.ajax({
         url: '/wp-admin/admin-ajax.php',
         type: 'POST',
         data: {
-            action: 'get_all_codes'
+            action: 'get_all_codes',
+            deptId: deptId
         }
     }).done(function (data) {
         let div = $('<div >', {
