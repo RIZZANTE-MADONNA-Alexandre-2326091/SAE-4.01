@@ -58,7 +58,7 @@ class CodeAdeController extends Controller
 
         if (isset($action)) {
 
-            $validType = ['year', 'group', 'halfGroup'];
+            $validType = ['year', 'group', 'halfGroup', 'room'];
 
             $title = filter_input(INPUT_POST, 'title');
             $code = filter_input(INPUT_POST, 'code');

@@ -35,6 +35,15 @@ class CommunicatorController extends UserController
     }
 
     /**
+     * Displays the schedule by rendering the welcome communicator view.
+     *
+     * @return string The result of rendering the welcome admin view.
+     */
+    public function displayMySchedule(): string {
+        return $this->view->displayWelcomeCommunicator();
+    }
+
+    /**
      * Handles the insertion of a communicator user record into the system.
      * Validates the input data, ensures it meets requirements, checks for duplicate users,
      * and calls the model to perform the actual insertion. Displays appropriate views based
