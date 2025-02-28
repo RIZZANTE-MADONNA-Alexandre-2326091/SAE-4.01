@@ -87,187 +87,136 @@ class InformationController extends Controller
 
         if (isset($actionText))
         {                      // If the information is a text
-            if ($content === '' || $endDate === '')
+            $information->setContent($content);
+            $information->setType("text");
+
+            // Try to insert the information
+            if ($information->insert())
             {
-                $this->view->displayErrorInsertionInfo();
+                $this->view->displayCreateValidate();
             }
             else
             {
-
-                $information->setContent($content);
-                $information->setType("text");
-
-                // Try to insert the information
-                if ($information->insert())
-                {
-                    $this->view->displayCreateValidate();
-                }
-                else
-                {
-                    $this->view->displayErrorInsertionInfo();
-                }
+                $this->view->displayErrorInsertionInfo();
             }
         }
         if (isset($actionImg))
         {                     // If the information is an image
-            if ($content === '' || $endDate === '')
+            $type = "img";
+            $information->setType($type);
+            $filename = $_FILES['contentFile']['name'];
+            $fileTmpName = $_FILES['contentFile']['tmp_name'];
+            $explodeName = explode('.', $filename);
+            $goodExtension = ['jpg', 'jpeg', 'gif', 'png', 'svg'];
+            if (in_array(end($explodeName), $goodExtension))
             {
-                $this->view->displayErrorInsertionInfo();
+                $this->registerFile($filename, $fileTmpName, $information);
             }
             else
             {
-                $type = "img";
-                $information->setType($type);
-                $filename = $_FILES['contentFile']['name'];
-                $fileTmpName = $_FILES['contentFile']['tmp_name'];
-                $explodeName = explode('.', $filename);
-                $goodExtension = ['jpg', 'jpeg', 'gif', 'png', 'svg'];
-                if (in_array(end($explodeName), $goodExtension))
-                {
-                    $this->registerFile($filename, $fileTmpName, $information);
-                }
-                else
-                {
-                    $this->view->buildModal('Image non valide', '<p>Ce fichier est une image non valide, veuillez choisir une autre image</p>');
-                }
+                $this->view->buildModal('Image non valide', '<p>Ce fichier est une image non valide, veuillez choisir une autre image</p>');
             }
         }
         if (isset($actionPDF))
         {
-            if ($content === '' || $endDate === '')
+            $type = "pdf";
+            $information->setType($type);
+            $filename = $_FILES['contentFile']['name'];
+            $explodeName = explode('.', $filename);
+            if (end($explodeName) == 'pdf')
             {
-                $this->view->displayErrorInsertionInfo();
+                $fileTmpName = $_FILES['contentFile']['tmp_name'];
+                $this->registerFile($filename, $fileTmpName, $information);
             }
             else
             {
-                $type = "pdf";
-                $information->setType($type);
-                $filename = $_FILES['contentFile']['name'];
-                $explodeName = explode('.', $filename);
-                if (end($explodeName) == 'pdf')
-                {
-                    $fileTmpName = $_FILES['contentFile']['tmp_name'];
-                    $this->registerFile($filename, $fileTmpName, $information);
-                }
-                else
-                {
-                    $this->view->buildModal('PDF non valide', '<p>Ce fichier est un tableau non PDF, veuillez choisir un autre PDF</p>');
-                }
+                $this->view->buildModal('PDF non valide', '<p>Ce fichier est un tableau non PDF, veuillez choisir un autre PDF</p>');
             }
         }
         if (isset($actionEvent))
         {                       // If the information is an event
-            if ($content === '' || $endDate === '')
+            $type = 'event';
+            $information->setType($type);
+            $countFiles = count($_FILES['contentFile']['name']);
+            for ($i = 0; $i < $countFiles; $i++)
             {
-                $this->view->displayErrorInsertionInfo();
-            }
-            else
-            {
-                $type = 'event';
-                $information->setType($type);
-                $countFiles = count($_FILES['contentFile']['name']);
-                for ($i = 0; $i < $countFiles; $i++)
-                {
-                    $this->model->setId(null);
-                    $filename = $_FILES['contentFile']['name'][$i];
-                    $fileTmpName = $_FILES['contentFile']['tmp_name'][$i];
-                    $explodeName = explode('.', $filename);
-                    $goodExtension = ['jpg', 'jpeg', 'gif', 'png', 'svg', 'pdf'];
-                    if (in_array(end($explodeName), $goodExtension))
-                    {
-                        $this->registerFile($filename, $fileTmpName, $information);
-                    }
-                }
-            }
-        }
-        if(isset($actionVideoYT)) {
-            // If the information is a Youtube video
-            if ($content === '' || $endDate === '') {
-                $this->view->displayErrorInsertionInfo();
-            }
-            else
-            {
-                $type = 'YTvideo';
-                if (str_contains($content, 'https://www.youtube.com/shorts/'))
-                {
-                    $information->setType($type . 'sh');
-                }
-                else if (str_contains($content, 'https://www.youtube.com/watch?v='))
-                {
-                    $information->setType($type . 'w');
-                }
-                else
-                {
-                    $this->view->displayErrorInsertionInfo();
-                }
-                $information->setContent($content);
-
-                // Try to insert the information
-                if ($information->insert())
-                {
-                    $this->view->displayCreateValidate();
-                }
-                else
-                {
-                    $this->view->displayErrorInsertionInfo();
-                }
-            }
-        }
-        if (isset($actionVideoCLocal) || isset($actionVideoSLocal))
-        {
-            if ($content === '' || $endDate === '')
-            {
-                $this->view->displayErrorInsertionInfo();
-            }
-            else
-            {
-                $type = '';
-                if (isset($actionVideoCLocal))
-                {
-                    $type = 'LocCvideo';
-                }
-                else if (isset($actionVideoSLocal))
-                {
-                    $type = 'LocSvideo';
-                }
-                $information->setType($type);
-                $filename = $_FILES['contentFile']['name'];
-                $fileTmpName = $_FILES['contentFile']['tmp_name'];
+                $this->model->setId(null);
+                $filename = $_FILES['contentFile']['name'][$i];
+                $fileTmpName = $_FILES['contentFile']['tmp_name'][$i];
                 $explodeName = explode('.', $filename);
-                $goodExtension = ['mp4'];
+                $goodExtension = ['jpg', 'jpeg', 'gif', 'png', 'svg', 'pdf'];
                 if (in_array(end($explodeName), $goodExtension))
                 {
                     $this->registerFile($filename, $fileTmpName, $information);
                 }
-                else if ($_FILES['contentFile']['size'] > 1073741824)
-                {
-                    $this->view->displayVideoExceedsMaxSize();
-                }
-                else
-                {
-                    $this->view->displayNotConformVideo();
-                }
+            }
+        }
+        if(isset($actionVideoYT))
+        {                      // If the information is a Youtube video
+            $type = 'YTvideo';
+            if (str_contains($content, 'https://www.youtube.com/shorts/'))
+            {
+                $information->setType($type . 'sh');
+            }
+            else if (str_contains($content, 'https://www.youtube.com/watch?v='))
+            {
+                $information->setType($type . 'w');
+            }
+            else
+            {
+                $this->view->displayErrorInsertionInfo();
+            }
+            $information->setContent($content);
+
+            // Try to insert the information
+            if ($information->insert())
+            {
+                $this->view->displayCreateValidate();
+            }
+            else
+            {
+                $this->view->displayErrorInsertionInfo();
+            }
+        }
+        if (isset($actionVideoCLocal) || isset($actionVideoSLocal))
+        {
+            $type = '';
+            if (isset($actionVideoCLocal))
+            {
+                $type = 'LocCvideo';
+            } else if (isset($actionVideoSLocal))
+            {
+                $type = 'LocSvideo';
+            }
+            $information->setType($type);
+            $filename = $_FILES['contentFile']['name'];
+            $fileTmpName = $_FILES['contentFile']['tmp_name'];
+            $explodeName = explode('.', $filename);
+            $goodExtension = ['mp4'];
+            if (in_array(end($explodeName), $goodExtension))
+            {
+                $this->registerFile($filename, $fileTmpName, $information);
+            } else if ($_FILES['contentFile']['size'] > 1073741824)
+            {
+                $this->view->displayVideoExceedsMaxSize();
+            }
+            else
+            {
+                $this->view->displayNotConformVideo();
             }
         }
 
         if (isset($actionRSS))
         {
-            if ($content === '' || $endDate === '')
+            $information->setContent($content);
+            $information->setType("rss");
+            if ($information->insert())
             {
-                $this->view->displayErrorInsertionInfo();
+                $this->view->displayCreateValidate();
             }
             else
             {
-                $information->setContent($content);
-                $information->setType("rss");
-                if ($information->insert())
-                {
-                    $this->view->displayCreateValidate();
-                }
-                else
-                {
-                    $this->view->displayErrorInsertionInfo();
-                }
+                $this->view->displayErrorInsertionInfo();
             }
         }
 
@@ -589,14 +538,18 @@ class InformationController extends Controller
                 {
                     $content = '[pdf-embedder url="' . TV_UPLOAD_PATH . $information->getContent() . '"]';
                 }
-                else if ($information->getType() === 'LocCvideo' && $contentExplode[1] === $videoExtension)
+                else if ($information->getType() === 'tab')
+                {
+                    $content = 'Tableau Excel';
+                }
+                else if ($information->getType() === 'LocCvideo')
                 {
                     $content = '<video class="previsualisationVideoClassique" controls muted>
 									<source src="' . $content . $information->getContent() . '" type="video/mp4">
 									<p>Votre navigateur ne permet pas de lire les vidéos de format mp4 avec HTML5.</p>
 								</video>';
                 }
-                else if ($information->getType() === 'LocSvideo' && $contentExplode[1] === $videoExtension)
+                else if ($information->getType() === 'LocSvideo')
                 {
                     $content = '<video class="previsualisationVideoShort" controls muted>
 									<source src="' . $content . $information->getContent() . '" type="video/mp4">
@@ -748,16 +701,16 @@ class InformationController extends Controller
         $this->view->endDiv();
     }
 
-    /**
-     * Synchronizes and updates the local information database with the information
-     * retrieved from the admin website. Existing information is compared and updated
-     * based on title, content, and expiration date. If an information entry no longer
-     * exists on the admin site, it is deleted from the local database. New information
-     * from the admin website is added to the local database if it doesn't already exist.
-     *
-     * @return void
-     */
-    public function registerNewInformation(): void
+	/**
+	 * Synchronizes and updates the local information database with the information
+	 * retrieved from the admin website. Existing information is compared and updated
+	 * based on title, content, and expiration date. If an information entry no longer
+	 * exists on the admin site, it is deleted from the local database. New information
+	 * from the admin website is added to the local database if it doesn't already exist.
+	 *
+	 * @return void
+	 */
+	public function registerNewInformation(): void
     {
         $informationList = $this->model->getFromAdminWebsite();
         $myInformationList = $this->model->getAdminWebsiteInformation();

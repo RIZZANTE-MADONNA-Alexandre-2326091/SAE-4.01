@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="SshConfigs">
-    <configs>
-      <sshConfig authType="PASSWORD" host="ssh-saeecransconnectes.alwaysdata.net" id="c25f99ae-70cc-470a-a574-f33f9b1e6258" port="22" nameFormat="DESCRIPTIVE" username="saeecransconnectes" useOpenSSHConfig="true" />
-    </configs>
-  </component>
-</project>

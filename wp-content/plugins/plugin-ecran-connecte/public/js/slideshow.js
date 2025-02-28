@@ -14,16 +14,8 @@ let firstScriptTag = document.getElementsByTagName('script')[0];
 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
 /**
- * Lecteur de vidéo YouTube shorts
+ * Lecteur de vidéo YouTube
  * */
-let playersh;
-
-/**
- * Lecteur de vidéo YouTube classique
-*/
-let playerw;
-
-
 let player;
 
 /**
@@ -289,22 +281,37 @@ function displayOrHide(slides, slideIndex)
                             // Si la vidéo correspond à celle affichée, on associe un id pour l'API
                             if (videoYouTube === slides[slideIndex].childNodes[i]) {
                                 videoYouTube.id = "videoID";
-                                urlYoutube = videoYouTube.src;
+                                urlYoutube = slides[slideIndex].childNodes[i].children();
+                                console.log(urlYoutube);
+
+                                let lienRealise = false;
                                 let lastElementIndex = 0;
-                                for (let i = 0; i < urlYoutube.length; ++i) {
-                                    if (urlYoutube.charAt(i) === "?") {
+                                for (let i = 24; i < urlYoutube.length; ++i) {
+                                    if (urlYoutube.charAt(i) === '?') {
                                         lastElementIndex = i;
+                                        urlYoutube = urlYoutube.substring(30, lastElementIndex);
+                                        lienRealise = true;
                                         break;
                                     }
                                 }
-                                urlYoutube = urlYoutube.substring(30, lastElementIndex);
+                                if(!lienRealise) {
+                                    let lienVerifShort = "";
+                                    for (let i = 24; i < 30; ++i) {
+                                        lienVerifShort += urlYoutube.charAt(i);
+                                    }
+                                    if (lienVerifShort === "shorts") {
+                                        urlYoutube = urlYoutube.substring(30,)
+                                    }
+                                }
+
                             }
                             // Sinon, elle n'a pas l'id
                             else {
                                 videoYouTube.id = "";
                             }
                         }
-                        onYouTubeIframeAPIReady();
+                        let youtubeIframe = new YouTubeIframeAPI(player, timeout, urlYoutube);
+                        youtubeIframe.onYouTubeIframeAPIReady();
                     }
                     // If it's a local normal video
                     else if (slides[slideIndex].childNodes[i].className === 'localCvideo') {
@@ -365,9 +372,14 @@ function displayOrHide(slides, slideIndex)
                         console.log('--Lecture image');
                         timeout = 10000;
                     }
-                    // If it's an image
+                    // If it's text
                     else if (slides[slideIndex].childNodes[i].className === 'text-info') {
                         console.log('--Lecture texte');
+                        timeout = 10000;
+                    }
+                    // If it's a RSS flow
+                    else if (slides[slideIndex].childNodes[i].className === 'rss-feed') {
+                        console.log('--Lecture rss');
                         timeout = 10000;
                     }
                 }
@@ -390,53 +402,89 @@ function displayOrHide(slides, slideIndex)
     }
 }
 
-//TODO fonctions API Youtube
-/**
- * Fonction qui démarre l'API et attribue les valeurs aux lecteurs de vidéos.
- * */
-function onYouTubeIframeAPIReady() {
-    console.log("---API Youtube démarrée");
-    player = new YT.Player('videoID', {
-        events: {
-            onReady : onPlayerReady,
-            onStateChange: onPlayerStateChange
-        }
-    });
-}
+//TODO corriger vidéos YouTube
 
 /**
- * Fonction évènementielle qui s'active lors de l'évènement onReady: s'active lorsque le lecteur concerné est chargé.
+ * Classe qui permet de gérer les vidéos YouTube
  * */
+class YouTubeIframeAPI {
+    /**
+     * Constructeur de la classe
+     * @param player Lecteur de la vidéo
+     * @param timeout Temps de la vidéo pour le défilement des informations
+     * @param urlId l'identifiant YouTube de la vidéo
+     * */
+    constructor(player, timeout, urlId) {
+        this.player = player;
+        this.timeout = timeout;
+        this.urlId = urlId;
+        this.onYouTubeIframeAPIReady();
+    }
 
-function onPlayerReady(event) {
-    event.target.cueVideoById(urlYoutube, 0, "default");
-    console.log("Chargement vidéo");
-    console.log(event.target.getVideoUrl());
-    event.target.seekTo(0);
-    event.target.playVideo();
-    timeout = (event.target.getDuration() + 1) * 1000;
-    console.log("timeout YT = " + timeout);
+    get getPlayer() {
+        return this.player;
+    }
 
-}
+    get getTimeout() {
+        return this.timeout;
+    }
 
-/**
- * Fonction évènementielle qui s'active lors de l'évènement onStateChange: se déclenche lorsque l'état du lecteur concerné change.
- * */
+    get geturlId() {
+        return this.urlId;
+    }
 
-function onPlayerStateChange(event) {
-    if (event.data === -1) {
+    /**
+     * Fonction qui démarre l'API et attribue les valeurs aux lecteurs de vidéos.
+     * */
+    onYouTubeIframeAPIReady() {
+        console.log("---API Youtube démarrée");
+        this.player = new YT.Player('videoID', {
+            videoId: this.urlId,
+            host: 'https://www.youtube-nocookie.com',
+            playerVars: {
+                origin: window.location.host,
+                autoplay: 1,
+                loop: 1,
+                playlist: this.urlId,
+                mute: 1,
+                controls: 0,
+                disablekb: 1,
+                enablejspi: 1
+            },
+            events: {
+                onReady: this.onPlayerReady,
+                onStateChange: this.onPlayerStateChange,
+            }
+        });
+    }
+
+    /**
+     * Fonction évènementielle qui s'active lors de l'évènement onReady: s'active lorsque le lecteur concerné est chargé.
+     * */
+    onPlayerReady(event) {
+        event.target.cueVideoById(urlYoutube, 0, "default");
+        console.log("Chargement vidéo");
+        console.log(event.target.getVideoUrl());
         event.target.seekTo(0);
         event.target.playVideo();
-        timeout = (event.target.getDuration() + 1) * 1000;
-        console.log("timeout YT = " + timeout + "\tduration = " + event.target.getDuration());
-    }
-    if (event.data === YT.PlayerState.ENDED) {
-        console.log("Vidéo terminée");
-        reloadVideo(event.target);
-    }
-}
+        this.timeout = (event.target.getDuration() + 1) * 1000;
+        console.log("timeout YT = " + timeout);
 
-function reloadVideo(player) {
-    player.seekTo(0);
-    player.playVideo();
+    }
+
+    /**
+     * Fonction évènementielle qui s'active lors de l'évènement onStateChange: se déclenche lorsque l'état du lecteur concerné change.
+     * */
+    onPlayerStateChange(event) {
+        if (event.data === -1) {
+            event.target.seekTo(0);
+            event.target.playVideo();
+            this.timeout = (event.target.getDuration() + 1) * 1000;
+            console.log("timeout YT = " + timeout + "\tduration = " + event.target.getDuration());
+        }
+        if (event.data === YT.PlayerState.ENDED) {
+            console.log("Vidéo terminée");
+            this.player.destroy();
+        }
+    }
 }
