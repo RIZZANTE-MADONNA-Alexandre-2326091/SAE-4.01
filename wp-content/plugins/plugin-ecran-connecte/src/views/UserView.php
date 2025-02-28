@@ -16,8 +16,10 @@ class UserView extends View
 	 *
 	 * @return string The HTML string of the generated form.
 	 */
-    protected function displayBaseForm(string $name):string {
-        return '
+    protected function displayBaseForm(string $name, array $departments = null, bool $isAdmin = false, int $currentDept = null):string {
+        $disabled = $isAdmin ? '' : 'disabled';
+
+        $form = '
             <form method="post" class="cadre">
             	<div class="form-group">
                 	<label for="login' . $name . '">Login</label>
@@ -27,8 +29,16 @@ class UserView extends View
                 <div class="form-group">
                 	<label for="email' . $name . '">Email</label>
                 	<input class="form-control" type="email" name="email' . $name . '" placeholder="Email" required="">
-                </div>
-                <div class="form-group">
+                </div>';
+        if($departments != null) {
+            $form .= '<div class="form-group">
+                	<label for="dept' . $name . '">Département</label>
+                	<select name="deptId' . $name . '" class="form-control" ' . $disabled . '>
+                		'. $this->displayAllDept($departments, $currentDept) .'
+                	</select>
+				</div>';
+        }
+        $form .= '<div class="form-group">
                 	<label for="pwd' . $name . '">Mot de passe</label>
                 	<input class="form-control" minlength="8" maxlength="25" type="password" id="pwd' . $name . '" name="pwd' . $name . '" placeholder="Mot de passe" minlength="8" maxlength="25" required="" onkeyup=checkPwd("' . $name . '")>
                     <input class="form-control" minlength="8" maxlength="25" type="password" id="pwdConf' . $name . '" name="pwdConfirm' . $name . '" placeholder="Confirmer le Mot de passe" minlength="8" maxlength="25" required="" onkeyup=checkPwd("' . $name . '")>
@@ -36,6 +46,8 @@ class UserView extends View
                 </div>
                 <button type="submit" class="btn button_ecran" id="valid' . $name . '" name="create' . $name . '">Créer</button>
             </form>';
+
+        return $form;
     }
 
 	/**
@@ -108,7 +120,29 @@ class UserView extends View
         </form>';
     }
 
+
     /**
+     * Generates an HTML string for the unsubscribe page.
+     *
+     * @return string The HTML content of the unsubscribe page containing a message and the unsubscribe code.
+     */
+    public function displayUnsubscribe(int $code) {
+        return ' 
+ 		<!DOCTYPE html>
+             <html lang="fr">
+                <head>
+                    <title>Désnscription à la télé-connecté</title>
+                </head>
+                <body>
+                    <p>Bonjour, vous avez décidé de vous désinscrire sur le site de la Télé Connecté</p>
+                    <p> Votre code de désinscription est : ' . $code . '.</p>
+                    <p> Pour vous désinscrire, rendez-vous sur le site : <a href="' . home_url() . '/mon-compte/"> Tv Connectée.</p>
+                </body>
+             </html>';
+    }
+
+
+	/**
      * Display a form to change our own codes
      *
      * @param $codes        CodeAde[]
@@ -180,13 +214,13 @@ class UserView extends View
         return '<p>Veuillez choisir un emploi du temps.</p>';
     }
 
-    /**
-     * Display the welcome page
-     *
-     * @return string
-     */
-    public function displayHome() {
-        return '
+	/**
+	 * Display the welcome page
+	 *
+	 * @return string
+	 */
+	public function displayHome() {
+		return '
         <div class="row">
             <div class="col-6 mx-auto col-md-6 order-md-1">
                 <img src="' . TV_PLUG_PATH . '/public/img/background.png" alt="Logo Amu" class="img-fluid mb-3 mb-md-0">
@@ -197,7 +231,7 @@ class UserView extends View
                 <p class="lead mb-4">Accédez à votre emploi du temps tant en recevant diverses informations de la part de votre département.</p>
             </div>
         </div>';
-    }
+	}
 
     /**
      * Display a message for the modification of the password

@@ -1,5 +1,10 @@
 <?php
 
+use Controllers\AlertRestController;
+use Controllers\CodeAdeRestController;
+use Controllers\InformationRestController;
+use Controllers\ProfileRestController;
+
 include_once 'vendor/R34ICS/R34ICS.php';
 include 'widgets/WidgetAlert.php';
 include 'widgets/WidgetWeather.php';
@@ -108,8 +113,10 @@ function installDatabaseEcran(): void
 			author BIGINT(20) UNSIGNED NOT NULL,
 			type VARCHAR (10) DEFAULT 'text' NOT NULL,
 			administration_id INT(10) DEFAULT NULL,
+    		dept_id INT(10) DEFAULT NULL,
 			PRIMARY KEY (id),
-			FOREIGN KEY (author) REFERENCES wp_users(ID) ON DELETE CASCADE
+			FOREIGN KEY (author) REFERENCES wp_users(ID) ON DELETE CASCADE,
+    		FOREIGN KEY (dept_id) REFERENCES ecran_departement(dept_id) ON DELETE CASCADE
 		) $charset_collate;";
 
     dbDelta($sql);
@@ -237,6 +244,17 @@ $result = add_role(
 );
 
 $result = add_role(
+    'communicant',
+    __('Communicant'),
+    array(
+        'read' => true,  // true allows this capability
+        'edit_posts' => true,
+        'delete_posts' => false, // Use false to explicitly deny
+    )
+);
+
+
+$result = add_role(
     'secretaire',
     __('Secretaire'),
     array(
@@ -266,4 +284,19 @@ $result = add_role(
     )
 );
 
+add_action(
+    'rest_api_init', function () {
+    $controller = new InformationRestController();
+    $controller->register_routes();
+
+    $controller = new CodeAdeRestController();
+    $controller->register_routes();
+
+    $controller = new AlertRestController();
+    $controller->register_routes();
+
+    $controller = new ProfileRestController();
+    $controller->register_routes();
+}
+);
 

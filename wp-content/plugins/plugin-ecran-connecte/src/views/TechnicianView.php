@@ -20,11 +20,11 @@ class TechnicianView extends UserView
 	 *
 	 * @return string The rendered output of the technician account creation form with a title, description, and base form elements.
 	 */
-    public function displayFormTechnician(): string {
+    public function displayFormTechnician($departments, $isAdmin, $currentDept): string {
         return '
         <h2>Compte technicien</h2>
         <p class="lead">Pour créer des techniciens, remplissez ce formulaire avec les valeurs demandées.</p>
-        ' . $this->displayBaseForm('Tech');
+        ' . $this->displayBaseForm('Tech', $departments, $isAdmin, $currentDept);
     }
 
 	/**
@@ -34,16 +34,17 @@ class TechnicianView extends UserView
 	 *
 	 * @return string The rendered output of the technicians' data in a formatted display.
 	 */
-    public function displayAllTechnicians(array $users): string {
+    public function displayAllTechnicians(array $users, $userDeptList): string {
         $title = 'Techniciens';
         $name = 'Tech';
-        $header = ['Login'];
+        $header = ['Login','Département'];
 
         $row = array();
         $count = 0;
         foreach ($users as $user) {
+            $row[] = [$count+1, $this->buildCheckbox($name, $user->getId()), $user->getLogin(), $userDeptList[$count]];
+
             ++$count;
-            $row[] = [$count, $this->buildCheckbox($name, $user->getId()), $user->getLogin()];
         }
 
         return $this->displayAll($name, $title, $header, $row, $name);

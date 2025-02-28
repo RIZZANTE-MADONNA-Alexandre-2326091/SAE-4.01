@@ -24,11 +24,13 @@ class TelevisionView extends UserView
 	 *
 	 * @return string The HTML string of the television account creation form.
 	 */
-    public function displayFormTelevision(array $years,array $groups, array $halfGroups): string {
-        $form = '
+    public function displayFormTelevision(array $years, array $groups, array $halfGroups, array $departments, $isAdmin = null, $currentDept = null): string {
+        $disabled = $isAdmin ? '' : 'disabled';
+
+        return '
         <h2> Compte télévision</h2>
         <p class="lead">Pour créer des télévisions, remplissez ce formulaire avec les valeurs demandées.</p>
-        <p class="lead">Vous pouvez mettre autant d\'emploi du temps que vous souhaitez, cliquez sur "Ajouter des emplois du temps</p>
+        <p class="lead">Vous pouvez mettre autant d\'emploi du temps que vous souhaitez, cliquez sur "Ajouter des emplois du temps".</p>
         <form method="post" id="registerTvForm">
             <div class="form-group">
             	<label for="loginTv">Login</label>
@@ -42,14 +44,18 @@ class TelevisionView extends UserView
             	<small id="passwordHelpBlock" class="form-text text-muted">Votre mot de passe doit contenir entre 8 et 25 caractère</small>
             </div>
             <div class="form-group">
+                <label for="deptTv">Département</label>  
+                <select name="deptTv" class="form-control"' . $disabled. '>
+                    ' . $this->displayAllDept($departments, $currentDept) . '
+                </select>
+            </div>
+            <div class="form-group">
             	<label>Premier emploi du temps</label>' .
             $this->buildSelectCode($years, $groups, $halfGroups) . '
             </div>
             <input type="button" class="btn button_ecran" id="addSchedule" onclick="addButtonTv()" value="Ajouter des emplois du temps">
             <button type="submit" class="btn button_ecran" id="validTv" name="createTv">Créer</button>
         </form>';
-
-        return $form;
     }
 
 	/**
@@ -62,19 +68,23 @@ class TelevisionView extends UserView
 	 *
 	 * @return string A formatted string representation of televisions and their associated user information.
 	 */
-    public function displayAllTv(array $users): string {
+    public function displayAllTv(array $users, $userDeptList): string {
         $page = get_page_by_title_V2('Modifier un utilisateur');
         $linkManageUser = get_permalink($page->ID);
 
         $title = 'Televisions';
         $name = 'Tele';
-        $header = ['Login', 'Nombre d\'emplois du temps ', 'Modifier'];
+        $header = ['Login', 'Nombre d\'emplois du temps ', 'Départements', 'Modifier'];
 
         $row = array();
         $count = 0;
         foreach ($users as $user) {
+            $row[] = [$count+1,
+                $this->buildCheckbox($name, $user->getId()),
+                $user->getLogin(), sizeof($user->getCodes()),
+                $userDeptList[$count], $this->buildLinkForModify($linkManageUser . '?id=' . $user->getId())];
+
             ++$count;
-            $row[] = [$count, $this->buildCheckbox($name, $user->getId()), $user->getLogin(), sizeof($user->getCodes()), $this->buildLinkForModify($linkManageUser . '?id=' . $user->getId())];
         }
 
         return $this->displayAll($name, $title, $header, $row, 'tele');

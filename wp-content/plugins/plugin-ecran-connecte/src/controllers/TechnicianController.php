@@ -3,6 +3,7 @@
 namespace Controllers;
 
 use Models\CodeAde;
+use Models\Department;
 use Models\User;
 use Views\TechnicianView;
 
@@ -51,24 +52,31 @@ class TechnicianController extends UserController implements Schedule
     public function insert(): string {
         $action = filter_input(INPUT_POST, 'createTech');
 
+	    $currentUser = wp_get_current_user();
+
+	    $deptModel = new Department();
+	    $isAdmin = in_array('administrator', $currentUser->roles);
+	    $currentDept = $isAdmin ? -1 : $deptModel->getUserInDept($currentUser->ID)->getId();
+
         if (isset($action)) {
 
             $login = filter_input(INPUT_POST, 'loginTech');
             $password = filter_input(INPUT_POST, 'pwdTech');
             $passwordConfirm = filter_input(INPUT_POST, 'pwdConfirmTech');
             $email = filter_input(INPUT_POST, 'emailTech');
+	        $deptId = $isAdmin ? filter_input(INPUT_POST, 'deptIdTech') : $currentUser;
 
             if (is_string($login) && strlen($login) >= 4 && strlen($login) <= 25 &&
                 is_string($password) && strlen($password) >= 8 && strlen($password) <= 25 &&
-                $password === $passwordConfirm
-                && is_email($email)) {
+                $password === $passwordConfirm && is_email($email)) {
 
                 $this->model->setLogin($login);
                 $this->model->setPassword($password);
                 $this->model->setEmail($email);
                 $this->model->setRole('technicien');
+	            $this->model->setDeptId($deptId);
 
-                if ($this->model->insert()) {
+                if (!$this->checkDuplicateUser($this->model) && $this->model->insert()) {
                     $this->view->displayInsertValidate();
                 } else {
                     $this->view->displayErrorInsertion();
@@ -77,7 +85,10 @@ class TechnicianController extends UserController implements Schedule
                 $this->view->displayErrorCreation();
             }
         }
-        return $this->view->displayFormTechnician();
+
+	    $departments = $deptModel->getAll();
+
+        return $this->view->displayFormTechnician($departments, $isAdmin, $currentDept);
     }
 
 	/**
@@ -88,7 +99,14 @@ class TechnicianController extends UserController implements Schedule
 	 */
     public function displayAllTechnician(): string {
         $users = $this->model->getUsersByRole('technicien');
-        return $this->view->displayAllTechnicians($users);
+
+	    $deptModel = new Department();
+	    $userDeptList = array();
+	    foreach ($users as $user) {
+		    $userDeptList[] = $deptModel->getUserInDept($user->getId())->getName();
+	    }
+
+        return $this->view->displayAllTechnicians($users, $userDeptList);
     }
 
 //    /**

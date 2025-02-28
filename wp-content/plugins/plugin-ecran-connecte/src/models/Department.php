@@ -158,7 +158,7 @@ class Department extends Model implements Entity, JsonSerializable
 	 *
 	 * @return array Returns an array containing department details that match the given name, or an empty array if no match is found.
 	 */
-	public function getDepartmentName(string $name): array {
+	public function getDepartmentByName(string $name): array {
 		$request = $this->getDatabase()->prepare("SELECT dept_id, name FROM ecran_department WHERE name = :name LIMIT 1");
 
 		$request->bindValue(':name', $name, PDO::PARAM_STR);
@@ -175,17 +175,19 @@ class Department extends Model implements Entity, JsonSerializable
 	 *
 	 * @return Department Returns an array of departments, where each department contains its ID and name.
 	 */
-	public function getUserInDept(int $userId) {
-		$request = $this->getDatabase()->prepare("SELECT ed.dept_id, name FROM ecran_department ed
-                        								JOIN ecran_dept_user edu ON edu.dept_id = ed.dept_id
-                     									WHERE edu.user_id = :userId");
+    public function getUserInDept(int $userId): Department
+    {
+        $request = $this->getDatabase()->prepare("SELECT ed.dept_id, ed.name FROM ecran_department ed
+                                              JOIN ecran_dept_user edu ON edu.dept_id = ed.dept_id
+                                              WHERE edu.user_id = :userId");
 
-		$request->bindValue(':userId', $userId, PDO::PARAM_INT);
+        $request->bindValue(':userId', $userId, PDO::PARAM_INT);
+        $request->execute();
 
-		$request->execute();
+        $data = $request->fetch(PDO::FETCH_ASSOC);
 
-		return $this->setEntity($request->fetchAll(PDO::FETCH_ASSOC));
-	}
+        return $this->setEntity($data);
+    }
 
 	/**
 	 * @return int
@@ -204,9 +206,9 @@ class Department extends Model implements Entity, JsonSerializable
 	/**
 	 * @return string
 	 */
-	public function getName(): string {
-		return $this->nameDept;
-	}
+    public function getName(): string {
+        return $this->nameDept;
+    }
 
 	/**
 	* @param string

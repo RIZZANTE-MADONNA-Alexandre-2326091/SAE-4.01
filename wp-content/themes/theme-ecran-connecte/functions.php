@@ -1,5 +1,7 @@
 <?php
 
+use Models\CodeAde;
+
 include_once 'inc/customizer/custom_colors.php';
 include_once 'inc/customizer/custom_sidebar.php';
 include_once 'inc/customizer/custom_schedule.php';
@@ -180,3 +182,33 @@ if (function_exists('register_sidebar')) {
         'after_title' => '</h3>',
     ));
 }
+
+function get_all_codes() {
+    $model = new CodeAde();
+
+    $years = $model->getAllFromType('year');
+    $groups = $model->getAllFromType('group');
+    $halfGroups = $model->getAllFromType('halfGroup');
+
+    echo '<option value="0">Aucun</option>
+      <option value="all">Tous</option>
+      <optgroup label="Année">';
+    foreach ($years as $year) {
+        echo '<option value="' . $year->getCode() . '">' . $year->getTitle() . '</option >';
+    }
+    echo '</optgroup>
+     <optgroup label="Groupe">';
+    foreach ($groups as $group) {
+        echo '<option value="' . $group->getCode() . '">' . $group->getTitle() . '</option>';
+    }
+    echo '</optgroup>
+      <optgroup label="Demi groupe">';
+    foreach ($halfGroups as $halfGroup) {
+        echo '<option value="' . $halfGroup->getCode() . '">' . $halfGroup->getTitle() . '</option>';
+    }
+    echo '</optgroup>';
+}
+add_action('wp_ajax_get_all_codes', 'get_all_codes');
+add_action('wp_ajax_nopriv_get_all_codes', 'get_all_codes');
+
+

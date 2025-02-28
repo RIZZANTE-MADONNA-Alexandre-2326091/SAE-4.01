@@ -4,6 +4,7 @@ namespace Models;
 
 use JsonSerializable;
 use PDO;
+use SimplePie\Author;
 
 /**
  * Class Alert
@@ -43,7 +44,7 @@ class Alert extends Model implements Entity, JsonSerializable
     /**
      * @var CodeAde[]
      */
-    private CodeAde $codes;
+    private array $codes;
 
     /**
      * @var int
@@ -55,33 +56,35 @@ class Alert extends Model implements Entity, JsonSerializable
      */
     private int $adminId;
 
+    /**
+     * @var int
+     */
+    private int $authorId;
+
 
 	/**
 	 * Inserts a new alert record into the database and associates related codes.
 	 *
 	 * @return string The ID of the newly inserted alert record.
 	 */
-    public function insert(): string {
+    public function insert() : string
+    {
         $database = $this->getDatabase();
-        $request = $database->prepare('INSERT INTO ecran_alert (author, content, creation_date, expiration_date, for_everyone, administration_id) VALUES (:author, :content, :creation_date, :expirationDate, :for_everyone, :administrationId)');
+        $request = $database->prepare('INSERT INTO ecran_alert (author, content, creation_date, expiration_date) VALUES (:author, :content, :creation_date, :expirationDate)');
 
-        $request->bindValue(':author', $this->getAuthor(), PDO::PARAM_INT);
+        $request->bindValue(':author', $this->getAuthorId(), PDO::PARAM_INT);
         $request->bindValue(':content', $this->getContent(), PDO::PARAM_STR);
-        $request->bindValue(':creation_date', $this->getCreationDate(), PDO::PARAM_STR);
-        $request->bindValue(':expirationDate', $this->getExpirationDate(), PDO::PARAM_STR);
-        $request->bindValue(':for_everyone', $this->isForEveryone(), PDO::PARAM_INT);
-        $request->bindValue(':administrationId', $this->getAdminId(), PDO::PARAM_INT);
+        $request->bindValue(':creation_date', $this->getCreationDate(),PDO::PARAM_STR);
+        $request->bindValue(':expirationDate', $this->getExpirationDate(),PDO::PARAM_STR);
 
         $request->execute();
 
         $id = $database->lastInsertId();
 
-        foreach ($this->getCodes() as $code) {
-
-            if ($code !== 'all' || $code !== 0) {
+        foreach ( $this->getCodes() as $code ) {
+            if ($code->getCode() != 'all' && $code->getCode() != 0 ) {
                 $request = $database->prepare('INSERT INTO ecran_code_alert (alert_id, code_ade_id) VALUES (:idAlert, :idCodeAde)');
-
-                $request->bindParam(':idAlert', $id, PDO::PARAM_INT);
+                $request->bindValue(':idAlert', $id, PDO::PARAM_INT);
                 $request->bindValue(':idCodeAde', $code->getId(), PDO::PARAM_INT);
 
                 $request->execute();
@@ -154,7 +157,7 @@ class Alert extends Model implements Entity, JsonSerializable
 	 * @return Alert|null Returns an Alert object if found, or null if no matching record exists.
 	 */
     public function get($id): Alert | null {
-        $request = $this->getDatabase()->prepare('SELECT id, content, creation_date, expiration_date, author, administration_id FROM ecran_alert WHERE id = :id LIMIT 1');
+        $request = $this->getDatabase()->prepare('SELECT id, content, creation_date, expiration_date, author, for_everyone, administration_id FROM ecran_alert WHERE id = :id LIMIT 1');
 
         $request->bindParam(':id', $id, PDO::PARAM_INT);
 
@@ -169,15 +172,16 @@ class Alert extends Model implements Entity, JsonSerializable
 	 * @param int $begin The starting position for the query, defaults to 0.
 	 * @param int $numberElement The number of elements to retrieve, defaults to 25.
 	 *
-	 * @return array|Alert A list of alerts as an array of entities or an empty array if no results are found.
+	 * @return array A list of alerts as an array of entities or an empty array if no results are found.
 	 */
-    public function getList(int $begin = 0,int $numberElement = 25): array|Alert {
-        $request = $this->getDatabase()->prepare("SELECT id, content, creation_date, expiration_date, author, administration_id FROM ecran_alert ORDER BY id ASC LIMIT :begin, :numberElement");
+    public function getList(int $begin = 0,int $numberElement = 25): array {
+        $request = $this->getDatabase()->prepare("SELECT id, content, creation_date, expiration_date, author, for_everyone, administration_id FROM ecran_alert ORDER BY id ASC LIMIT :begin, :numberElement");
 
-        $request->bindValue(':begin', (int)$begin, PDO::PARAM_INT);
-        $request->bindValue(':numberElement', (int)$numberElement, PDO::PARAM_INT);
+        $request->bindValue(':begin', $begin, PDO::PARAM_INT);
+        $request->bindValue(':numberElement', $numberElement, PDO::PARAM_INT);
 
         $request->execute();
+
 
         if ($request->rowCount() > 0) {
             return $this->setEntityList($request->fetchAll());
@@ -195,10 +199,10 @@ class Alert extends Model implements Entity, JsonSerializable
 	 * @return array An array of alerts associated with the specified author, or an empty array if none are found.
 	 */
     public function getAuthorListAlert(int $author, int $begin = 0, int $numberElement = 25): array {
-        $request = $this->getDatabase()->prepare("SELECT id, content, creation_date, expiration_date, author, administration_id FROM ecran_alert  WHERE author = :author ORDER BY id ASC LIMIT :begin, :numberElement");
+        $request = $this->getDatabase()->prepare("SELECT id, content, creation_date, expiration_date, author, for_everyone, administration_id FROM ecran_alert WHERE author = :author ORDER BY id ASC LIMIT :begin, :numberElement");
 
-        $request->bindValue(':begin', (int)$begin, PDO::PARAM_INT);
-        $request->bindValue(':numberElement', (int)$numberElement, PDO::PARAM_INT);
+        $request->bindValue(':begin', $begin, PDO::PARAM_INT);
+        $request->bindValue(':numberElement', $numberElement, PDO::PARAM_INT);
         $request->bindParam(':author', $author, PDO::PARAM_INT);
 
         $request->execute();
@@ -346,47 +350,23 @@ class Alert extends Model implements Entity, JsonSerializable
 	 */
     public function setEntity($data, bool $adminSite = false): Alert {
         $entity = new Alert();
-        $author = new User();
         $codeAde = new CodeAde();
+        $author = new User();
+        $author->get($data['author']);
 
         $entity->setId($data['id']);
         $entity->setContent($data['content']);
+        $entity->setAuthor($author);
         $entity->setCreationDate(date('Y-m-d', strtotime($data['creation_date'])));
-        $entity->setExpirationDate(date('Y-m-d', strtotime($data['expiration_date'])));
+        $entity->setExpirationDate(
+            date('Y-m-d', strtotime($data['expiration_date']))
+        );
 
-        if ($data['administration_id'] != null) {
-            $author->setLogin('Administration');
-            $entity->setAuthor($author);
-        } else {
-            $entity->setAuthor($author->get($data['author']));
+        $codes = array();
+        foreach ( $codeAde->getByAlert($data['id']) as $code ) {
+            $codes[] = $code;
         }
-
-
-        if ($adminSite) {
-            $entity->setAdminId($data['id']);
-            $entity->setForEveryone(1);
-        } else {
-            $entity->setAdminId($data['administration_id']);
-
-            $codes = array();
-
-            if (sizeof($codes) <= 0) {
-                if ($entity->isForEveryone()) {
-                    $codeAde->setTitle('Tous');
-                    $codeAde->setCode('all');
-                    $codes[] = $codeAde;
-                } else {
-                    $codeAde->setTitle('Aucun');
-                    $codeAde->setCode('0');
-                    $codes[] = $codeAde;
-                }
-            }
-
-            foreach ($codeAde->getByAlert($data['id']) as $code) {
-                $codes[] = $code;
-            }
-            $entity->setCodes($codes);
-        }
+        $entity->setCodes($codes);
 
         return $entity;
     }
@@ -417,6 +397,20 @@ class Alert extends Model implements Entity, JsonSerializable
      */
     public function setAuthor(User $author): void {
         $this->author = $author;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAuthorId(): int {
+        return $this->authorId;
+    }
+
+    /**
+     * @param int $authorId
+     */
+    public function setAuthorId(int $authorId): void {
+        $this->authorId = $authorId;
     }
 
     /**
@@ -462,16 +456,16 @@ class Alert extends Model implements Entity, JsonSerializable
     }
 
     /**
-     * @return CodeAde
+     * @return array
      */
-    public function getCodes(): CodeAde {
+    public function getCodes(): array {
         return $this->codes;
     }
 
 	/**
-	 * @param CodeAde $codes
+	 * @param CodeAde[] $codes
 	 */
-    public function setCodes(CodeAde $codes): void {
+    public function setCodes(array $codes): void {
         $this->codes = $codes;
     }
 
@@ -499,7 +493,7 @@ class Alert extends Model implements Entity, JsonSerializable
     /**
      * @param int $adminId
      */
-    public function setAdminId(int $adminId): void {
+    public function setAdminId($adminId): void {
         $this->adminId = $adminId;
     }
 
