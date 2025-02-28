@@ -51,7 +51,7 @@ class InformationController extends Controller
     {
         $current_user = wp_get_current_user();
         $author = new User();
-        $author->get($current_user->ID);
+        $author->get($current_user);
 
         // All forms
         $actionText = filter_input(INPUT_POST, 'createText');
@@ -128,12 +128,7 @@ class InformationController extends Controller
 
                 if (end($explodeName) == 'pdf')
                 {
-                    $fileTmpName = $_FILES['contentFile']['tmp_name'];
                     $this->registerFile($filename, $fileTmpName, $information);
-                }
-                else
-                {
-                    $this->view->buildModal('PDF non valide', '<p>Ce fichier est un tableau non PDF, veuillez choisir un autre PDF</p>');
                 }
             }
             if (isset($actionEvent))
@@ -210,7 +205,6 @@ class InformationController extends Controller
                     $this->view->displayNotConformVideo();
                 }
             }
-
             if (isset($actionRSS))
             {
                 $information->setContent($content);
@@ -225,7 +219,6 @@ class InformationController extends Controller
                 }
             }
         }
-
         // Return a selector with all forms
         return
             $this->view->displayStartMultiSelect() .
@@ -545,14 +538,18 @@ class InformationController extends Controller
                 {
                     $content = '[pdf-embedder url="' . TV_UPLOAD_PATH . $information->getContent() . '"]';
                 }
-                else if ($information->getType() === 'LocCvideo' && $contentExplode[1] === $videoExtension)
+                else if ($information->getType() === 'tab')
+                {
+                    $content = 'Tableau Excel';
+                }
+                else if ($information->getType() === 'LocCvideo')
                 {
                     $content = '<video class="previsualisationVideoClassique" controls muted>
 									<source src="' . $content . $information->getContent() . '" type="video/mp4">
 									<p>Votre navigateur ne permet pas de lire les vidéos de format mp4 avec HTML5.</p>
 								</video>';
                 }
-                else if ($information->getType() === 'LocSvideo' && $contentExplode[1] === $videoExtension)
+                else if ($information->getType() === 'LocSvideo')
                 {
                     $content = '<video class="previsualisationVideoShort" controls muted>
 									<source src="' . $content . $information->getContent() . '" type="video/mp4">
@@ -704,16 +701,16 @@ class InformationController extends Controller
         $this->view->endDiv();
     }
 
-    /**
-     * Synchronizes and updates the local information database with the information
-     * retrieved from the admin website. Existing information is compared and updated
-     * based on title, content, and expiration date. If an information entry no longer
-     * exists on the admin site, it is deleted from the local database. New information
-     * from the admin website is added to the local database if it doesn't already exist.
-     *
-     * @return void
-     */
-    public function registerNewInformation(): void
+	/**
+	 * Synchronizes and updates the local information database with the information
+	 * retrieved from the admin website. Existing information is compared and updated
+	 * based on title, content, and expiration date. If an information entry no longer
+	 * exists on the admin site, it is deleted from the local database. New information
+	 * from the admin website is added to the local database if it doesn't already exist.
+	 *
+	 * @return void
+	 */
+	public function registerNewInformation(): void
     {
         $informationList = $this->model->getFromAdminWebsite();
         $myInformationList = $this->model->getAdminWebsiteInformation();

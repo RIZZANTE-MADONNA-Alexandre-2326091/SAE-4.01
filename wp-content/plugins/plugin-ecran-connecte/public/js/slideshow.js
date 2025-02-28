@@ -435,6 +435,11 @@ function displayOrHide(slides, slideIndex)
                         console.log('--Lecture rss');
                         timeout = defaultTimeout;
                     }
+                    // If it's a RSS flow
+                    else if (slides[slideIndex].childNodes[i].className === 'rss-feed') {
+                        console.log('--Lecture rss');
+                        timeout = 10000;
+                    }
                 }
                 if (count === 0) {
                     console.log("--Lecture divers");

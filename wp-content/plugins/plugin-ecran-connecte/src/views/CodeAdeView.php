@@ -46,6 +46,10 @@ class CodeAdeView extends View
                     <input class="form-check-input" type="radio" name="type" id="halfGroup" value="halfGroup">
                     <label class="form-check-label" for="halfGroup">Demi-groupe</label>
                 </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="type" id="room" value="room">
+                    <label class="form-check-label" for="room">Salle</label>
+                </div>
             </div>
             <div class="form-group">
                 <label for="department">Département</label>
@@ -117,6 +121,10 @@ class CodeAdeView extends View
                 'value' => 'halfGroup',
                 'title' => 'Demi-Groupe',
             ),
+            array(
+                'value' => 'room',
+                'title' => 'Salle'
+            )
         );
 
         // Build option list
@@ -164,6 +172,8 @@ class CodeAdeView extends View
                     $code->setType('Groupe');
                 } else if ($code->getType() === 'halfGroup') {
                     $code->setType('Demi-groupe');
+                } else if ($code->getType() === 'room') {
+                    $code->setType('Salle');
                 }
                 ++$count;
                 $row[] = [$count, $this->buildCheckbox($name, $code->getId()), $code->getTitle(), $code->getCode(), $code->getType(), $deptModel->get($code->getDeptId())->getName() , $this->buildLinkForModify($linkManageCodeAde . '?id=' . $code->getId())];

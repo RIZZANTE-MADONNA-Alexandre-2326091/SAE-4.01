@@ -125,8 +125,10 @@ class SecretaryController extends UserController
 	    $user_id = get_current_user_id();
 	    $user_info = get_userdata($user_id);
 		$adminDept = null;
+        $communiquant = null;
 		if(in_array('administrator', $user_info->roles)){
 			$adminDept = new AdminDeptController();
+            $communiquant = new CommunicatorController();
 		}
         $secretary = new SecretaryController();
         $technician = new TechnicianController();
@@ -135,19 +137,22 @@ class SecretaryController extends UserController
 		$form = $this->view->displayStartMultiSelect() .
 		           $this->view->displayTitleSelect('secretary', 'Secrétaires', true) .
 		           $this->view->displayTitleSelect('technician', 'Technicien') .
-		           $this->view->displayTitleSelect('television', 'Télévisions');
+		           $this->view->displayTitleSelect('television', 'Télévisions') ;
 
-	    if (!is_null($adminDept)) {
-			$form .= $this->view->displayTitleSelect('adminDept', 'Admin Département');;
+	    if (!is_null($adminDept) && !is_null($communiquant)) {
+            $form .= $this->view->displayTitleSelect('communicator', 'Communicants').
+			         $this->view->displayTitleSelect('adminDept', 'Admin Département');;
 	    }
 
 		$form .= $this->view->displayEndOfTitle() .
 		         $this->view->displayContentSelect('secretary', $secretary->insert(), true) .
 		         $this->view->displayContentSelect('technician', $technician->insert()) .
-		         $this->view->displayContentSelect('television', $television->insert());
+		         $this->view->displayContentSelect('television', $television->insert()) ;
+
 
 	    if (!is_null($adminDept)) {
-		    $form .= $this->view->displayContentSelect('adminDept', $adminDept->insert());
+		    $form .= $this->view->displayContentSelect('communicator', $communiquant->insert()) .
+		            $this->view->displayContentSelect('adminDept', $adminDept->insert());
 	    }
 
 		$form .= $this->view->displayEndDiv() .
@@ -166,38 +171,38 @@ class SecretaryController extends UserController
 	 * @return string The generated HTML form for displaying users based on their roles.
 	 */
     public function displayUsers(): string{
-	    $user_id = get_current_user_id();
-	    $user_info = get_userdata($user_id);
-	    $adminDept = null;
-	    if(in_array('administrator', $user_info->roles)){
-		    $adminDept = new AdminDeptController();
-	    }
-	    $secretary = new SecretaryController();
-	    $technician = new TechnicianController();
-	    $television = new TelevisionController();
+        $user_id = get_current_user_id();
+        $user_info = get_userdata($user_id);
+        $adminDept = null;
+        if(in_array('administrator', $user_info->roles)){
+            $adminDept = new AdminDeptController();
+        }
+        $secretary = new SecretaryController();
+        $technician = new TechnicianController();
+        $television = new TelevisionController();
 
-	    $form = $this->view->displayStartMultiSelect() .
-	            $this->view->displayTitleSelect('secretary', 'Secrétaires', true) .
-	            $this->view->displayTitleSelect('technician', 'Technicien') .
-	            $this->view->displayTitleSelect('television', 'Télévisions');
+        $form = $this->view->displayStartMultiSelect() .
+            $this->view->displayTitleSelect('secretary', 'Secrétaires', true) .
+            $this->view->displayTitleSelect('technician', 'Technicien') .
+            $this->view->displayTitleSelect('television', 'Télévisions');
 
-	    if (!is_null($adminDept)) {
-		    $form .= $this->view->displayTitleSelect('adminDept', 'Admin Département');;
-	    }
+        if (!is_null($adminDept)) {
+            $form .= $this->view->displayTitleSelect('adminDept', 'Admin Département');;
+        }
 
-	    $form .= $this->view->displayEndOfTitle() .
-	             $this->view->displayContentSelect('secretary', $secretary->displayAllSecretary(), true) .
-	             $this->view->displayContentSelect('technician', $technician->displayAllTechnician()) .
-	             $this->view->displayContentSelect('television', $television->displayAllTv());
+        $form .= $this->view->displayEndOfTitle() .
+            $this->view->displayContentSelect('secretary', $secretary->displayAllSecretary(), true) .
+            $this->view->displayContentSelect('technician', $technician->displayAllTechnician()) .
+            $this->view->displayContentSelect('television', $television->displayAllTv());
 
-	    if (!is_null($adminDept)) {
-		    $form .= $this->view->displayContentSelect('adminDept', $adminDept->displayAllAdminDept());
-	    }
+        if (!is_null($adminDept)) {
+            $form .= $this->view->displayContentSelect('adminDept', $adminDept->displayAllAdminDept());
+        }
 
-	    $form .= $this->view->displayEndDiv() .
-	             $this->view->contextCreateUser();
+        $form .= $this->view->displayEndDiv() .
+            $this->view->contextCreateUser();
 
-	    return $form;
+        return $form;
     }
 
 	/**

@@ -2,6 +2,7 @@
 
 use Controllers\AlertController;
 use Controllers\CodeAdeController;
+use Controllers\CommunicatorController;
 use Controllers\DepartmentController;
 use Controllers\InformationController;
 use Controllers\SecretaryController;
@@ -426,6 +427,12 @@ function schedule_render_callback()
         } else if (in_array("administrator", $current_user->roles) || in_array("adminDept", $current_user->roles) || in_array("secretaire", $current_user->roles)) {
             $controller = new SecretaryController();
             return $controller->displayMySchedule();
+        } else if(in_array("communicant", $current_user->roles)){
+            $controller = new CommunicatorController();
+            return $controller->displayMySchedule();
+        } else{
+            $view = new UserView();
+            return $view->displayHome();
         }
     }
 }

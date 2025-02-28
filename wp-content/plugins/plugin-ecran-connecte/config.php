@@ -1,5 +1,10 @@
 <?php
 
+use Controllers\AlertRestController;
+use Controllers\CodeAdeRestController;
+use Controllers\InformationRestController;
+use Controllers\ProfileRestController;
+
 include_once 'vendor/R34ICS/R34ICS.php';
 include 'widgets/WidgetAlert.php';
 include 'widgets/WidgetWeather.php';
@@ -252,6 +257,17 @@ $result = add_role(
 );
 
 $result = add_role(
+    'communicant',
+    __('Communicant'),
+    array(
+        'read' => true,  // true allows this capability
+        'edit_posts' => true,
+        'delete_posts' => false, // Use false to explicitly deny
+    )
+);
+
+
+$result = add_role(
     'secretaire',
     __('Secretaire'),
     array(
@@ -281,4 +297,19 @@ $result = add_role(
     )
 );
 
+add_action(
+    'rest_api_init', function () {
+    $controller = new InformationRestController();
+    $controller->register_routes();
+
+    $controller = new CodeAdeRestController();
+    $controller->register_routes();
+
+    $controller = new AlertRestController();
+    $controller->register_routes();
+
+    $controller = new ProfileRestController();
+    $controller->register_routes();
+}
+);
 

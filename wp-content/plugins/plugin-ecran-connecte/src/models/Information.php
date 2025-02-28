@@ -57,6 +57,11 @@ class Information extends Model implements Entity, JsonSerializable
     private int|null $adminId;
 
     /**
+     * @var int
+     */
+    private int $authorId;
+
+    /**
      * Insert an information in the database
      *
      * @return string
@@ -71,7 +76,7 @@ class Information extends Model implements Entity, JsonSerializable
         $request->bindValue(':creationDate', $this->getCreationDate(), PDO::PARAM_STR);
         $request->bindValue(':expirationDate', $this->getExpirationDate(), PDO::PARAM_STR);
         $request->bindValue(':type', $this->getType(), PDO::PARAM_STR);
-        $request->bindValue(':userId', $this->getAuthor(), PDO::PARAM_INT);
+        $request->bindValue(':userId', $this->getAuthorId(), PDO::PARAM_INT);
         $request->bindValue(':administration_id', $this->getAdminId(), PDO::PARAM_INT);
 
         try {
@@ -132,7 +137,7 @@ class Information extends Model implements Entity, JsonSerializable
         $request->execute();
 
         if ($request->rowCount() > 0)
-		{
+        {
             return $this->setEntity($request->fetch(PDO::FETCH_ASSOC));
         }
         return false;
@@ -154,7 +159,7 @@ class Information extends Model implements Entity, JsonSerializable
         $request->execute();
 
         if ($request->rowCount() > 0)
-		{
+        {
             return $this->setEntityList($request->fetchAll());
         }
         return [];
@@ -243,7 +248,7 @@ class Information extends Model implements Entity, JsonSerializable
         $request->execute();
 
         if ($request->rowCount() > 0)
-		{
+        {
             return $this->setEntity($request->fetch(), true);
         }
         return false;
@@ -260,7 +265,7 @@ class Information extends Model implements Entity, JsonSerializable
     {
         $listEntity = array();
         foreach ($dataList as $data)
-		{
+        {
             $listEntity[] = $this->setEntity($data, $adminSite);
         }
         return $listEntity;
@@ -288,21 +293,21 @@ class Information extends Model implements Entity, JsonSerializable
         $entity->setType($data['type']);
 
         if ($data['administration_id'] != null)
-		{
+        {
             $author->setLogin('Administration');
             $entity->setAuthor($author);
         }
-		else
-		{
+        else
+        {
             $entity->setAuthor($author->get($data['author']));
         }
 
         if ($adminSite)
-		{
+        {
             $entity->setAdminId($data['id']);
         }
-		else
-		{
+        else
+        {
             $entity->setAdminId($data['administration_id']);
         }
 
@@ -355,6 +360,22 @@ class Information extends Model implements Entity, JsonSerializable
     public function setAuthor(User $author): void
     {
         $this->author = $author;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAuthorId(): int
+    {
+        return $this->authorId;
+    }
+
+    /**
+     * @param int $author
+     */
+    public function setAuthorId(int $authorId): void
+    {
+        $this->authorId = $authorId;
     }
 
     /**
