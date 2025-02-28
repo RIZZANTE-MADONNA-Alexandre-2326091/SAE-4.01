@@ -5,6 +5,7 @@ namespace Views;
 
 use Controllers\InformationController;
 use Models\Information;
+use Models\RssModel;
 
 /**
  * Class InformationView
@@ -93,61 +94,6 @@ class InformationView extends View
 		        <input type="hidden" name="MAX_FILE_SIZE" value="5000000"/>
 	        </div>
 	        <div class="form-group">
-				<label for="expirationDate">Date d\'expiration</label>
-				<input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' . $dateMin . '" value="' . $endDate . '" required >
-			</div>
-			<button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
-
-        if ($type == 'submit')
-        {
-            $form .= '<button type="submit" class="btn delete_button_ecran" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette information ?\');">Supprimer</button>';
-        }
-
-        return $form . '</form>';
-    }
-
-    /**
-     * Display a form to create an information with a table
-     *
-     * @param string|null $title
-     * @param string|null $content
-     * @param string|null $endDate
-     * @param string $type
-     *
-     * @return string
-     * @throws \PhpOffice\PhpSpreadsheet\Exception
-     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
-     */
-    public function displayFormTab(string $title = null, string $content = null,
-                                   string $endDate = null, string $type = "createTab"): string
-    {
-        $dateMin = date('Y-m-d', strtotime("+1 day"));
-
-        $form = '<form method="post" enctype="multipart/form-data">
-						<div class="form-group">
-			                <label for="title">Titre <span class="text-muted">(Optionnel)</span></label>
-			                <input id="title" class="form-control" type="text" name="title" placeholder="Inserer un titre" maxlength="60" value="' . $title . '">
-			            </div>';
-
-        if ($content != null)
-        {
-            $info = new InformationController();
-            $list = $info->readSpreadSheet(TV_UPLOAD_PATH . $content);
-            foreach ($list as $table)
-            {
-                $form .= $table;
-            }
-        }
-
-        $form .= '
-			<div class="form-group">
-                <label for="contentFile">Ajout du fichier Xls (ou xlsx)</label>
-                <input class="form-control-file" id="contentFile" type="file" name="contentFile" />
-                <input type="hidden" name="MAX_FILE_SIZE" value="5000000" />
-                <small id="tabHelp" class="form-text text-muted">Nous vous conseillons de ne pas dépasser trois colonnes.</small>
-                <small id="tabHelp" class="form-text text-muted">Nous vous conseillons également de ne pas mettre trop de contenu dans une cellule.</small>
-            </div>
-            <div class="form-group">
 				<label for="expirationDate">Date d\'expiration</label>
 				<input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' . $dateMin . '" value="' . $endDate . '" required >
 			</div>
@@ -458,10 +404,6 @@ class InformationView extends View
         {
             return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormImg($title, $content, $endDate, 'submit');
         }
-        elseif ($type == "tab")
-        {
-            return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormTab($title, $content, $endDate, 'submit');
-        }
         elseif ($type == "pdf")
         {
             return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormPDF($title, $content, $endDate, 'submit');
@@ -503,11 +445,14 @@ class InformationView extends View
      * @param string $title
      * @param string $content
      * @param string $type
+     * @param int $timeout
      * @param bool $adminSite
      */
-    public function displaySlide(string $title, string $content, string $type, bool $adminSite = false): void
+    public function displaySlide(string $title, string $content, string $type, string $typeDefilement, int $timeout, bool $adminSite = false): void
     {
         echo '<div class="myInfoSlides text-center">';
+        echo '<p id="timeout" style="display: none">' . $timeout . '</p>';
+        echo '<p id="typeDefilement" style="display: none">' . $typeDefilement . '</p>';
 
         // If the title is empty
         if ($title != "Sans titre")
@@ -516,6 +461,7 @@ class InformationView extends View
         }
 
         $url = TV_UPLOAD_PATH;
+        $extension = '';
         if ($adminSite)
         {
             $url = URL_WEBSITE_VIEWER . TV_UPLOAD_PATH;
@@ -580,9 +526,9 @@ class InformationView extends View
         }
 
         else if ($type == 'rss') {
-            $rssModel = new \Models\RssModel($content);
+            $rssModel = new RssModel($content);
             $rssFeed = $rssModel->getRssFeed();
-            $rssView = new \Views\RssView();
+            $rssView = new RssView();
             echo $rssView->render($rssFeed);
         }
 
@@ -705,12 +651,27 @@ class InformationView extends View
         $this->buildModal('Vidéo non valide', '<p>Ce fichier est une vidéo non valide, veuillez choisir une autre vidéo</p>');
     }
 
+    /**
+     * Display if the information is null
+     * @return string The error box to display
+     * */
+    public function displayNullInformation(): string
+    {
+        return '
+		<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>
+		<div>
+			<h3>Votre information est nulle</h3>
+			<p>Le contenu ou la date d\'expiration de votre information est nul. Veuillez modifier les informations correctement.</p>
+			<a href="' . esc_url(get_permalink(get_page_by_title_V2('Créer une information'))) . '">Créer une information</a>
+		</div>';
+    }
+
     public function informationNotAllowed(): string
     {
         return '
 		<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>
 		<div>
-			<h3>Vous ne pouvez pas modifier cette alerte</h3>
+			<h3>Vous ne pouvez pas modifier cette information</h3>
 			<p>Cette information appartient à quelqu\'un d\'autre, vous ne pouvez donc pas modifier cette information.</p>
 			<a href="' . esc_url(get_permalink(get_page_by_title_V2('Créer une information'))) . '">Créer une information</a>
 		</div>';
