@@ -54,8 +54,8 @@ class TelevisionView extends UserView
             </div>
             <!--Formulaire temps de défilement des vidéos-->
             <div class="form-group">
-                <label for="temps">Temps de défilement des informations</label>
-                <input type="number" name="temps" placeholder="Temps en secondes (par défaut 10s)">
+                <label for="temps">Temps de défilement des informations (par défaut 10s)</label>
+                <input type="number" name="temps" placeholder="Temps en secondes (par défaut 10s)" value="10">
             </div>
             <div class="form-group">
             	<label>Premier emploi du temps</label>' .
@@ -150,8 +150,8 @@ class TelevisionView extends UserView
             </div>
             <!--Formulaire temps de défilement des vidéos-->
             <div class="form-group">
-                <label for="temps">Temps de défilement des informations</label>
-                <input type="number" name="temps" placeholder="Temps en secondes (par défaut 10s)">
+                <label for="temps">Temps de défilement des informations (par défaut 10s)</label>
+                <input type="number" name="temps" placeholder="Temps en secondes (par défaut 10s)" value="10">
             </div>
             <label id="selectId1"> Emploi du temps</label>';
 
@@ -254,7 +254,8 @@ class TelevisionView extends UserView
 	 *
 	 * @return string The HTML string representing the opening of a slideshow container.
 	 */
-    public function displayStartSlide(): string {
+    public function displayStartSlide(): string
+    {
         return '<div id="slideshow-container" class="slideshow-container">';
     }
 
@@ -266,7 +267,13 @@ class TelevisionView extends UserView
 	 *
 	 * @return string A string containing the HTML structure for the middle slide.
 	 */
-    public function displayMidSlide(): string {
+    public function displayMidSlide(): string
+    {
         return '<div class="mySlides">';
+    }
+
+    public function displayTimeoutNegativeError(): void
+    {
+        $this->buildModal('Erreur valeur temps de défilement', '<p class="alert alert-danger">Le nombre que vous avez saisi pour le temps de défilement des informations est nul ou négatif.</p>');
     }
 }

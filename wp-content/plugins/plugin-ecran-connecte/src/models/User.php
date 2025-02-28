@@ -127,7 +127,8 @@ class User extends Model implements Entity, JsonSerializable
         $database = $this->getDatabase();
         $database->beginTransaction();
 
-        try {
+        try
+        {
             $request = $database->prepare('UPDATE wp_users SET user_pass = :password WHERE ID = :id');
             $request->bindValue(':id', $this->getId(), PDO::PARAM_INT);
             $request->bindValue(':password', $this->getPassword(), PDO::PARAM_STR);
@@ -442,12 +443,13 @@ class User extends Model implements Entity, JsonSerializable
      */
     public function setEntity($data): User
     {
-        $this->setId($data['ID']);
-        $this->setLogin($data['user_login']);
-        $this->setPassword($data['user_pass']);
-        $this->setEmail($data['user_email']);
-        $this->setRole(get_user_by('ID', $data['ID'])->roles[0]);
-        $this->setDeptId(($data['dept_id']) ?: 0);
+        $entity = new User();
+        $entity->setId($data['ID']);
+        $entity->setLogin($data['user_login']);
+        $entity->setPassword($data['user_pass']);
+        $entity->setEmail($data['user_email']);
+        $entity->setRole(get_user_by('ID', $data['ID'])->roles[0]);
+        $entity->setDeptId(($data['dept_id']) ?: 0);
 
         $request = $this->getDatabase()->prepare('SELECT id, title, code, type, dept_id FROM ecran_code_ade
                                                 JOIN ecran_code_user ON ecran_code_ade.id = ecran_code_user.code_ade_id
@@ -457,9 +459,9 @@ class User extends Model implements Entity, JsonSerializable
 
         $codeAde = new CodeAde();
         $codes = $codeAde->setEntityList($request->fetchAll());
-        $this->setCodes($codes);
+        $entity->setCodes($codes);
 
-        return $this;
+        return $entity;
     }
 	/**
 	 * @param array $dataList List of data entries to be converted into entity objects.
@@ -469,7 +471,8 @@ class User extends Model implements Entity, JsonSerializable
     public function setEntityList($dataList): array
     {
         $listEntity = array();
-        foreach ($dataList as $data) {
+        foreach ($dataList as $data)
+        {
             $listEntity[] = $this->setEntity($data);
         }
         return $listEntity;

@@ -2,6 +2,7 @@
 
 namespace Controllers;
 
+use Exception;
 use Models\CodeAde;
 use Models\Department;
 use Models\User;
@@ -45,7 +46,8 @@ class TelevisionController extends UserController implements Schedule
 	 *
 	 * @return string A response indicating the result of the action. Either 'error', renders a form, or displays a success/error message.
 	 */
-    public function insert(): string {
+    public function insert(): string
+    {
         $action = filter_input(INPUT_POST, 'createTv');
 
         $codeAde = new CodeAde();
@@ -55,7 +57,8 @@ class TelevisionController extends UserController implements Schedule
         $isAdmin = in_array('administrator', $currentUser->roles);
         $currentDept = $isAdmin ? null : $deptModel->getUserInDept($currentUser->ID)->getId();
 
-        if (isset($action)) {
+        if (isset($action))
+        {
             $login = filter_input(INPUT_POST, 'loginTv');
             $password = filter_input(INPUT_POST, 'pwdTv');
             $passwordConfirm = filter_input(INPUT_POST, 'pwdConfirmTv');
@@ -66,14 +69,20 @@ class TelevisionController extends UserController implements Schedule
 
             if (is_string($login) && strlen($login) >= 4 && strlen($login) <= 25 &&
                 is_string($password) && strlen($password) >= 8 && strlen($password) <= 25 &&
-                $password === $passwordConfirm) {
+                $password === $passwordConfirm)
+            {
 
                 $codesAde = array();
-                foreach ($codes as $code) {
-                    if (is_numeric($code) && $code > 0) {
-                        if (is_null($codeAde->getByCode($code)->getId())) {
+                foreach ($codes as $code)
+                {
+                    if (is_numeric($code) && $code > 0)
+                    {
+                        if (is_null($codeAde->getByCode($code)->getId()))
+                        {
                             return 'error'; // Code invalide;
-                        } else {
+                        }
+                        else
+                        {
                             $codesAde[] = $codeAde->getByCode($code);
                         }
                     }
@@ -87,21 +96,40 @@ class TelevisionController extends UserController implements Schedule
                 $this->model->setCodes($codesAde);
                 $this->model->setDeptId($deptId);
 
-                $this->model->setTypeDefilement($typeDefilement);
+                if ($typeDefilement === null)
+                {
+                    $typeDefilement = 'suret';
+                }
 
                 if ($tempsDefilement === null)
                 {
-                    $tempsDefilement = 10;
+                    $tempsDefilement = 0;
                 }
-                $this->model->setTimeout($tempsDefilement * 1000);
+                $tempsDefilement = (int)$tempsDefilement;
 
-                // Insertion du modèle dans la base de données
-                if (!$this->checkDuplicateUser($this->model) && $this->model->insert()) {
-                    $this->view->displayInsertValidate();
-                } else {
-                    $this->view->displayErrorInsertion();
+                $this->model->setTypeDefilement($typeDefilement);
+
+                if ($tempsDefilement <= 0)
+                {
+                    $this->view->displayTimeoutNegativeError();
                 }
-            } else {
+                else
+                {
+                    $this->model->setTimeout($tempsDefilement * 1000);
+
+                    // Insertion du modèle dans la base de données
+                    if (!$this->checkDuplicateUser($this->model) && $this->model->insert())
+                    {
+                        $this->view->displayInsertValidate();
+                    }
+                    else
+                    {
+                        $this->view->displayErrorInsertion();
+                    }
+                }
+            }
+            else
+            {
                 $this->view->displayErrorCreation();
             }
         }
@@ -115,13 +143,14 @@ class TelevisionController extends UserController implements Schedule
         return $this->view->displayFormTelevision($years, $groups, $halfGroups, $allDepts, $isAdmin, $currentDept);
     }
 
-	/**
-	 * Modify user data and handle the modification process
-	 *
-	 * @param user $user The user object that will be modified
-	 *
-	 * @return string The HTML content for the modification form or an error message
-	 */
+    /**
+     * Modify user data and handle the modification process
+     *
+     * @param user $user The user object that will be modified
+     *
+     * @return string The HTML content for the modification form or an error message
+     * @throws Exception
+     */
     public function modify(user $user): string {
         $page = get_page_by_title_V2('Gestion des utilisateurs');
         $linkManageUser = get_permalink($page->ID);
@@ -130,31 +159,50 @@ class TelevisionController extends UserController implements Schedule
 
         $action = filter_input(INPUT_POST, 'modifValidate');
 
-        if (isset($action)) {
+        if (isset($action))
+        {
             $codes = filter_input(INPUT_POST, 'selectTv', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
             $typeDefilement = $_POST['defilement'];
             $tempsDefilement = filter_input(INPUT_POST, 'temps');
 
             $codesAde = array();
-            foreach ($codes as $code) {
-                if (is_null($codeAde->getByCode($code)->getId())) {
+            foreach ($codes as $code)
+            {
+                if (is_null($codeAde->getByCode($code)->getId()))
+                {
                     return 'error';
-                } else {
+                }
+                else
+                {
                     $codesAde[] = $codeAde->getByCode($code);
                 }
             }
 
-            $user->setTypeDefilement($typeDefilement);
+            if ($typeDefilement === null)
+            {
+                $typeDefilement = 'suret';
+            }
             if ($tempsDefilement === null)
             {
-                $tempsDefilement = 10;
+                $tempsDefilement = 0;
             }
-            $user->setTimeout($tempsDefilement * 1000);
+            $tempsDefilement = (int)$tempsDefilement;
 
-            $user->setCodes($codesAde);
+            $user->setTypeDefilement($typeDefilement);
 
-            if ($user->update()) {
-                $this->view->displayModificationValidate($linkManageUser);
+            if ($tempsDefilement <= 0)
+            {
+                $this->view->displayTimeoutNegativeError();
+            }
+            else
+            {
+                $user->setTimeout($tempsDefilement * 1000);
+
+                $user->setCodes($codesAde);
+                if ($user->update())
+                {
+                    $this->view->displayModificationValidate($linkManageUser);
+                }
             }
         }
 
