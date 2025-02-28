@@ -50,6 +50,8 @@ class InformationController extends Controller
     public function create(): string
     {
         $current_user = wp_get_current_user();
+        $author = new User();
+        $author->get($current_user->ID);
 
         // All forms
         $actionText = filter_input(INPUT_POST, 'createText');
@@ -75,23 +77,17 @@ class InformationController extends Controller
 
         $information = $this->model;
 
-        // Set the base of all information
-        $information->setTitle($title);
-        $information->setAuthor($author);
-        $information->setCreationDate($creationDate);
-        $information->setExpirationDate($endDate);
-        $information->setAdminId(null);
+        if ((!empty($content) || !is_null($_FILES['contentFile'])) && !empty($endDate))
+        {
+            // Set the base of all information
+            $information->setTitle($title);
+            $information->setAuthor($author);
+            $information->setCreationDate($creationDate);
+            $information->setExpirationDate($endDate);
+            $information->setAdminId(null);
 
-
-        if (isset($actionText))
-        {                      // If the information is a text
-            if ($content === '' || $endDate === '')
-            {
-                $this->view->displayErrorInsertionInfo();
-            }
-            else
-            {
-
+            if (isset($actionText))
+            {                      // If the information is a text
                 $information->setContent($content);
                 $information->setType("text");
 
@@ -105,21 +101,15 @@ class InformationController extends Controller
                     $this->view->displayErrorInsertionInfo();
                 }
             }
-        }
-        if (isset($actionImg))
-        {                     // If the information is an image
-            if ($content === '' || $endDate === '')
-            {
-                $this->view->displayErrorInsertionInfo();
-            }
-            else
-            {
+            if (isset($actionImg))
+            {                     // If the information is an image
                 $type = "img";
                 $information->setType($type);
                 $filename = $_FILES['contentFile']['name'];
                 $fileTmpName = $_FILES['contentFile']['tmp_name'];
                 $explodeName = explode('.', $filename);
                 $goodExtension = ['jpg', 'jpeg', 'gif', 'png', 'svg'];
+
                 if (in_array(end($explodeName), $goodExtension))
                 {
                     $this->registerFile($filename, $fileTmpName, $information);
@@ -129,19 +119,13 @@ class InformationController extends Controller
                     $this->view->buildModal('Image non valide', '<p>Ce fichier est une image non valide, veuillez choisir une autre image</p>');
                 }
             }
-        }
-        if (isset($actionPDF))
-        {
-            if ($content === '' || $endDate === '')
-            {
-                $this->view->displayErrorInsertionInfo();
-            }
-            else
-            {
+            if (isset($actionPDF))
+            {                       // If the information is an PDF file
                 $type = "pdf";
                 $information->setType($type);
                 $filename = $_FILES['contentFile']['name'];
                 $explodeName = explode('.', $filename);
+
                 if (end($explodeName) == 'pdf')
                 {
                     $fileTmpName = $_FILES['contentFile']['tmp_name'];
@@ -152,18 +136,12 @@ class InformationController extends Controller
                     $this->view->buildModal('PDF non valide', '<p>Ce fichier est un tableau non PDF, veuillez choisir un autre PDF</p>');
                 }
             }
-        }
-        if (isset($actionEvent))
-        {                       // If the information is an event
-            if ($content === '' || $endDate === '')
-            {
-                $this->view->displayErrorInsertionInfo();
-            }
-            else
-            {
+            if (isset($actionEvent))
+            {                       // If the information is an event
                 $type = 'event';
                 $information->setType($type);
                 $countFiles = count($_FILES['contentFile']['name']);
+
                 for ($i = 0; $i < $countFiles; $i++)
                 {
                     $this->model->setId(null);
@@ -177,14 +155,8 @@ class InformationController extends Controller
                     }
                 }
             }
-        }
-        if(isset($actionVideoYT)) {
-            // If the information is a Youtube video
-            if ($content === '' || $endDate === '') {
-                $this->view->displayErrorInsertionInfo();
-            }
-            else
-            {
+            if (isset($actionVideoYT))
+            {                         // If the information is a Youtube video
                 $type = 'YTvideo';
                 if (str_contains($content, 'https://www.youtube.com/shorts/'))
                 {
@@ -210,21 +182,13 @@ class InformationController extends Controller
                     $this->view->displayErrorInsertionInfo();
                 }
             }
-        }
-        if (isset($actionVideoCLocal) || isset($actionVideoSLocal))
-        {
-            if ($content === '' || $endDate === '')
-            {
-                $this->view->displayErrorInsertionInfo();
-            }
-            else
+            if (isset($actionVideoCLocal) || isset($actionVideoSLocal))
             {
                 $type = '';
                 if (isset($actionVideoCLocal))
                 {
                     $type = 'LocCvideo';
-                }
-                else if (isset($actionVideoSLocal))
+                } else if (isset($actionVideoSLocal))
                 {
                     $type = 'LocSvideo';
                 }
@@ -246,15 +210,8 @@ class InformationController extends Controller
                     $this->view->displayNotConformVideo();
                 }
             }
-        }
 
-        if (isset($actionRSS))
-        {
-            if ($content === '' || $endDate === '')
-            {
-                $this->view->displayErrorInsertionInfo();
-            }
-            else
+            if (isset($actionRSS))
             {
                 $information->setContent($content);
                 $information->setType("rss");
@@ -463,11 +420,11 @@ class InformationController extends Controller
      *
      * @param string $filename The original name of the file being uploaded.
      * @param string $tmpName The temporary file path where the uploaded file is stored.
-     * @param object $entity The entity object to which the file content is associated.
+     * @param Information $entity The entity object to which the file content is associated.
      *
      * @return void
      */
-    public function registerFile(string $filename, string $tmpName, object $entity): void
+    public function registerFile(string $filename, string $tmpName, Information $entity): void
     {
         $id = 'temporary';
         $extension_upload = strtolower(substr(strrchr($filename, '.'), 1));
@@ -477,7 +434,8 @@ class InformationController extends Controller
         if ($result = move_uploaded_file($tmpName, $name))
         {
             $entity->setContent('temporary content');
-            if ($entity->getId() == null)
+            $idEntity = $entity->getId();
+            if (!isset($idEntity))
             {
                 $id = $entity->insert();
             }
@@ -710,14 +668,15 @@ class InformationController extends Controller
         }
     }
 
-	/**
-	 * Handles the display of information slides by retrieving a list of information,
-	 * processing each item based on its type and expiration date, and displaying
-	 * the components in a slideshow format.
-	 *
-	 * @return void
-	 */
-    public function informationMain(): void {
+    /**
+     * Handles the display of information slides by retrieving a list of information,
+     * processing each item based on its type and expiration date, and displaying
+     * the components in a slideshow format.
+     *
+     * @return void
+     */
+    public function informationMain(): void
+    {
         $informations = $this->model->getList();
         $currentUser = wp_get_current_user();
         $user = new User();

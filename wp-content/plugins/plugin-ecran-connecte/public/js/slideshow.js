@@ -32,7 +32,7 @@ const defaultTimeout = timeout;
 /**
  * Type de défilement des vidéos classiques
  * */
-let typeDefilement = document.getElementById("typeDefilement");
+let typeDefilement = document.getElementById("typeDefilement").innerHTML;
 
 /**
  * Diaporama des informations
@@ -51,9 +51,11 @@ let urlYoutube;
 
 if (typeDefilement === "suret") {
     infoSlideShowSuret();
+    scheduleSlideshowSuret();
 }
 else if (typeDefilement === "defil") {
     infoSlideShowDefil();
+    scheduleSlideshowDefil();
 }
 else {
     console.error("Erreur dans le type de défilement des vidéos");
@@ -61,7 +63,6 @@ else {
     console.log("-Début du diaporama");
     displayOrHide(slidesShow, 0);
 }
-scheduleSlideshow();
 
 /**
  * Fonction
@@ -152,9 +153,20 @@ function infoSlideShowDefil() {
 }
 
 /**
- * Begin a slideshow if there is some informations
+ * Begin a schedule if there is some informations
  */
-function scheduleSlideshow()
+function scheduleSlideshowSuret()
+{
+    if(document.getElementsByClassName("mySlides").length > 0) {
+        console.log("-Début du diaporama");
+        displayOrHide(document.getElementsByClassName("mySlides"), 0);
+    }
+}
+
+/**
+ * Begin a schedule if there is some informations
+ */
+function scheduleSlideshowDefil()
 {
     if(document.getElementsByClassName("mySlides").length > 0) {
         console.log("-Début du diaporama");
