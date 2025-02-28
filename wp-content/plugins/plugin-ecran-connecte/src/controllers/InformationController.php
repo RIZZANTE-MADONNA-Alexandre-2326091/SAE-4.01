@@ -51,7 +51,7 @@ class InformationController extends Controller
     {
         $current_user = wp_get_current_user();
         $author = new User();
-        $author->get($current_user);
+        $author = $author->get($current_user->ID);
 
         // All forms
         $actionText = filter_input(INPUT_POST, 'createText');

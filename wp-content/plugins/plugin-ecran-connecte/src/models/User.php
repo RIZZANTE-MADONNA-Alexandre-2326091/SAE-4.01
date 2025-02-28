@@ -209,14 +209,16 @@ class User extends Model implements Entity, JsonSerializable
 	 *
 	 * @return User|false Returns a User object if the user is found, otherwise returns false.
 	 */
-    public function get($id): User | false {
+    public function get($id): User | false
+    {
         $request = $this->getDatabase()->prepare('SELECT wp.ID, user_login, user_pass, user_email, edu.dept_id FROM wp_users wp
                                                 LEFT JOIN ecran_dept_user edu ON edu.user_id = wp.ID
                                                 WHERE wp.ID = :id LIMIT 1');
         $request->bindParam(':id', $id, PDO::PARAM_INT);
         $request->execute();
 
-        if ($request->rowCount() > 0) {
+        if ($request->rowCount() > 0)
+        {
             return $this->setEntity($request->fetch());
         }
         return false;
