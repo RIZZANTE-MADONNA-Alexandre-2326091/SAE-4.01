@@ -440,35 +440,35 @@ class InformationView extends View
     {
         if ($type == "text")
         {
-            return '<a href="' . esc_url( get_permalink(get_page_by_title('Gestion des informations' ))) . '">< Retour</a>' . $this->displayFormText( $title, $content, $endDate, 'submit' );
+            return '<a href="' . esc_url( get_permalink(get_page_by_title_V2('Gestion des informations' ))) . '">< Retour</a>' . $this->displayFormText( $title, $content, $endDate, 'submit' );
         }
         else if ($type == "YTvideosh" || $type == "YTvideow")
         {
-            return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormVideoYT($title, $content, $endDate, 'submit');
+            return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormVideoYT($title, $content, $endDate, 'submit');
         }
         else if ($type == "LocCvideo")
         {
-            return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormVideoCLocal($title, $content, $endDate, 'submit');
+            return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormVideoCLocal($title, $content, $endDate, 'submit');
         }
         else if ($type == "LocSvideo")
         {
-            return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormVideoSLocal($title, $content, $endDate, 'submit');
+            return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormVideoSLocal($title, $content, $endDate, 'submit');
         }
         elseif ($type == "img")
         {
-            return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormImg($title, $content, $endDate, 'submit');
+            return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormImg($title, $content, $endDate, 'submit');
         }
         elseif ($type == "tab")
         {
-            return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormTab($title, $content, $endDate, 'submit');
+            return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormTab($title, $content, $endDate, 'submit');
         }
         elseif ($type == "pdf")
         {
-            return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormPDF($title, $content, $endDate, 'submit');
+            return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormPDF($title, $content, $endDate, 'submit');
         }
         else if ($type == "rss")
         {
-            return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormRSS($title, $content, $endDate, 'submit');
+            return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormRSS($title, $content, $endDate, 'submit');
         }
         elseif ($type == "event")
         {
@@ -476,11 +476,11 @@ class InformationView extends View
             $extension = $extension[1];
             if ($extension == "pdf")
             {
-                return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormPDF($title, $content, $endDate, 'submit');
+                return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormPDF($title, $content, $endDate, 'submit');
             }
             else
             {
-                return '<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormImg($title, $content, $endDate, 'submit');
+                return '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>' . $this->displayFormImg($title, $content, $endDate, 'submit');
             }
         }
         else
@@ -545,16 +545,24 @@ class InformationView extends View
 		else if ($type == 'YTvideosh')
 		{
 			$link = substr_replace($content,'embed',24,6);
-			echo '<iframe id="" class="videosh" src="' . $link . '?autoplay=1&loop=1&playlist=' . substr($link,30) . '&mute=1&controls=0&disablekb=1&enablejsapi=1"
+            $link = substr_replace($link, '-nocookie', 19, 0);
+
+            echo '<span class="lien"><p id="">' . $content . '</p></span>';
+            echo '<div class="videosh"></div>';
+			/*echo '<iframe id="" class="videosh" src="' . $link . '?autoplay=1&loop=1&playlist=' . substr($link,30) . '&mute=1&controls=0&disablekb=1&enablejsapi=1"
 				  title="YouTube short player" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
-				  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';
+				  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';*/
 		}
 		else if ($type == 'YTvideow')
 		{
 			$link = substr_replace($content,'embed/',24,8);
-			echo '<iframe id="" class="videow" src="' . $link . '?autoplay=1&loop=1playlist=' . substr($link,30) . '&mute=1&controls=0&disablekb=1&enablejsapi=1"
+            $link = substr_replace($link, '-nocookie', 19, 0);
+
+            echo '<span class="lien"><p>' . $content . '</p></span>';
+            echo '<div class="videow"></div>';
+			/*echo '<iframe id="" class="videow" src="' . $link . '?autoplay=1&loop=1playlist=' . substr($link,30) . '&mute=1&controls=0&disablekb=1&enablejsapi=1"
 				  title="YouTube video player" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
-				  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';
+				  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';*/
         }
         else if ($type == 'LocCvideo')
         {
@@ -611,18 +619,18 @@ class InformationView extends View
 				<p class="lead">Vous souhaitez supprimer une / plusieurs information(s) ? Cochez les cases des informations puis cliquez sur "Supprimer" le bouton ce situe en bas du tableau.</p>
 			</div>
 		</div>
-		<a href="' . esc_url(get_permalink(get_page_by_title('Créer une information'))) . '">Créer une information</a>
+		<a href="' . esc_url(get_permalink(get_page_by_title_V2('Créer une information'))) . '">Créer une information</a>
 		<hr class="half-rule">';
     }
 
     public function noInformation(): string
     {
         return '
-		<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>
+		<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>
 		<div>
 			<h3>Information non trouvée</h3>
 			<p>Cette information n\'éxiste pas, veuillez bien vérifier d\'avoir bien cliqué sur une information.</p>
-			<a href="' . esc_url(get_permalink(get_page_by_title('Créer une information'))) . '">Créer une information</a>
+			<a href="' . esc_url(get_permalink(get_page_by_title_V2('Créer une information'))) . '">Créer une information</a>
 		</div>';
     }
 
@@ -649,7 +657,7 @@ class InformationView extends View
      */
     public function displayCreateValidate(): void
     {
-        $page = get_page_by_title('Gestion des informations');
+        $page = get_page_by_title_V2('Gestion des informations');
         $linkManageInfo = get_permalink($page->ID);
         $this->buildModal('Ajout d\'information validé', '<p class="alert alert-success"> L\'information a été ajoutée </p>', $linkManageInfo);
     }
@@ -660,7 +668,7 @@ class InformationView extends View
      */
     public function displayModifyValidate(): void
     {
-        $page = get_page_by_title('Gestion des informations');
+        $page = get_page_by_title_V2('Gestion des informations');
         $linkManageInfo = get_permalink($page->ID);
         $this->buildModal('Modification d\'information validée', '<p class="alert alert-success"> L\'information a été modifiée </p>', $linkManageInfo);
     }
@@ -700,11 +708,11 @@ class InformationView extends View
     public function informationNotAllowed(): string
     {
         return '
-		<a href="' . esc_url(get_permalink(get_page_by_title('Gestion des informations'))) . '">< Retour</a>
+		<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))) . '">< Retour</a>
 		<div>
 			<h3>Vous ne pouvez pas modifier cette alerte</h3>
 			<p>Cette information appartient à quelqu\'un d\'autre, vous ne pouvez donc pas modifier cette information.</p>
-			<a href="' . esc_url(get_permalink(get_page_by_title('Créer une information'))) . '">Créer une information</a>
+			<a href="' . esc_url(get_permalink(get_page_by_title_V2('Créer une information'))) . '">Créer une information</a>
 		</div>';
     }
 }

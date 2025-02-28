@@ -143,36 +143,36 @@ class TechnicianController extends UserController implements Schedule
 		$user = $this->model->getMycodes( [ $user ] )[0];
 
 		$string = "";
-		if ( sizeof( $user->getCodes() ) > 1 ) {
-			// Récupération des informations pertinentes pour le tri
-			$courses = [];
-			foreach ( $user->getCodes() as $code ) {
-				$path = $this->getFilePath( $code->getCode() );
-				if ( file_exists( $path ) ) {
-					$schedule = $this->displaySchedule( $code->getCode() );
-					if ( $schedule ) {
-						$parsedSchedule = $this->parseScheduleData( $schedule ); // Méthode pour extraire les infos heure/salle/étage
-						if ( $parsedSchedule ) {
-							$courses[] = $parsedSchedule;
+        if (sizeof($user->getCodes()) > 0) {
+            // Récupération des informations pertinentes pour le tri
+            $courses = [];
+            foreach ($user->getCodes() as $code) {
+                $path = $this->getFilePath($code->getCode());
+                if (file_exists($path)) {
+                    $schedule = $this->displaySchedule($code->getCode());
+                    if ($schedule) {
+                        $parsedSchedule = $this->parseScheduleData($schedule); // Méthode pour extraire les infos heure/salle/étage
+                        if ($parsedSchedule) {
+                            $courses[] = $parsedSchedule;
 						}
 					}
 				}
 			}
 
-			// Tri des cours : par heure, par numéro de salle, puis par étage
+			// Tri des cours : par etages, puis par heure, puis par salle
 			usort( $courses, function ( $a, $b ) {
-				// Trier par heure
-				if ( $a['time'] === $b['time'] ) {
-					// Trier par salle
-					if ( $a['room'] === $b['room'] ) {
-						// Trier par étage
-						return $a['floor'] <=> $b['floor'];
+				// Trier par étage
+				if ( $a['floor'] === $b['floor'] ) {
+					// Trier par heure
+					if ( $a['time'] === $b['time'] ) {
+						// Trier par numéro de salle
+						return $a['room'] <=> $b['room'];
 					}
 
-					return $a['room'] <=> $b['room'];
+					return $a['time'] <=> $b['time'];
 				}
 
-				return $a['time'] <=> $b['time'];
+				return $a['floor'] <=> $b['floor'];
 			} );
 
 			// Génération de l'affichage après tri
@@ -195,14 +195,11 @@ class TechnicianController extends UserController implements Schedule
 				$string .= $this->view->displayEndDiv();
 			}
 		} else {
-			if ( ! empty( $user->getCodes()[0] ) ) {
-				$string .= $this->displaySchedule( $user->getCodes()[0]->getCode() );
-			} else {
 				$string .= '<p>Aucun cours de prévu aujourd\'hui </p>';
-			}
-		}
+        }
 		return $string;
 	}
+
 
 	/**
 	 * Parses the schedule data from an HTML formatted string and extracts specific details such as time, room number, and floor.
@@ -237,4 +234,5 @@ class TechnicianController extends UserController implements Schedule
 
 		return null; // Retourner null si l'extraction échoue.
 	}
+
 }
