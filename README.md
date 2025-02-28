@@ -16,7 +16,7 @@ Ces codes ADE sont récupérés manuellement et créés dans le site.
 Pour plus d'informations,
 [voir le readme du plugin écrans connectés](wp-content/plugins/plugin-ecran-connecte/readme.md).
 
-
+---
 ### Réalisé par :
 - BELZ Matteo
 - BUCHMULLER Nassim
