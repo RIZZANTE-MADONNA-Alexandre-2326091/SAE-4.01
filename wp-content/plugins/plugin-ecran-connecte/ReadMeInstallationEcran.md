@@ -82,7 +82,7 @@ Récupérer la valeur à ressources=.... (Dans notre lien d'exemple, il s'agit d
 
 Dans votre site WordPress, allez dans la partie "Code ADE" et remplissez le formulaire.  
 
-## Custimisation
+## Customisation
 
 Vous pouvez customiser ce site comme vous le souhaitez.
 
