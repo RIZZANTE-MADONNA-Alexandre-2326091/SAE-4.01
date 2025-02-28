@@ -109,8 +109,6 @@ class AlertController extends Controller
         $groups = $codeAde->getAllFromType('group');
         $halfGroups = $codeAde->getAllFromType('halfGroup');
 
-        var_dump($deptId);
-
         return $this->view->creationForm($years, $groups, $halfGroups, $deptId);
     }
 
