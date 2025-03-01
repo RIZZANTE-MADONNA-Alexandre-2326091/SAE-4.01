@@ -2,6 +2,7 @@
 
 namespace Controllers;
 
+use Models\Department;
 use Models\User;
 use Views\CommunicatorView;
 
@@ -56,10 +57,10 @@ class CommunicatorController extends UserController
         $action = filter_input(INPUT_POST, 'createCommunicator');
 
         if (isset($action)) {
-            $login = filter_input(INPUT_POST, 'loginCommunicator');
-            $password = filter_input(INPUT_POST, 'pwdCommunicator');
-            $passwordConfirm = filter_input(INPUT_POST, 'pwdConfirmCommunicator');
-            $email = filter_input(INPUT_POST, 'emailCommunicator');
+            $login = filter_input(INPUT_POST, 'loginComm');
+            $password = filter_input(INPUT_POST, 'pwdComm');
+            $passwordConfirm = filter_input(INPUT_POST, 'pwdConfirmComm');
+            $email = filter_input(INPUT_POST, 'emailComm');
 
             if (is_string($login) && strlen($login) >= 4 && strlen($login) <= 25 &&
                 is_string($password) && strlen($password) >= 8 && strlen($password) <= 25 &&
@@ -82,13 +83,9 @@ class CommunicatorController extends UserController
         return $this->view->displayFormCommunicator();
     }
 
-    function modify()
-    {
-        //Todo
-    }
+    function displayAllCommunicator(): string {
+	    $users = $this->model->getUsersByRole('communicant');
 
-    function displayAllCommunicator()
-    {
-        //Todo
+	    return $this->view->displayAllCommunicator($users);
     }
 }

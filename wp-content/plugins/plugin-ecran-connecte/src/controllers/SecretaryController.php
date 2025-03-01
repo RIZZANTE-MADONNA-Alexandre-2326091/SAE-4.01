@@ -125,10 +125,10 @@ class SecretaryController extends UserController
 	    $user_id = get_current_user_id();
 	    $user_info = get_userdata($user_id);
 		$adminDept = null;
-        $communiquant = null;
+        $communicator = null;
 		if(in_array('administrator', $user_info->roles)){
 			$adminDept = new AdminDeptController();
-            $communiquant = new CommunicatorController();
+            $communicator = new CommunicatorController();
 		}
         $secretary = new SecretaryController();
         $technician = new TechnicianController();
@@ -139,9 +139,9 @@ class SecretaryController extends UserController
 		           $this->view->displayTitleSelect('technician', 'Technicien') .
 		           $this->view->displayTitleSelect('television', 'Télévisions') ;
 
-	    if (!is_null($adminDept) && !is_null($communiquant)) {
+	    if (!is_null($adminDept)) {
             $form .= $this->view->displayTitleSelect('communicator', 'Communicants').
-			         $this->view->displayTitleSelect('adminDept', 'Admin Département');;
+			         $this->view->displayTitleSelect('adminDept', 'Admin Département');
 	    }
 
 		$form .= $this->view->displayEndOfTitle() .
@@ -151,7 +151,7 @@ class SecretaryController extends UserController
 
 
 	    if (!is_null($adminDept)) {
-		    $form .= $this->view->displayContentSelect('communicator', $communiquant->insert()) .
+		    $form .= $this->view->displayContentSelect('communicator', $communicator->insert()) .
 		            $this->view->displayContentSelect('adminDept', $adminDept->insert());
 	    }
 
@@ -174,8 +174,10 @@ class SecretaryController extends UserController
         $user_id = get_current_user_id();
         $user_info = get_userdata($user_id);
         $adminDept = null;
+	    $communicator = null;
         if(in_array('administrator', $user_info->roles)){
             $adminDept = new AdminDeptController();
+	        $communicator = new CommunicatorController();
         }
         $secretary = new SecretaryController();
         $technician = new TechnicianController();
@@ -187,7 +189,8 @@ class SecretaryController extends UserController
             $this->view->displayTitleSelect('television', 'Télévisions');
 
         if (!is_null($adminDept)) {
-            $form .= $this->view->displayTitleSelect('adminDept', 'Admin Département');;
+	        $form .= $this->view->displayTitleSelect('communicator', 'Communicants').
+	                 $this->view->displayTitleSelect('adminDept', 'Admin Département');
         }
 
         $form .= $this->view->displayEndOfTitle() .
@@ -196,7 +199,8 @@ class SecretaryController extends UserController
             $this->view->displayContentSelect('television', $television->displayAllTv());
 
         if (!is_null($adminDept)) {
-            $form .= $this->view->displayContentSelect('adminDept', $adminDept->displayAllAdminDept());
+            $form .= $this->view->displayContentSelect('communicator', $communicator->displayAllCommunicator()) .
+                    $this->view->displayContentSelect('adminDept', $adminDept->displayAllAdminDept());
         }
 
         $form .= $this->view->displayEndDiv() .
