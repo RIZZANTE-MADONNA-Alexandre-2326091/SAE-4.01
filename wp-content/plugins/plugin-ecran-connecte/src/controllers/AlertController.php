@@ -7,11 +7,6 @@ use Models\CodeAde;
 use Models\Department;
 use Models\User;
 use Views\AlertView;
-
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 /**
  * Class AlertController
  *
@@ -237,14 +232,11 @@ class AlertController extends Controller
             $pageNumber = $maxPage;
         }
         $current_user = wp_get_current_user();
-		var_dump($current_user->roles);
         if (in_array('administrator', $current_user->roles) || in_array('communicant', $current_user->roles)) {
             $alertList = $this->model->getList($begin, $number);
         } else {
             $alertList = $this->model->getAuthorListAlert($current_user->ID, $begin,  $number);
         }
-
-		var_dump('<br>' . $alertList);
 
         $name = 'Alert';
         $header = ['Contenu', 'Date de création', 'Date d\'expiration', 'Auteur', 'Modifier'];
