@@ -45,7 +45,7 @@ class AlertView extends View
 			</div>
             <div class="form-group">
                 <label for="selectAlert">Année, groupe, demi-groupes concernés</label>
-                ' . $this->buildSelectCode($years, $groups, $halfGroups, null, 0, 0, $deptId) . '
+                ' . $this->buildSelectCode($deptId, $years, $groups, $halfGroups) . '
             </div>
             <input type="button" id="plus" onclick="addButtonAlert(' . $deptId . ')" class="btn button_ecran" value="+">
             <button type="submit" id="valider" class="btn button_ecran" name="submit">Valider</button>
@@ -87,7 +87,7 @@ class AlertView extends View
 	 * @return string The HTML string representing the alert modification form.
 	 */
 
-    public function modifyForm(Alert $alert, array $years, array $groups, array $halfGroups): string {
+    public function modifyForm(Alert $alert, array $years, array $groups, array $halfGroups, int $deptId): string {
         error_log("Rendering modify form for alert ID: " . $alert->getId());
         $dateMin = date('Y-m-d', strtotime("+1 day"));
         $codes = $alert->getCodes();
@@ -106,7 +106,7 @@ class AlertView extends View
             </div>
             <div class="form-group">
             <label for="selectId1">Année, groupe, demi-groupes concernés</label>' .
-            $this->buildSelectCode($years, $groups, $halfGroups, $firstCode, 1, $alert->getForEveryone()) . '
+            $this->buildSelectCode($deptId, $years, $groups, $halfGroups, $firstCode, 1, $alert->isForEveryone()) . '
             </div>';
 
         if (!$alert->getForEveryone()) {
@@ -114,14 +114,14 @@ class AlertView extends View
             foreach ($codes as $code) {
                 $form .= '
 				<div class="row" id="selctId' . $count . '">' .
-                    $this->buildSelectCode($years, $groups, $halfGroups, $code, $count)
+                    $this->buildSelectCode($deptId, $years, $groups, $halfGroups, $code, $count)
                     . '<input type="button" id="selectId' . $count . '" onclick="deleteRowAlert(this.id)" class="selectbtn" value="Supprimer">
                   </div>';
                 $count = $count + 1;
             }
         }
 
-	    $form .= '<input type="button" id="plus" onclick="addButtonAlert()" value="+">
+	    $form .= '<input type="button" id="plus" onclick="addButtonAlert(' . $deptId . ')" value="+">
                   <button type="submit" class="btn button_ecran" id="valider" name="submit">Valider</button>
                   <button type="submit" class="btn delete_button_ecran" id="supprimer" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette alerte ?\');">Supprimer</button>
                 </form>' . $this->contextModify();
@@ -191,40 +191,48 @@ class AlertView extends View
 	 * @param array $years An array of year objects, where each object is expected to have methods `getCode()` and `getTitle()` to fetch year code and title.
 	 * @param array $groups An array of group objects, where each object is expected to have methods `getCode()` and `getTitle()` to fetch group
 	 */
-    public function buildSelectCode(array $years,array $groups,array $halfGroups,array $code = null, int $count = 0, int $forEveryone = 0, int $deptId): string {
-        $select = '<select class="form-control firstSelect" id="selectId' . $count . '" name="selectAlert[]" required="">';
+	// PHP
+	public function buildSelectCode(int $deptId, array $years, array $groups, array $halfGroups, CodeAde|array $code = null, int $count = 0, int $forEveryone = 0): string {
+		$select = '<select class="form-control firstSelect" id="selectId' . $count . '" name="selectAlert[]" required="">';
 
-        if ($forEveryone) {
-            $select .= '<option value="all" selected>Tous</option>';
-        } elseif (!is_null($code)) {
-                $select .= '<option value="' . $code->getCode() . '" selected>' . $code->getTitle() . '</option>';
-        }
+		if ($forEveryone) {
+			$select .= '<option value="all" selected>Tous</option>';
+		} elseif (!is_null($code)) {
+			if (is_array($code)) {
+				$select .= '<option value="' . $code['code'] . '" selected>' . $code['title'] . '</option>';
+			} else {
+				$select .= '<option value="' . $code->getCode() . '" selected>' . $code->getTitle() . '</option>';
+			}
+		}
 
-        $select .= '<option value="all">Tous</option>
-                    <option value="0">Aucun</option>
-            		<optgroup label="Année">';
+		$select .= '<option value="all">Tous</option>
+                <option value="0">Aucun</option>
+                <optgroup label="Année">';
 
-        foreach ($years as $year) {
-            if($deptId == 0 || $year->getDeptId() == $deptId)
-                $select .= '<option value="' . $year->getCode() . '">' . $year->getTitle() . '</option >';
-        }
-        $select .= '</optgroup><optgroup label="Groupe">';
+		foreach ($years as $year) {
+			if ($deptId == 0 || $year->getDeptId() == $deptId) {
+				$select .= '<option value="' . $year->getCode() . '">' . $year->getTitle() . '</option>';
+			}
+		}
+		$select .= '</optgroup><optgroup label="Groupe">';
 
-        foreach ($groups as $group) {
-            if($deptId == 0 || $group->getDeptId() == $deptId)
-                $select .= '<option value="' . $group->getCode() . '">' . $group->getTitle() . '</option>';
-        }
-        $select .= '</optgroup><optgroup label="Demi groupe">';
+		foreach ($groups as $group) {
+			if ($deptId == 0 || $group->getDeptId() == $deptId) {
+				$select .= '<option value="' . $group->getCode() . '">' . $group->getTitle() . '</option>';
+			}
+		}
+		$select .= '</optgroup><optgroup label="Demi groupe">';
 
-        foreach ($halfGroups as $halfGroup) {
-            if($deptId == 0 || $halfGroup->getDeptId() == $deptId)
-                $select .= '<option value="' . $halfGroup->getCode() . '">' . $halfGroup->getTitle() . '</option>';
-        }
-        $select .= '</optgroup>
-			</select>';
+		foreach ($halfGroups as $halfGroup) {
+			if ($deptId == 0 || $halfGroup->getDeptId() == $deptId) {
+				$select .= '<option value="' . $halfGroup->getCode() . '">' . $halfGroup->getTitle() . '</option>';
+			}
+		}
+		$select .= '</optgroup>
+   				</select>';
 
-        return $select;
-    }
+		return $select;
+	}
 
 	/**
 	 * Generates and returns the HTML content for the "alert not found" section,

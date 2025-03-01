@@ -7,6 +7,7 @@ use Models\CodeAde;
 use Models\Department;
 use Models\User;
 use Views\AlertView;
+
 /**
  * Class AlertController
  *
@@ -128,7 +129,7 @@ class AlertController extends Controller
      */
     public function modify(): string {
         $id = $_GET['id'];
-        $current_user = wp_get_current_user();
+	    $currentUser = wp_get_current_user();
         error_log("Modify method called with ID: $id");
 
         if (!is_numeric($id) || !$this->model->get($id)) {
@@ -137,17 +138,24 @@ class AlertController extends Controller
         }
         $alert = $this->model->get($id);
 
-        if (!in_array('administrator', $current_user->roles) && !in_array('secretaire', $current_user->roles) && $alert->getAuthor()->getId() != $current_user->ID) {
+        if (!in_array('administrator', $currentUser->roles) && !in_array('communicant', $currentUser->roles) && !in_array('secretaire', $currentUser->roles)
+            && $alert->getAuthor()->getId() != $currentUser->ID) {
             error_log("User does not have permission to modify this alert.");
             return $this->view->alertNotAllowed();
         }
 
-        if ($alert->getAdminId()) {
-            error_log("Alert modification not allowed for admin alerts.");
-            return $this->view->alertNotAllowed();
-        }
+//        if ($alert->getAdminId()) {
+//            error_log("Alert modification not allowed for admin alerts.");
+//            return $this->view->alertNotAllowed();
+//        }
 
         $codeAde = new CodeAde();
+
+	    $deptId = 0;
+	    if(in_array('adminDept', $currentUser->roles)|| in_array('secretaire', $currentUser->roles)) {
+		    $deptModel = new Department();
+		    $deptId = $deptModel->getUserInDept($currentUser->ID)->getId();
+	    }
 
         $submit = filter_input(INPUT_POST, 'submit');
         if (isset($submit)) {
@@ -205,7 +213,7 @@ class AlertController extends Controller
         $halfGroups = $codeAde->getAllFromType('halfGroup');
 
         error_log("Rendering modify form for alert ID: $id");
-        return $this->view->modifyForm($alert, $years, $groups, $halfGroups);
+        return ' ' . $this->view->modifyForm($alert, $years, $groups, $halfGroups, $deptId);
     }
 
 
