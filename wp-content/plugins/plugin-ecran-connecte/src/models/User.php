@@ -445,13 +445,13 @@ class User extends Model implements Entity, JsonSerializable
      */
     public function setEntity($data): User
     {
-        $entity = new User();
-        $entity->setId($data['ID']);
-        $entity->setLogin($data['user_login']);
-        $entity->setPassword($data['user_pass']);
-        $entity->setEmail($data['user_email']);
-        $entity->setRole(get_user_by('ID', $data['ID'])->roles[0]);
-        $entity->setDeptId(($data['dept_id']) ?: 0);
+        //$entity = new User();
+        $this->setId($data['ID']);
+	    $this->setLogin($data['user_login']);
+	    $this->setPassword($data['user_pass']);
+	    $this->setEmail($data['user_email']);
+	    $this->setRole($wp_user->roles[0] ?? 'default_role');
+	    $this->setDeptId(($data['dept_id']) ?: 0);
 
         $request = $this->getDatabase()->prepare('SELECT id, title, code, type, dept_id FROM ecran_code_ade
                                                 JOIN ecran_code_user ON ecran_code_ade.id = ecran_code_user.code_ade_id
@@ -461,9 +461,9 @@ class User extends Model implements Entity, JsonSerializable
 
         $codeAde = new CodeAde();
         $codes = $codeAde->setEntityList($request->fetchAll());
-        $entity->setCodes($codes);
+	    $this->setCodes($codes);
 
-        return $entity;
+        return $this;
     }
 	/**
 	 * @param array $dataList List of data entries to be converted into entity objects.
