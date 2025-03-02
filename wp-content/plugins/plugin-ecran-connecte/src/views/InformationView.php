@@ -49,7 +49,7 @@ class InformationView extends View
                 <input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' . $dateMin . '"
                 value="' . $endDate . '" required="required">
             </div>
-            <button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
+            <button class="btn button_ecran" type="submit" name="' . $type . '">Confirmer</button>';
 
         if ($type == 'submit')
         {

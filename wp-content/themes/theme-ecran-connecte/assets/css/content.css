@@ -85,7 +85,29 @@ body {
 }
 
 .row {
-    margin: 0;
+    margin: 0px;
+}
+
+.alertEntry {
+    margin-bottom: 1rem;
+}
+
+.table-responsive {
+    margin-top: 12px;
+}
+
+.page-item:last-child .page-link {
+    border-radius: 100px;
+}
+
+.button, input {
+    padding: 6px;
+    border-radius: 18px;
+    border: #1f63de 3px solid;
+}
+
+.pagination {
+    justify-content: center;
 }
 
 a, a:hover, a:active {
@@ -104,6 +126,7 @@ a:hover {
 
 .dropdown-menu {
     background-color: #1f63de;
+    border-radius: 12px;
 }
 
 .dropdown-item:hover {
