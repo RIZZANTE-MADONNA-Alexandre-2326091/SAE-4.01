@@ -81,13 +81,15 @@ class User extends Model implements Entity, JsonSerializable
         );
 
         $id = wp_insert_user($userData);
+	    $database = $this->getDatabase();
 
         // Add to table ecran_dept_user
-        $database = $this->getDatabase();
-        $request = $database->prepare('INSERT INTO ecran_dept_user (dept_id, user_id) VALUES (:dept_id, :user_id)');
-        $request->bindValue(':dept_id', $this->getDeptId(), PDO::PARAM_INT);
-        $request->bindParam(':user_id', $id, PDO::PARAM_INT);
-        $request->execute();
+	    if($this->getDeptId() !== 0){
+		    $request = $database->prepare('INSERT INTO ecran_dept_user (dept_id, user_id) VALUES (:dept_id, :user_id)');
+		    $request->bindValue(':dept_id', $this->getDeptId(), PDO::PARAM_INT);
+		    $request->bindParam(':user_id', $id, PDO::PARAM_INT);
+		    $request->execute();
+	    }
 
         // To review
         if ($this->getRole() == 'television')
