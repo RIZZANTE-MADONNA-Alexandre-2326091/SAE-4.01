@@ -5,6 +5,7 @@ namespace Controllers;
 use Exception;
 use Models\CodeAde;
 use Models\Department;
+use Models\Information;
 use Models\User;
 use Views\TelevisionView;
 
@@ -248,6 +249,7 @@ class TelevisionController extends UserController implements Schedule
 
         $string = "";
         if (sizeof($user->getCodes()) > 1) {
+            $informationVideo = new InformationController();
             if (get_theme_mod('ecran_connecte_schedule_scroll', 'vert') == 'vert') {
                 $string .= '<div class="ticker1">
 						<div class="innerWrap tv-schedule">';
@@ -258,6 +260,7 @@ class TelevisionController extends UserController implements Schedule
                             $string .= '<div class="list">';
                             $string .= $this->displaySchedule($code->getCode());
                             $string .= $this->view->displayEndDiv();
+                            $informationVideo->displayVideo();
                         }
                     }
                 }

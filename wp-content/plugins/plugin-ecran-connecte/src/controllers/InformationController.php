@@ -542,14 +542,14 @@ class InformationController extends Controller
                 {
                     $content = 'Tableau Excel';
                 }
-                else if ($information->getType() === 'LocCvideo')
+                else if ($information->getType() === 'LocCvideo' && $contentExplode[1] === $videoExtension)
                 {
                     $content = '<video class="previsualisationVideoClassique" controls muted>
 									<source src="' . $content . $information->getContent() . '" type="video/mp4">
 									<p>Votre navigateur ne permet pas de lire les vidéos de format mp4 avec HTML5.</p>
 								</video>';
                 }
-                else if ($information->getType() === 'LocSvideo')
+                else if ($information->getType() === 'LocSvideo' && $contentExplode[1] === $videoExtension)
                 {
                     $content = '<video class="previsualisationVideoShort" controls muted>
 									<source src="' . $content . $information->getContent() . '" type="video/mp4">
@@ -644,6 +644,40 @@ class InformationController extends Controller
             $returnString = $this->view->contextDisplayAll();
         }
         return $returnString . $this->view->displayAll($name, 'Informations', $header, $dataList) . $this->view->pageNumber($maxPage, $pageNumber, esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))), $number);
+    }
+
+    /**
+     *
+     */
+    public function displayVideo(): void
+    {
+        $currentUser = wp_get_current_user();
+        $user = new User();
+        $user->get($currentUser->ID);
+
+        // Début du conteneur pour les vidéos
+        $this->view->displayStartSlideVideo();
+
+        //On récupère depuis le model toutes les informations qui sont des vidéos "classiques".
+        $informations = $this->model->getListClassicsVideos(array('videow','LocalCvideo'));
+        foreach ($informations as $information)
+        {
+            $adminSite = true;
+            if (is_null($information->getAdminId()))
+            {
+                $adminSite = false;
+            }
+            // Affiche uniquement les vidéos
+            if ($information->getType() === 'videow' || $information->getType() === 'LocalCvideo')
+            {
+                $this->view->displaySlideVideo(
+                    $information->getTitle(),
+                    $information->getContent(),
+                    $information->getType(),$user->getTypeDefilement(), $adminSite
+                );
+            }
+        }
+        echo '</div>';
     }
 
 
