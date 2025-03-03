@@ -77,7 +77,7 @@ function loadScriptsEcran()
 
     // SCRIPT
 	wp_enqueue_script('addCheckBox_script_ecran', TV_PLUG_PATH . 'public/js/addAllCheckBox.js', array('jquery'), '1.0', true);
-	wp_enqueue_script('addCodeAlert_script_ecran', TV_PLUG_PATH . 'public/js/addOrDeleteAlertCode.js', array('jquery'), '1.0', true);
+	wp_enqueue_script('addCodeAlert_script_ecran', TV_PLUG_PATH . 'public/js/addOrDeleteCodeADE.js', array('jquery'), '1.0', true);
 	wp_enqueue_script('addCodeTv_script_ecran', TV_PLUG_PATH . 'public/js/addOrDeleteTvCode.js', array('jquery'), '1.0', true);
 	wp_enqueue_script('alertTicker_script_ecran', TV_PLUG_PATH . 'public/js/alertTicker.js', array('jquery'), '', true);
 	wp_enqueue_script('confPass_script_ecran', TV_PLUG_PATH . 'public/js/confirmPass.js', array('jquery'), '1.0', true);
@@ -165,6 +165,18 @@ function installDatabaseEcran(): void
 
     dbDelta($query);
 
+	$table_name = 'ecran_code_information';
+
+    $query = "CREATE TABLE IF NOT EXISTS $table_name (
+			info_id INT(10) NOT NULL ,
+			code_ade_id INT(10) NOT NULL ,
+			PRIMARY KEY (info_id, code_ade_id),
+			FOREIGN KEY (info_id) REFERENCES ecran_information(id) ON DELETE CASCADE,
+			FOREIGN KEY (code_ade_id) REFERENCES ecran_code_ade(id) ON DELETE CASCADE
+			) $charset_collate;";
+
+    dbDelta($query);
+
     $table_name = 'ecran_code_user';
 
     $query = "CREATE TABLE IF NOT EXISTS $table_name (
@@ -209,8 +221,6 @@ function installDatabaseEcran(): void
 			FOREIGN KEY (dept_id) REFERENCES ecran_department(dept_id) ON DELETE CASCADE,
 			FOREIGN KEY (user_id) REFERENCES wp_users(ID) ON DELETE CASCADE
 		) $charset_collate;";
-
-	dbDelta($sql);
 
 	$table_name = 'ecran_location';
 

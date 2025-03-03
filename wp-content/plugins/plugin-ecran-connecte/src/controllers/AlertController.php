@@ -59,7 +59,7 @@ class AlertController extends Controller
         }
 
         if (isset($action)) {
-            $codes = $_POST['selectAlert'];
+            $codes = $_POST['select'];
             $content = filter_input(INPUT_POST, 'content');
             $endDate = filter_input(INPUT_POST, 'expirationDate');
 
