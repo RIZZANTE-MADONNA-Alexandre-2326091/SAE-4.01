@@ -478,6 +478,11 @@ class InformationController extends Controller
         wp_delete_file($source);
     }
 
+    /**
+     * Display a slideshow of informations. If the type of slideshow is 'suret', the horizontal videos are display on the schedule
+     *
+     * @return string
+     */
     public function displayAll(): string
     {
         $numberAllEntity = $this->model->countAll();
@@ -647,7 +652,9 @@ class InformationController extends Controller
     }
 
     /**
+     * Display a slideshow of video if the type of slideshow is 'defil'
      *
+     * @return void
      */
     public function displayVideo(): void
     {

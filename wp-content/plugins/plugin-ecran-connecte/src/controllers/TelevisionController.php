@@ -260,7 +260,10 @@ class TelevisionController extends UserController implements Schedule
                             $string .= '<div class="list">';
                             $string .= $this->displaySchedule($code->getCode());
                             $string .= $this->view->displayEndDiv();
+                            if ($user->getTypeDefilement() == 'defil')
+                            {
                             $informationVideo->displayVideo();
+                            }
                         }
                     }
                 }

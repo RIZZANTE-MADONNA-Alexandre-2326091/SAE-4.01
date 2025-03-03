@@ -560,13 +560,7 @@ class InformationView extends View
     }
 
     /**
-     * Affiche une diapositive dans le diaporama avec un titre, un contenu et un type
-     * spécifié.
-     *
-     * Cette méthode génère du HTML pour afficher une diapositive, qui peut contenir
-     * différents types de contenu tels que du texte, des images, des vidéos ou des
-     * fichiers PDF. Elle gère également la distinction entre l'affichage sur le site
-     * d'administration et l'affichage normal.
+     * Display the slideshow of video on the schedule
      *
      * @param string $title
      * @param string $content
