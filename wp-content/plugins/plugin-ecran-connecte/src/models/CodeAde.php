@@ -132,7 +132,7 @@ class CodeAde extends Model implements Entity, JsonSerializable
 	 * @return array
 	 */
     public function getList(): array {
-        $request = $this->getDatabase()->prepare('SELECT id, title, code, type FROM ecran_code_ade ORDER BY id DESC LIMIT 1000');
+        $request = $this->getDatabase()->prepare('SELECT id, title, code, type, dept_id FROM ecran_code_ade ORDER BY id DESC LIMIT 1000');
 
         $request->execute();
 

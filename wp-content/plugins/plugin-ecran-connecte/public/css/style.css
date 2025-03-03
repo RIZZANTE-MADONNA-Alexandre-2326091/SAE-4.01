@@ -6,6 +6,15 @@
     border: none;
 }
 
+.selectbtn {
+    background-color: #cb0000;
+    color: white;
+    border: none;
+    padding: 0px 8px 0px 8px;
+    border-radius: 30px;
+    margin-left: 8px;
+}
+
 .bg-light {
     background-color: transparent!important;
 }
@@ -20,8 +29,16 @@
     margin-right: 1em;
 }
 
+.addbtn {
+    display: grid;
+    margin-bottom: 12px;
+    background-color: #00a32a;
+}
+
+
 .delete_button_ecran {
     background-color: #cb0000;
+    border-radius: 10px;
 }
 
 .active_ecran .page-link {
@@ -32,6 +49,14 @@
     color: white;
 }
 
+div[id^="selctId"] {
+    margin-bottom: 1rem;
+}
+
+.alert {
+    margin-bottom: 12px;
+}
+
 thead {
     background-color: #1f63de;
     color: white;
@@ -40,6 +65,10 @@ thead {
 .form-control {
     border-radius: 12px;
     width: auto;
+}
+
+.returnbutton {
+    font-size: 1.1rem;
 }
 
 .nav-tabs {

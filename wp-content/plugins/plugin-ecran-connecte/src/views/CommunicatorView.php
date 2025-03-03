@@ -15,7 +15,7 @@ class CommunicatorView extends UserView
         return '
         <h2>Compte communicant</h2>
         <p class="lead">Pour créer des communicants, remplissez ce formulaire avec les valeurs demandées.</p>
-        ' . $this->displayBaseForm('Communicator', $departments, $isAdmin, $currentDept);
+        ' . $this->displayBaseForm('Comm', $departments, $isAdmin, $currentDept);
     }
 
     public function displayWelcomeCommunicator(): string
@@ -60,5 +60,21 @@ class CommunicatorView extends UserView
             </div>
         </div>';
     }
+
+
+	public function displayAllCommunicator(array $users): string {
+		$title = 'Communicants';
+		$name = 'Comm';
+		$header = ['Login'];
+
+		$row = array();
+		$count = 0;
+		foreach ($users as $user) {
+			++$count;
+			$row[] = [$count, $this->buildCheckbox($name, $user->getId()), $user->getLogin()];
+		}
+
+		return $this->displayAll($name, $title, $header, $row, $name);
+	}
 
 }

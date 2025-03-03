@@ -104,6 +104,8 @@ class CodeAdeController extends Controller
         if (is_numeric($id) && !$this->model->get($id))
             return $this->view->errorNobody();
 
+        var_dump('test');
+
         $result = $codeAde = $this->model->get($id);
 
         $submit = filter_input(INPUT_POST, 'submit');
@@ -147,8 +149,9 @@ class CodeAdeController extends Controller
         $years = $this->model->getAllFromType('year');
         $groups = $this->model->getAllFromType('group');
         $halfGroups = $this->model->getAllFromType('halfGroup');
+        $room = $this->model->getAllFromType('room');
 
-        return $this->view->displayAllCode($years, $groups, $halfGroups);
+        return $this->view->displayAllCode($years, $groups, $halfGroups, $room);
     }
 
 	/**

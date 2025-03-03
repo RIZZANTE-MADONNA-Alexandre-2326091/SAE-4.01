@@ -357,6 +357,7 @@ class Alert extends Model implements Entity, JsonSerializable
         $entity->setId($data['id']);
         $entity->setContent($data['content']);
         $entity->setAuthor($author);
+		$entity->setForEveryone($data['for_everyone']);
         $entity->setCreationDate(date('Y-m-d', strtotime($data['creation_date'])));
         $entity->setExpirationDate(
             date('Y-m-d', strtotime($data['expiration_date']))
