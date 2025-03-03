@@ -25,21 +25,9 @@ class TechnicianView extends UserView
         $form = '
         <h2>Compte technicien</h2>
         <p class="lead">Pour créer des techniciens, remplissez ce formulaire avec les valeurs demandées.</p>
+        ' . $this->displayBaseForm('Tech');'
         <p class="lead">Vous pouvez mettre autant d\'emploi du temps que vous souhaitez, cliquez sur "Ajouter des emplois du temps</p>
-        <form method="post" id="registerTvForm">
-            <div class="form-group">
-            	<label for="loginTv">Login</label>
-            	<input type="text" class="form-control" name="loginTv" placeholder="Nom de compte" required="">
-            	<small id="passwordHelpBlock" class="form-text text-muted">Votre login doit contenir entre 4 et 25 caractère</small>
-            </div>
-            <div class="form-group">
-            	<label for="pwdTv">Mot de passe</label>
-            	<input type="password" class="form-control" id="pwdTv" name="pwdTv" placeholder="Mot de passe" minlength="8" maxlength="25" required="" onkeyup=checkPwd("Tv")>
-            	<input type="password" class="form-control" id="pwdConfTv" name="pwdConfirmTv" placeholder="Confirmer le Mot de passe" minlength="8" maxlength="25" required="" onkeyup=checkPwd("Tv")>
-            	<small id="passwordHelpBlock" class="form-text text-muted">Votre mot de passe doit contenir entre 8 et 25 caractère</small>
-            </div>
-            <div class="form-group">
-            	<label>Premier emploi du temps</label>' .
+            <label>Premier emploi du temps</label>' .
             $this->buildSelectCode($years, $groups, $halfGroups) . '
             </div>
             <input type="button" class="btn button_ecran" id="addSchedule" onclick="addButtonTv()" value="Ajouter des emplois du temps">
