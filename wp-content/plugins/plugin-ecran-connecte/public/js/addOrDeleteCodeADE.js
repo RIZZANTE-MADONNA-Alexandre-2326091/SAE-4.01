@@ -23,8 +23,8 @@ function addButton(deptId, information) {
             information: information
         }
     }).done(function (data) {
-        let div = $('<div>', {
-            class: 'row',
+        let div = $('<div >', {
+            class: 'row alertEntry',
             id: countRow
         }).appendTo('#' + formId);
         let select = $('<select>', {
@@ -36,7 +36,7 @@ function addButton(deptId, information) {
             id: countRow,
             onclick: 'deleteRow(this.id)',
             class: 'selectbtn',
-            value: 'Supprimer'
+            value: 'Retirer'
         }).appendTo(div);
 
         // Delete buttons from the form.

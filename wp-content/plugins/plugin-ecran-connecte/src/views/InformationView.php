@@ -59,7 +59,7 @@ class InformationView extends View
             <input type="button" id="plus" onclick="addButton(' . $deptId . ', ' . true . ')" class="addbtn btn button_ecran" value="Ajouter">';
 		}
 
-		$form .= '<button class="btn button_ecran" id="valider" type="submit" name="' . $type . '">Valider</button>';
+		$form .= '<button class="btn button_ecran" id="valider" type="submit" name="' . $type . '">Confirmer</button>';
 
         if ($type == 'submit')
         {

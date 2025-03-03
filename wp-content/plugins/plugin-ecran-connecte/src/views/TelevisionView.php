@@ -136,7 +136,7 @@ class TelevisionView extends UserView
     public function modifyForm(User $user, array $years, array $groups, array $halfGroups): string {
         $count = 0;
         $string = '
-        <a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des utilisateurs'))) . '">< Retour</a>
+        <a class="returnbutton" href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des utilisateurs'))) . '">< Retour</a>
         <h2>' . $user->getLogin() . '</h2>
          <form method="post" id="registerTvForm">
             <!--Formulaire type de défilement des vidéos-->
@@ -177,7 +177,6 @@ class TelevisionView extends UserView
         $string .= '
             <input type="button" class="btn button_ecran" id="addSchedule" onclick="addButtonTv()" value="Ajouter des emplois du temps">
             <button name="modifValidate" class="btn button_ecran" type="submit" id="validTv">Valider</button>
-            <a href="' . $linkManageUser . '" id="linkReturn">Annuler</a>
         </form>';
         return $string;
     }

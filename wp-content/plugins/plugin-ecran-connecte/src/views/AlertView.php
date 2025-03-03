@@ -19,17 +19,17 @@ class AlertView extends View
         error_log("AlertView instantiated");
     }
 
-	/**
-	 * Generates an HTML form for alert creation, including content input,
-	 * expiration date, and select options for years, groups, and half-groups.
-	 *
-	 * @param array $years Array of available years.
-	 * @param array $groups Array of available groups.
-	 * @param array $halfGroups Array of available half-groups.
+    /**
+     * Generates an HTML form for alert creation, including content input,
+     * expiration date, and select options for years, groups, and half-groups.
+     *
+     * @param array $years Array of available years.
+     * @param array $groups Array of available groups.
+     * @param array $halfGroups Array of available half-groups.
      * @param int $deptId The ID of the department to which the user will be associated.
-	 *
-	 * @return string Array containing the HTML code for the form.
-	 */
+     *
+     * @return string Array containing the HTML code for the form.
+     */
     public function creationForm(array $years, array $groups, array $halfGroups, int $deptId): string {
         $dateMin = date('Y-m-d', strtotime("+1 day"));
 
@@ -53,12 +53,12 @@ class AlertView extends View
         <a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des alertes'))) . '">Voir les alertes</a>' . $this->contextCreateAlert();
     }
 
-	/**
-	 * Generates and returns the HTML content for the alert context section,
-	 * explaining how alerts will be displayed on the televisions that use the site.
-	 *
-	 * @return string The HTML string for the alert context section, including text descriptions and an illustrative image.
-	 */
+    /**
+     * Generates and returns the HTML content for the alert context section,
+     * explaining how alerts will be displayed on the televisions that use the site.
+     *
+     * @return string The HTML string for the alert context section, including text descriptions and an illustrative image.
+     */
     public function contextCreateAlert(): string {
         return '
 		<hr class="half-rule">
@@ -76,16 +76,16 @@ class AlertView extends View
 		</div>';
     }
 
-	/**
-	 * Generates and returns the HTML form for modifying an alert, including fields for content, expiration date, and target audience.
-	 *
-	 * @param Alert $alert The alert object containing data for pre-populating the form fields.
-	 * @param array $years An array of available years to select from in the form.
-	 * @param array $groups An array of groups to populate the selection options.
-	 * @param array $halfGroups An array of half-groups to populate additional selection options.
-	 *
-	 * @return string The HTML string representing the alert modification form.
-	 */
+    /**
+     * Generates and returns the HTML form for modifying an alert, including fields for content, expiration date, and target audience.
+     *
+     * @param Alert $alert The alert object containing data for pre-populating the form fields.
+     * @param array $years An array of available years to select from in the form.
+     * @param array $groups An array of groups to populate the selection options.
+     * @param array $halfGroups An array of half-groups to populate additional selection options.
+     *
+     * @return string The HTML string representing the alert modification form.
+     */
 
     public function modifyForm(Alert $alert, array $years, array $groups, array $halfGroups, int $deptId): string {
         error_log("Rendering modify form for alert ID: " . $alert->getId());
@@ -113,7 +113,7 @@ class AlertView extends View
             $count = 2;
             foreach ($codes as $code) {
                 $form .= '
-				<div class="row" id="selctId' . $count . '">' .
+				<div class="row alertEntry" id="selctId' . $count . '">' .
                     $this->buildSelectCode($deptId, $years, $groups, $halfGroups, $code, $count)
                     . '<input type="button" id="selectId' . $count . '" onclick="deleteRow(this.id)" class="selectbtn" value="Supprimer">
                   </div>';
@@ -129,13 +129,13 @@ class AlertView extends View
         return $form;
     }
 
-	/**
-	 * Generates and returns the HTML content for the modify context section,
-	 * describing how alert modifications are applied and their effects.
-	 *
-	 * @return string The HTML string for the modify context section, including details on expiration adjustments and content updates.
-	 */
-	public function contextModify(): string {
+    /**
+     * Generates and returns the HTML content for the modify context section,
+     * describing how alert modifications are applied and their effects.
+     *
+     * @return string The HTML string for the modify context section, including details on expiration adjustments and content updates.
+     */
+    public function contextModify(): string {
         return '
 		<hr class="half-rule">
 		<div>
@@ -161,13 +161,13 @@ class AlertView extends View
 		<hr class="half-rule">';
     }
 
-	/**
-	 * Displays an HTML structure for a sliding alert system using the provided text content.
-	 *
-	 * @param array $texts An array of strings, where each string represents a piece of text to be displayed as an individual alert item.
-	 *
-	 * @return void
-	 */
+    /**
+     * Displays an HTML structure for a sliding alert system using the provided text content.
+     *
+     * @param array $texts An array of strings, where each string represents a piece of text to be displayed as an individual alert item.
+     *
+     * @return void
+     */
     public function displayAlertMain(array $texts): void {
         echo '
         <div class="alerts" id="alert">
@@ -195,53 +195,53 @@ class AlertView extends View
 	public function buildSelectCode(int $deptId, array $years, array $groups, array $halfGroups, CodeAde|array $code = null, int $count = 0, int $forEveryone = 0): string {
 		$select = '<select class="form-control firstSelect" id="selectId' . $count . '" name="select[]" required="">';
 
-		if ($forEveryone) {
-			$select .= '<option value="all" selected>Tous</option>';
-		} elseif (!is_null($code)) {
-			if (is_array($code)) {
-				$select .= '<option value="' . $code['code'] . '" selected>' . $code['title'] . '</option>';
-			} else {
-				$select .= '<option value="' . $code->getCode() . '" selected>' . $code->getTitle() . '</option>';
-			}
-		}
+        if ($forEveryone) {
+            $select .= '<option value="all" selected>Tous</option>';
+        } elseif (!is_null($code)) {
+            if (is_array($code)) {
+                $select .= '<option value="' . $code['code'] . '" selected>' . $code['title'] . '</option>';
+            } else {
+                $select .= '<option value="' . $code->getCode() . '" selected>' . $code->getTitle() . '</option>';
+            }
+        }
 
-		$select .= '<option value="all">Tous</option>
+        $select .= '<option value="all">Tous</option>
                 <option value="0">Aucun</option>
                 <optgroup label="Année">';
 
-		foreach ($years as $year) {
-			if ($deptId == 0 || $year->getDeptId() == $deptId) {
-				$select .= '<option value="' . $year->getCode() . '">' . $year->getTitle() . '</option>';
-			}
-		}
-		$select .= '</optgroup><optgroup label="Groupe">';
+        foreach ($years as $year) {
+            if ($deptId == 0 || $year->getDeptId() == $deptId) {
+                $select .= '<option value="' . $year->getCode() . '">' . $year->getTitle() . '</option>';
+            }
+        }
+        $select .= '</optgroup><optgroup label="Groupe">';
 
-		foreach ($groups as $group) {
-			if ($deptId == 0 || $group->getDeptId() == $deptId) {
-				$select .= '<option value="' . $group->getCode() . '">' . $group->getTitle() . '</option>';
-			}
-		}
-		$select .= '</optgroup><optgroup label="Demi groupe">';
+        foreach ($groups as $group) {
+            if ($deptId == 0 || $group->getDeptId() == $deptId) {
+                $select .= '<option value="' . $group->getCode() . '">' . $group->getTitle() . '</option>';
+            }
+        }
+        $select .= '</optgroup><optgroup label="Demi groupe">';
 
-		foreach ($halfGroups as $halfGroup) {
-			if ($deptId == 0 || $halfGroup->getDeptId() == $deptId) {
-				$select .= '<option value="' . $halfGroup->getCode() . '">' . $halfGroup->getTitle() . '</option>';
-			}
-		}
-		$select .= '</optgroup>
+        foreach ($halfGroups as $halfGroup) {
+            if ($deptId == 0 || $halfGroup->getDeptId() == $deptId) {
+                $select .= '<option value="' . $halfGroup->getCode() . '">' . $halfGroup->getTitle() . '</option>';
+            }
+        }
+        $select .= '</optgroup>
    				</select>';
 
-		return $select;
-	}
+        return $select;
+    }
 
-	/**
-	 * Generates and returns the HTML content for the "alert not found" section,
-	 * providing information that the requested alert does not exist and offering
-	 * options to navigate back or create a new alert.
-	 *
-	 * @return string The HTML string indicating the alert was not found and containing navigation links.
-	 */
-	public function noAlert(): string {
+    /**
+     * Generates and returns the HTML content for the "alert not found" section,
+     * providing information that the requested alert does not exist and offering
+     * options to navigate back or create a new alert.
+     *
+     * @return string The HTML string indicating the alert was not found and containing navigation links.
+     */
+    public function noAlert(): string {
         return '
 		<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des alertes'))) . '">< Retour</a>
 		<div>
@@ -251,14 +251,14 @@ class AlertView extends View
 		</div>';
     }
 
-	/**
-	 * Generates and returns the HTML content for the alert notification,
-	 * informing the user that they cannot modify the alert as it belongs to someone else.
-	 * Includes navigation links to return to the alert management page or to create a new alert.
-	 *
-	 * @return string
-	 */
-	public function alertNotAllowed(): string {
+    /**
+     * Generates and returns the HTML content for the alert notification,
+     * informing the user that they cannot modify the alert as it belongs to someone else.
+     * Includes navigation links to return to the alert management page or to create a new alert.
+     *
+     * @return string
+     */
+    public function alertNotAllowed(): string {
         return '
 		<a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des alertes'))) . '">< Retour</a>
 		<div>
@@ -268,21 +268,21 @@ class AlertView extends View
 		</div>';
     }
 
-	/**
-	 * Displays a validation modal indicating the successful addition of an alert.
-	 * The modal contains a success message and a link to the alert management page.
-	 *
-	 * @return void
-	 */
+    /**
+     * Displays a validation modal indicating the successful addition of an alert.
+     * The modal contains a success message and a link to the alert management page.
+     *
+     * @return void
+     */
     public function displayAddValidate(): void {
         $this->buildModal('Ajout d\'alerte', '<div class="alert alert-success"> Votre alerte a été envoyée !</div>', esc_url(get_permalink(get_page_by_title_V2('Gestion des alertes'))));
     }
 
-	/**
-	 * Displays a modal confirming the successful modification of an alert and provides a link to the alert management page.
-	 *
-	 * @return void The generated content for the modal, including a success message and a link to manage alerts.
-	 */
+    /**
+     * Displays a modal confirming the successful modification of an alert and provides a link to the alert management page.
+     *
+     * @return void The generated content for the modal, including a success message and a link to manage alerts.
+     */
     public function displayModifyValidate(): void {
         $page = get_page_by_title_V2('Gestion des alertes');
         $linkManageAlert = get_permalink($page->ID);
