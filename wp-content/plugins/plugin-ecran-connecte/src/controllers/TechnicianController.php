@@ -51,22 +51,37 @@ class TechnicianController extends UserController implements Schedule
     public function insert(): string {
         $action = filter_input(INPUT_POST, 'createTech');
 
+        $codeAde = new CodeAde();
+
         if (isset($action)) {
 
             $login = filter_input(INPUT_POST, 'loginTech');
             $password = filter_input(INPUT_POST, 'pwdTech');
             $passwordConfirm = filter_input(INPUT_POST, 'pwdConfirmTech');
             $email = filter_input(INPUT_POST, 'emailTech');
+            $codes = $_POST['selectTech'];
 
             if (is_string($login) && strlen($login) >= 4 && strlen($login) <= 25 &&
                 is_string($password) && strlen($password) >= 8 && strlen($password) <= 25 &&
                 $password === $passwordConfirm
                 && is_email($email)) {
 
+                $codesAde = array();
+                foreach ($codes as $code) {
+                    if (is_numeric($code) && $code > 0) {
+                        if (is_null($codeAde->getByCode($code)->getId())) {
+                            return 'error';
+                        } else {
+                            $codesAde[] = $codeAde->getByCode($code);
+                        }
+                    }
+                }
+
                 $this->model->setLogin($login);
                 $this->model->setPassword($password);
                 $this->model->setEmail($email);
                 $this->model->setRole('technicien');
+                $this->model->setCodes($codesAde);
 
                 if ($this->model->insert()) {
                     $this->view->displayInsertValidate();
@@ -78,9 +93,57 @@ class TechnicianController extends UserController implements Schedule
             }
         }
         return $this->view->displayFormTechnician();
+
+        $years = $codeAde->getAllFromType('year');
+        $groups = $codeAde->getAllFromType('group');
+        $halfGroups = $codeAde->getAllFromType('halfGroup');
+
+        return $this->view->displayFormTechnician($years, $groups, $halfGroups);
     }
 
-	/**
+    /**
+     * Modify user data and handle the modification process
+     *
+     * @param user $user The user object that will be modified
+     *
+     * @return string The HTML content for the modification form or an error message
+     */
+    public function modify(user $user): string {
+        $page = get_page_by_title_V2('Gestion des utilisateurs');
+        $linkManageUser = get_permalink($page->ID);
+
+        $codeAde = new CodeAde();
+
+        $action = filter_input(INPUT_POST, 'modifValidate');
+
+        if (isset($action)) {
+            $codes = $_POST['selectTech'];
+
+            $codesAde = array();
+            foreach ($codes as $code) {
+                if (is_null($codeAde->getByCode($code)->getId())) {
+                    return 'error';
+                } else {
+                    $codesAde[] = $codeAde->getByCode($code);
+                }
+            }
+
+            $user->setCodes($codesAde);
+
+            if ($user->update()) {
+                $this->view->displayModificationValidate($linkManageUser);
+            }
+        }
+
+        $years = $codeAde->getAllFromType('year');
+        $groups = $codeAde->getAllFromType('group');
+        $halfGroups = $codeAde->getAllFromType('halfGroup');
+
+        return $this->view->modifyForm($user, $years, $groups, $halfGroups);
+    }
+
+
+    /**
 	 * Displays all technicians by retrieving users with the role of 'technicien'
 	 * and passing them to the view for rendering.
 	 *
