@@ -124,10 +124,10 @@ class UserView extends View
         return '
         <div id="themePreview" class="theme-preview">Sélectionnez un thème</div>
         <div class="theme-selector-grid">
-            <button class="theme-button" onclick="changeTheme(\'light\')" style="background-color: blue; color: white;">Bleu AMU</button>
-            <button class="theme-button" onclick="changeTheme(\'purple\')" style="background-color: purple; color: white;">Violet AMU</button>
-            <button class="theme-button" onclick="changeTheme(\'green\')" style="background-color: green; color: white;">Vert AMU</button>
-            <button class="theme-button" onclick="changeTheme(\'orange\')" style="background-color: orange; color: white;">Orange AMU</button>
+            <button class="theme-button" onclick="changeTheme(\'light\')" style="background-color: #1f63de; color: white;">Bleu AMU</button>
+            <button class="theme-button" onclick="changeTheme(\'purple\')" style="background-color: #742899; color: white;">Violet AMU</button>
+            <button class="theme-button" onclick="changeTheme(\'green\')" style="background-color: #009B75; color: white;">Vert AMU</button>
+            <button class="theme-button" onclick="changeTheme(\'orange\')" style="background-color: #BC6C20; color: white;">Orange AMU</button>
         </div>
         <script>
             document.addEventListener("DOMContentLoaded", (event) => {
