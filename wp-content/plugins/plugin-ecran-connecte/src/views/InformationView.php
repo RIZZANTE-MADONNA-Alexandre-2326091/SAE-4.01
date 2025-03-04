@@ -4,6 +4,7 @@ namespace Views;
 
 
 use Controllers\InformationController;
+use Models\CodeAde;
 use Models\Information;
 use Models\RssModel;
 
@@ -27,13 +28,13 @@ class InformationView extends View
      *
      * @return string
      */
-    public function displayFormText(string $title = null, string $content = null,
-                                    string $endDate = null, string $type = "createText"): string
+    public function displayFormText(array $years, int $deptId, string $title = null, string $content = null,
+                                    string $endDate = null, string $type = "createText") : string
     {
         $dateMin = date ('Y-m-d', strtotime("+1 day"));
 
         $form = '
-        <form method="post">
+        <form method="post" id="information">
             <div class="form-group">
                 <label for="title">Titre <span class="text-muted">(Optionnel)</span></label>
                 <input id="info" class="form-control" type="text" name="title" minlength="4" maxlength="40"
@@ -48,8 +49,17 @@ class InformationView extends View
                 <label for="expirationDate">Date d\'expiration</label>
                 <input id="expirationDate" class="form-control" type="date" name="expirationDate" min="' . $dateMin . '"
                 value="' . $endDate . '" required="required">
+            </div>';
+
+		if ($years != null){
+			$form .= '<div class="form-group">
+                <label for="select">Années concernées</label>
+                ' . $this->buildSelectCode($years, $deptId) . '
             </div>
-            <button class="btn button_ecran" type="submit" name="' . $type . '">Valider</button>';
+            <input type="button" id="plus" onclick="addButton(' . $deptId . ', ' . true . ')" class="addbtn btn button_ecran" value="Ajouter">';
+		}
+
+		$form .= '<button class="btn button_ecran" id="valider" type="submit" name="' . $type . '">Confirmer</button>';
 
         if ($type == 'submit')
         {
@@ -499,7 +509,7 @@ class InformationView extends View
 				  title="YouTube short player" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
 				  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';*/
 		}
-		else if ($type == 'YTvideow')
+		else if ($type == 'YTvideow' && $typeDefilement == 'suret')
 		{
 			$link = substr_replace($content,'embed/',24,8);
             $link = substr_replace($link, '-nocookie', 19, 0);
@@ -510,7 +520,7 @@ class InformationView extends View
 				  title="YouTube video player" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
 				  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';*/
         }
-        else if ($type == 'LocCvideo')
+        else if ($type == 'LocCvideo' && $typeDefilement == 'suret')
         {
             echo '<video class="localCvideo" muted>
 				      <source src="' . TV_UPLOAD_PATH . $content . '" type="video/mp4">
@@ -549,6 +559,57 @@ class InformationView extends View
             echo $content;
         }
         echo '</div>';
+    }
+
+    /**
+     * Display the start of the videos slideshow
+     *
+     * @return string
+     * */
+    public function displayStartSlideVideo(): string
+    {
+        return '<div class="video-slideshow-container">';
+    }
+
+    /**
+     * Display the slideshow of video on the schedule
+     *
+     * @param string $title
+     * @param string $content
+     * @param string $type
+     * @param string $typeDefilement
+     * @param bool $adminSite
+     *
+     * @return string
+     */
+    public function displaySlideVideo(string $title, string $content, string $type, string $typeDefilement, bool $adminSite = false): string
+    {
+        $affichage = '<div class="myVideoSlides text-center" style="display: block;">';
+
+        // If the title is empty
+        if ($title != "Sans titre")
+        {
+            $affichage .= '<h2 class="titleInfo">' . $title . '</h2>';
+        }
+
+        $url = $adminSite ? URL_WEBSITE_VIEWER . TV_UPLOAD_PATH : TV_UPLOAD_PATH;
+
+        if ($type === 'LocCvideo' && $typeDefilement === 'defil')
+        {
+            $affichage .= '<video class="video_container" src="' . $url . $content . '
+              " autoplay loop muted type="video/mp4"></video>';
+        }
+        else if ($type === 'YTvideow' && $typeDefilement === 'defil')
+        {
+            $link = substr_replace($content,'embed/',24,8);
+            $link = substr_replace($link, '-nocookie', 19, 0);
+            $affichage .= '<iframe class="video_container" src="' . $link . '?autoplay=1&loop=1&playlist=' . substr($link,30) . '&mute=1&controls=0&disablekb=1&enablejsapi=0"
+				  title="YouTube slide player" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
+				  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';
+        }
+
+        $affichage .= '</div>';
+        return $affichage;
     }
 
     public function contextDisplayAll(): string
@@ -676,4 +737,28 @@ class InformationView extends View
 			<a href="' . esc_url(get_permalink(get_page_by_title_V2('Créer une information'))) . '">Créer une information</a>
 		</div>';
     }
+
+	private function buildSelectCode( array $years, int $deptId, CodeAde|array $code = null, int $count = 0) {
+		$select = '<select class="form-control firstSelect" id="selectId' . $count . '" name="select[]" required="">';
+
+		if (!is_null($code)) {
+			if (is_array($code)) {
+				$select .= '<option value="' . $code['code'] . '" selected>' . $code['title'] . '</option>';
+			} else {
+				$select .= '<option value="' . $code->getCode() . '" selected>' . $code->getTitle() . '</option>';
+			}
+		}
+
+		$select .= '<optgroup label="Année">';
+
+		foreach ($years as $year) {
+			if ($deptId == 0 || $year->getDeptId() == $deptId) {
+				$select .= '<option value="' . $year->getCode() . '">' . $year->getTitle() . '</option>';
+			}
+		}
+		$select .= '</optgroup>
+   				</select>';
+
+		return $select;
+	}
 }

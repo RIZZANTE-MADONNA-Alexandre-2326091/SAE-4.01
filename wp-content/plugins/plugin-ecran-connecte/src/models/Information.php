@@ -61,6 +61,16 @@ class Information extends Model implements Entity, JsonSerializable
      */
     private int $authorId;
 
+	/**
+	 * @var CodeAde[]
+	 */
+	private array $codes;
+
+	/**
+	 * @var int
+	 */
+	private int $deptId;
+
     /**
      * Insert an information in the database
      *
@@ -81,11 +91,27 @@ class Information extends Model implements Entity, JsonSerializable
 
         try {
             $request->execute();
-            return $database->lastInsertId();
+            $lastId = $database->lastInsertId();
         } catch (PDOException $e) {
             error_log('Insert Error: ' . $e->getMessage());
             return false;
         }
+
+		if($this->getDeptId() !== 0){
+			$request = $database->prepare("INSERT INTO ecran_information_department (info_id, dept_id) VALUES (:info_id, :dept_id)");
+
+			$request->bindValue(':info_id', $lastId, PDO::PARAM_INT);
+			$request->bindValue(':dept_id', $this->getDeptId(), PDO::PARAM_INT);
+		} elseif ($this->getCodes() !== null){
+			foreach ($this->getCodes() as $code){
+				$request = $database->prepare("INSERT INTO ecran_code_information (info_id, code_ade_id) VALUES (:info_id, :code_ade_id)");
+
+				$request->bindValue(':info_id', $lastId, PDO::PARAM_INT);
+				$request->bindValue(':code_ade_id', $code->getId(), PDO::PARAM_INT);
+			}
+		}
+
+		return $lastId;
     }
 
     /**
@@ -95,7 +121,8 @@ class Information extends Model implements Entity, JsonSerializable
      */
     public function update(): int
     {
-        $request = $this->getDatabase()->prepare("UPDATE ecran_information SET title = :title, content = :content, expiration_date = :expirationDate WHERE id = :id");
+        $database = $this->getDatabase();
+        $request = $database->prepare("UPDATE ecran_information SET title = :title, content = :content, expiration_date = :expirationDate WHERE id = :id");
 
         $request->bindValue(':title', $this->getTitle(), PDO::PARAM_STR);
         $request->bindValue(':content', $this->getContent(), PDO::PARAM_STR);
@@ -194,6 +221,20 @@ class Information extends Model implements Entity, JsonSerializable
         $request->execute();
 
         return $request->fetch()[0];
+    }
+
+    /**
+     * Returns a list of information where the type are normal videos
+     * @return array
+     */
+    public function getListClassicsVideos(array $types): array
+    {
+        $request = $this->getDatabase()->prepare('SELECT * FROM ecran_information WHERE type = :type1 OR type = :type2');
+        $request->bindValue(':type1', $types[0], PDO::PARAM_STR);
+        $request->bindValue(':type1', $types[1], PDO::PARAM_STR);
+        $request->execute();
+
+        return $this->setEntityList($request->fetchAll(PDO::FETCH_ASSOC));
     }
 
     /**
@@ -457,6 +498,28 @@ class Information extends Model implements Entity, JsonSerializable
     {
         $this->adminId = $adminId;
     }
+
+	/**
+	 * @return CodeAde[]
+	 */
+	public function getCodes(): array {
+		return $this->codes;
+	}
+
+	/**
+	 * @param CodeAde[] $codes
+	 */
+	public function setCodes( array $codes ): void {
+		$this->codes = $codes;
+	}
+
+	public function getDeptId(): int {
+		return $this->deptId;
+	}
+
+	public function setDeptId( int $deptId ): void {
+		$this->deptId = $deptId;
+	}
 
     public function jsonSerialize()
     {

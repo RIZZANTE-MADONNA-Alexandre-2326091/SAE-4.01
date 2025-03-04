@@ -3,6 +3,8 @@
 namespace Controllers;
 
 use Exception;
+use Models\CodeAde;
+use Models\Department;
 use Models\Information;
 use Models\User;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -49,9 +51,18 @@ class InformationController extends Controller
 	 */
     public function create(): string
     {
-        $current_user = wp_get_current_user();
+	    $codeAde = new CodeAde();
+
+	    $currentUser = wp_get_current_user();
+
+		$deptId = 0;
+	    if(in_array('adminDept', $currentUser->roles)|| in_array('secretaire', $currentUser->roles)) {
+		    $deptModel = new Department();
+		    $deptId = $deptModel->getUserInDept($currentUser->ID)->getId();
+	    }
+
         $author = new User();
-        $author = $author->get($current_user->ID);
+        $author = $author->get($currentUser->ID);
 
         // All forms
         $actionText = filter_input(INPUT_POST, 'createText');
@@ -68,6 +79,18 @@ class InformationController extends Controller
         $content = filter_input(INPUT_POST, 'content');
         $endDate = filter_input(INPUT_POST, 'expirationDate');
         $creationDate = date('Y-m-d');
+	    $codes = $_POST['select'];
+
+	    $codesAde = array();
+	    foreach ($codes as $code) {
+		    if ($code != 'all' && $code != 0) {
+			    if (is_null($codeAde->getByCode($code)->getId())) {
+				    $this->view->errorMessageInvalidForm();
+			    } else {
+				    $codesAde[] = $codeAde->getByCode($code);
+			    }
+		    }
+	    }
 
         // If the title is empty
         if ($title == '')
@@ -85,6 +108,8 @@ class InformationController extends Controller
             $information->setCreationDate($creationDate);
             $information->setExpirationDate($endDate);
             $information->setAdminId(null);
+			$information->setDeptId($deptId);
+			$information->setCodes($codesAde);
 
             if (isset($actionText))
             {                      // If the information is a text
@@ -219,6 +244,9 @@ class InformationController extends Controller
                 }
             }
         }
+
+	    $years = $codeAde->getAllFromType('year');
+
         // Return a selector with all forms
         return
             $this->view->displayStartMultiSelect() .
@@ -231,7 +259,7 @@ class InformationController extends Controller
             $this->view->displayTitleSelect('LocalSVideo', 'Vidéo short local') .
             $this->view->displayTitleSelect('rss', 'Flux RSS') .
             $this->view->displayEndOfTitle() .
-            $this->view->displayContentSelect('text', $this->view->displayFormText(), true) .
+            $this->view->displayContentSelect('text', $this->view->displayFormText($years, $deptId), true) .
             $this->view->displayContentSelect('image', $this->view->displayFormImg()) .
             $this->view->displayContentSelect('pdf', $this->view->displayFormPDF()) .
             $this->view->displayContentSelect('event', $this->view->displayFormEvent()) .
@@ -478,6 +506,11 @@ class InformationController extends Controller
         wp_delete_file($source);
     }
 
+    /**
+     * Display a slideshow of informations. If the type of slideshow is 'suret', the horizontal videos are display on the schedule
+     *
+     * @return string
+     */
     public function displayAll(): string
     {
         $numberAllEntity = $this->model->countAll();
@@ -542,14 +575,14 @@ class InformationController extends Controller
                 {
                     $content = 'Tableau Excel';
                 }
-                else if ($information->getType() === 'LocCvideo')
+                else if ($information->getType() === 'LocCvideo' && $contentExplode[1] === $videoExtension)
                 {
                     $content = '<video class="previsualisationVideoClassique" controls muted>
 									<source src="' . $content . $information->getContent() . '" type="video/mp4">
 									<p>Votre navigateur ne permet pas de lire les vidéos de format mp4 avec HTML5.</p>
 								</video>';
                 }
-                else if ($information->getType() === 'LocSvideo')
+                else if ($information->getType() === 'LocSvideo' && $contentExplode[1] === $videoExtension)
                 {
                     $content = '<video class="previsualisationVideoShort" controls muted>
 									<source src="' . $content . $information->getContent() . '" type="video/mp4">
@@ -644,6 +677,43 @@ class InformationController extends Controller
             $returnString = $this->view->contextDisplayAll();
         }
         return $returnString . $this->view->displayAll($name, 'Informations', $header, $dataList) . $this->view->pageNumber($maxPage, $pageNumber, esc_url(get_permalink(get_page_by_title_V2('Gestion des informations'))), $number);
+    }
+
+    /**
+     * Display a slideshow of video if the type of slideshow is 'defil'
+     *
+     * @return string
+     */
+    public function displayVideo(): string
+    {
+        $currentUser = wp_get_current_user();
+        $user = new User();
+        $user->get($currentUser->ID);
+
+        // Début du conteneur pour les vidéos
+        $string = $this->view->displayStartSlideVideo();
+
+        //On récupère depuis le model toutes les informations qui sont des vidéos "classiques".
+        $informations = $this->model->getListClassicsVideos(array('videow','LocalCvideo'));
+        foreach ($informations as $information)
+        {
+            $adminSite = true;
+            if (is_null($information->getAdminId()))
+            {
+                $adminSite = false;
+            }
+            // Affiche uniquement les vidéos
+            if ($information->getType() === 'videow' || $information->getType() === 'LocalCvideo')
+            {
+                $string .= $this->view->displaySlideVideo(
+                    $information->getTitle(),
+                    $information->getContent(),
+                    $information->getType(),$user->getTypeDefilement(), $adminSite
+                );
+            }
+        }
+        $string .= '</div>';
+        return $string;
     }
 
 

@@ -35,7 +35,10 @@ Les classes utilisées sont : InformationController, Information & InformationVi
 Les librairies "PhpOffice" et "PDF.js" sont aussi utilisées.  
 Fichier javascript : slideshow.js  
 
-Les informations sont affichées comme dans un diaporama les une après les autres.  
+Les informations sont affichées comme dans un diaporama les unes après les autres.<br>
+Les vidéos de format "classique" sont séparées dans un diaporama différent,
+alors que les vidéos de format "short" sont affichées dans le même diaporama que les autres informations.
+
 
 ### Alertes
 
