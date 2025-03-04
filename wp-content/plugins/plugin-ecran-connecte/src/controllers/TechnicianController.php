@@ -3,7 +3,6 @@
 namespace Controllers;
 
 use Models\CodeAde;
-use Models\Department;
 use Models\User;
 use Views\TechnicianView;
 
@@ -13,226 +12,231 @@ use Views\TechnicianView;
  */
 class TechnicianController extends UserController implements Schedule
 {
-
-    /**
-     * @var User
-     */
     private User $model;
-
-    /**
-     * @var TechnicianView
-     */
     private TechnicianView $view;
 
-    /**
-     * Constructor of SecretaryController.
-     */
     public function __construct() {
         parent::__construct();
         $this->model = new User();
         $this->view = new TechnicianView();
     }
 
-	/**
-	 * Handles the insertion of a new technician entry based on user input from a POST request.
-	 *
-	 * Validates the input data such as login, password, password confirmation, and email.
-	 * Ensures the login length is between 4 and 25 characters, password length is between 8 and 25 characters,
-	 * and the passwords match. If the inputs are valid and the email format is correct,
-	 * the technician details are saved into the model.
-	 *
-	 * On successful insertion, displays a confirmation message.
-	 * Otherwise, displays an error message indicating the issue.
-	 *
-	 * If no technician creation action is detected in the POST request or if the
-	 * provided inputs are invalid, the method returns the technician creation form view.
-	 *
-	 * @return string The rendered view content, either the form or feedback messages.
-	 */
+    /**
+     * Handles the insertion of a new technician.
+     *
+     * @return string The rendered view content.
+     */
     public function insert(): string {
         $action = filter_input(INPUT_POST, 'createTech');
 
-	    $currentUser = wp_get_current_user();
-
-	    $deptModel = new Department();
-	    $isAdmin = in_array('administrator', $currentUser->roles);
-	    $currentDept = $isAdmin ? -1 : $deptModel->getUserInDept($currentUser->ID)->getId();
-
         if (isset($action)) {
-
             $login = filter_input(INPUT_POST, 'loginTech');
             $password = filter_input(INPUT_POST, 'pwdTech');
             $passwordConfirm = filter_input(INPUT_POST, 'pwdConfirmTech');
-            $email = filter_input(INPUT_POST, 'emailTech');
-	        $deptId = $isAdmin ? filter_input(INPUT_POST, 'deptIdTech') : $currentUser;
+            $codes = $_POST['selectTech'] ?? []; // Récupère les codes ADE sélectionnés
 
-            if (is_string($login) && strlen($login) >= 4 && strlen($login) <= 25 &&
-                is_string($password) && strlen($password) >= 8 && strlen($password) <= 25 &&
-                $password === $passwordConfirm && is_email($email)) {
+            if ($this->validateInput($login, $password, $passwordConfirm, $codes)) {
+                $codesAde = $this->getValidCodes($codes);
+
+                if ($codesAde === null) {
+                    return $this->view->displayErrorCreation();
+                }
 
                 $this->model->setLogin($login);
+                $this->model->setEmail($login . '@' . $login . '.fr'); // Génère un email par défaut
                 $this->model->setPassword($password);
-                $this->model->setEmail($email);
                 $this->model->setRole('technicien');
-	            $this->model->setDeptId($deptId);
+                $this->model->setCodes($codesAde);
 
                 if (!$this->checkDuplicateUser($this->model) && $this->model->insert()) {
-                    $this->view->displayInsertValidate();
+                    return $this->view->displayInsertValidate();
                 } else {
-                    $this->view->displayErrorInsertion();
+                    return $this->view->displayErrorLogin();
                 }
             } else {
-                $this->view->displayErrorCreation();
+                return $this->view->displayErrorCreation();
             }
         }
 
-	    $departments = $deptModel->getAll();
+        // Affiche le formulaire de création avec les codes ADE disponibles
+        $codeAde = new CodeAde();
+        $years = $codeAde->getAllFromType('year');
+        $groups = $codeAde->getAllFromType('group');
+        $halfGroups = $codeAde->getAllFromType('halfGroup');
 
-        return $this->view->displayFormTechnician($departments, $isAdmin, $currentDept);
+        return $this->view->displayFormTechnician($years, $groups, $halfGroups);
     }
 
-	/**
-	 * Displays all technicians by retrieving users with the role of 'technicien'
-	 * and passing them to the view for rendering.
-	 *
-	 * @return string The rendered view displaying all technicians.
-	 */
+    /**
+     * Validates input data for technician creation.
+     *
+     * @param string $login The technician's login.
+     * @param string $password The technician's password.
+     * @param string $passwordConfirm The password confirmation.
+     * @param array $codes The selected codes.
+     *
+     * @return bool True if the input is valid, false otherwise.
+     */
+    private function validateInput(string $login, string $password, string $passwordConfirm, array $codes): bool {
+        return strlen($login) >= 4 && strlen($login) <= 25 &&
+            strlen($password) >= 8 && strlen($password) <= 25 &&
+            $password === $passwordConfirm &&
+            !empty($codes);
+    }
+
+    /**
+     * Retrieves valid codes from the provided array.
+     *
+     * @param array $codes The selected codes.
+     *
+     * @return array|null An array of valid codes or null if any code is invalid.
+     */
+    private function getValidCodes(array $codes): ?array {
+        $codeAde = new CodeAde();
+        $codesAde = [];
+
+        foreach ($codes as $code) {
+            if (is_numeric($code) && $code > 0) {
+                $codeEntity = $codeAde->getByCode($code);
+                if (is_null($codeEntity->getId())) {
+                    return null;
+                }
+                $codesAde[] = $codeEntity;
+            }
+        }
+
+        return $codesAde;
+    }
+
+    /**
+     * Modifies an existing technician.
+     *
+     * @param User $user The technician to modify.
+     *
+     * @return string The rendered view content.
+     */
+    public function modify(User $user): string {
+        $action = filter_input(INPUT_POST, 'modifValidate');
+
+        if (isset($action)) {
+            $codes = $_POST['selectTech'] ?? [];
+            $codesAde = $this->getValidCodes($codes);
+
+            if ($codesAde === null) {
+                return $this->view->displayErrorCreation();
+            }
+
+            $user->setCodes($codesAde);
+
+            if ($user->update()) {
+                $page = get_page_by_title_V2('Gestion des utilisateurs');
+                $linkManageUser = get_permalink($page->ID);
+                return $this->view->displayModificationValidate($linkManageUser);
+            }
+        }
+
+        // Affiche le formulaire de modification avec les codes ADE disponibles
+        $codeAde = new CodeAde();
+        $years = $codeAde->getAllFromType('year');
+        $groups = $codeAde->getAllFromType('group');
+        $halfGroups = $codeAde->getAllFromType('halfGroup');
+
+        return $this->view->modifyForm($user, $years, $groups, $halfGroups);
+    }
+
+    /**
+     * Displays all technicians.
+     *
+     * @return string The rendered view content.
+     */
     public function displayAllTechnician(): string {
         $users = $this->model->getUsersByRole('technicien');
-
-	    $deptModel = new Department();
-	    $userDeptList = array();
-	    foreach ($users as $user) {
-		    $userDeptList[] = $deptModel->getUserInDept($user->getId())->getName();
-	    }
-
-        return $this->view->displayAllTechnicians($users, $userDeptList);
+        return $this->view->displayAllTechnicians($users);
     }
 
-//    /**
-//     * Display the schedule of all students
-//     *
-//     * @return mixed|string
-//     */
-//    public function displayMySchedule() {
-//        $codeAde = new CodeAde();
-//
-//        $years = $codeAde->getAllFromType('year');
-//        $string = "";
-//        foreach ($years as $year) {
-//            $string .= $this->displaySchedule($year->getCode());
-//        }
-//        return $string;
-//    }
+    /**
+     * Displays the schedule for the current technician, sorted by floor and time.
+     *
+     * @return string The rendered schedule content.
+     **/
+    public function displayMySchedule(): string {
+        $current_user = wp_get_current_user();
+        $user = $this->model->get($current_user->ID);
+        $user = $this->model->getMycodes([$user])[0];
 
-
-	/**
-	 * Displays the schedule for the current user based on their assigned codes.
-	 *
-	 * This method retrieves the current user's information and fetches their associated codes.
-	 * It processes the schedule data for multiple codes to display sorted and formatted schedules.
-	 * If there are multiple courses, they are sorted by time, room number, and floor number before being displayed.
-	 * If only one code is present, it simply displays the schedule for that code.
-	 * If no courses are scheduled, an appropriate message is returned.
-	 *
-	 * @return string The HTML string containing the formatted and sorted schedule or a message indicating no scheduled courses.
-	 */
-	public function displayMySchedule(): string {
-		$current_user = wp_get_current_user();
-		$user = $this->model->get( $current_user->ID );
-		$user = $this->model->getMycodes( [ $user ] )[0];
-
-		$string = "";
-        if (sizeof($user->getCodes()) > 0) {
-            // Récupération des informations pertinentes pour le tri
-            $courses = [];
-            foreach ($user->getCodes() as $code) {
-                $path = $this->getFilePath($code->getCode());
-                if (file_exists($path)) {
-                    $schedule = $this->displaySchedule($code->getCode());
-                    if ($schedule) {
-                        $parsedSchedule = $this->parseScheduleData($schedule); // Méthode pour extraire les infos heure/salle/étage
-                        if ($parsedSchedule) {
-                            $courses[] = $parsedSchedule;
-						}
-					}
-				}
-			}
-
-			// Tri des cours : par etages, puis par heure, puis par salle
-			usort( $courses, function ( $a, $b ) {
-				// Trier par étage
-				if ( $a['floor'] === $b['floor'] ) {
-					// Trier par heure
-					if ( $a['time'] === $b['time'] ) {
-						// Trier par numéro de salle
-						return $a['room'] <=> $b['room'];
-					}
-
-					return $a['time'] <=> $b['time'];
-				}
-
-				return $a['floor'] <=> $b['floor'];
-			} );
-
-			// Génération de l'affichage après tri
-			if ( get_theme_mod( 'ecran_connecte_schedule_scroll', 'vert' ) == 'vert' ) {
-				$string .= '<div class="ticker1">
-                        <div class="innerWrap tv-schedule">';
-				foreach ( $courses as $course ) {
-					$string .= '<div class="list">';
-					$string .= $course['content']; // Utiliser le contenu trié
-					$string .= '</div>';
-				}
-				$string .= '</div></div>';
-			} else {
-				$string .= $this->view->displayStartSlide();
-				foreach ( $courses as $course ) {
-					$string .= $this->view->displayMidSlide();
-					$string .= $course['content']; // Utiliser le contenu trié
-					$string .= $this->view->displayEndDiv();
-				}
-				$string .= $this->view->displayEndDiv();
-			}
-		} else {
-				$string .= '<p>Aucun cours de prévu aujourd\'hui </p>';
+        if (empty($user->getCodes())) {
+            return '<p>Aucun cours de prévu aujourd\'hui.</p>';
         }
-		return $string;
-	}
 
+        // Récupère tous les cours de la journée
+        $courses = [];
+        foreach ($user->getCodes() as $code) {
+            $path = $this->getFilePath($code->getCode());
+            if (file_exists($path)) {
+                $schedule = $this->displaySchedule($code->getCode());
+                if ($schedule) {
+                    $parsedCourse = $this->parseCourseData($schedule);
+                    if ($parsedCourse) {
+                        $courses[] = $parsedCourse;
+                    }
+                }
+            }
+        }
 
-	/**
-	 * Parses the schedule data from an HTML formatted string and extracts specific details such as time, room number, and floor.
-	 *
-	 * @param string $schedule The HTML formatted string containing the schedule information.
-	 *
-	 * @return array|null Returns an associative array with the keys 'time' (timestamp), 'room' (int), 'floor' (int), and 'content' (string),
-	 *                    or null if the extraction fails.
-	 */
-	private
-	function parseScheduleData(string $schedule ): array|null {
-		// Supposons que le planning `$schedule` contient un format HTML avec des balises spécifiques,
-		// par exemple <span class="time">08:00</span>, <span class="room">207</span>, etc.
+        // Trie les cours selon les consignes
+        usort($courses, function ($a, $b) {
+            // Priorité des étages : rez-de-chaussée > premier étage > deuxième étage
+            if ($a['floor'] === $b['floor']) {
+                // Si même étage, trie par heure
+                return $a['time'] <=> $b['time'];
+            }
+            return $a['floor'] <=> $b['floor'];
+        });
 
-		// Extraction de l'heure (time)
-		preg_match( '/<span class="time">([\d:]+)<\/span>/', $schedule, $timeMatch );
-		// Extraction du numéro de la salle (room)
-		preg_match( '/<span class="room">(\d+)<\/span>/', $schedule, $roomMatch );
+        // Affiche les cours triés
+        $string = "";
+        if (get_theme_mod('ecran_connecte_schedule_scroll', 'vert') == 'vert') {
+            $string .= '<div class="ticker1"><div class="innerWrap tv-schedule">';
+            foreach ($courses as $course) {
+                $string .= '<div class="list">' . $course['content'] . '</div>';
+            }
+            $string .= '</div></div>';
+        } else {
+            $string .= $this->view->displayStartSlide();
+            foreach ($courses as $course) {
+                $string .= $this->view->displayMidSlide() . $course['content'] . $this->view->displayEndDiv();
+            }
+            $string .= $this->view->displayEndDiv();
+        }
+        return $string;
+    }
 
-		if ( ! empty( $timeMatch[1] ) && ! empty( $roomMatch[1] ) ) {
-			$time  = strtotime( $timeMatch[1] ); // Convertir l'heure (08:00) en timestamp
-			$room  = (int) $roomMatch[1]; // Numéro de salle
-			$floor = intval( $room / 100 ); // Étages dérivés des centaines dans le numéro de salle (ex: 207 -> étage 2)
+    /**
+     * Parses course data to extract time, room, floor, and content.
+     *
+     * @param string $schedule The schedule data.
+     *
+     * @return array|null The parsed data or null if extraction fails.
+     */
+    private function parseCourseData(string $schedule): ?array {
+        // Extraction de l'heure (time)
+        preg_match('/<span class="time">([\d:]+)<\/span>/', $schedule, $timeMatch);
+        // Extraction du numéro de la salle (room)
+        preg_match('/<span class="room">(\d+)<\/span>/', $schedule, $roomMatch);
 
-			return [
-				'time'    => $time,         // Heure en format timestamp
-				'room'    => $room,         // Numéro de la salle
-				'floor'   => $floor,       // Étages calculés à partir de la salle
-				'content' => $schedule   // Garder le contenu brut pour réutilisation après tri
-			];
-		}
+        if (!empty($timeMatch[1]) && !empty($roomMatch[1])) {
+            $time  = strtotime($timeMatch[1]); // Convertit l'heure en timestamp
+            $room  = (int) $roomMatch[1]; // Numéro de salle
+            $floor = intval($room / 100); // Étages dérivés des centaines dans le numéro de salle (ex: 207 -> étage 2)
 
-		return null; // Retourner null si l'extraction échoue.
-	}
+            return [
+                'time'    => $time,         // Heure en format timestamp
+                'room'    => $room,         // Numéro de la salle
+                'floor'   => $floor,       // Étages calculés à partir de la salle
+                'content' => $schedule   // Garde le contenu brut pour réutilisation après tri
+            ];
+        }
 
+        return null; // Retourne null si l'extraction échoue.
+    }
 }
