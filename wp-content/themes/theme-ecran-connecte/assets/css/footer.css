@@ -1,13 +1,25 @@
 /* FOOTER */
 .footer_ecran {
     color: #f2eff2;
-    background-color: #1f63de;
+    background-color: var(--color-light-primary);
     width: 100%;
     padding: 10px;
     min-height: 5vh;
     box-sizing: border-box; /* Assure que padding ne fait pas déborder */
     margin-top: auto;
     overflow: hidden;
+}
+
+body.green .footer_ecran {
+    background-color: var(--color-green-primary);
+}
+
+body.purple .footer_ecran {
+    background-color: var(--color-purple-primary);
+}
+
+body.orange .footer_ecran {
+    background-color: var(--color-orange-primary);
 }
 
 .footer_custom {

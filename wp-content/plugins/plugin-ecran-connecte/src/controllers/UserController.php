@@ -6,6 +6,7 @@ use Models\Alert;
 use Models\CodeAde;
 use Models\Department;
 use Models\Information;
+use Models\Theme;
 use Models\User;
 use R34ICS;
 use Views\UserView;
@@ -36,7 +37,9 @@ class UserController extends Controller
     public function __construct() {
         $this->model = new User();
         $this->view = new UserView();
+        $this->themeModel = new Theme();
     }
+
 
 	/**
 	 * Deletes a user and associated data such as alerts and information.
@@ -127,17 +130,29 @@ class UserController extends Controller
      * @return string
      */
     public function chooseModif() {
+        if (filter_input(INPUT_POST, 'changeTheme')) {
+            $this->changeTheme();
+        }
+
         $string = $this->view->displayStartMultiSelect();
 
-		$string .= $this->view->displayTitleSelect('pass', 'Modifier mon mot de passe', true);
+        $string .= $this->view->displayTitleSelect('pass', 'Modifier mon mot de passe', true);
+        $string .= $this->view->displayTitleSelect('delete', 'Supprimer mon compte');
+        $string .= $this->view->displayTitleSelect('theme', 'Changer le thème') . $this->view->displayEndOfTitle();
 
-        $string .= $this->view->displayTitleSelect('delete', 'Supprimer mon compte') . $this->view->displayEndOfTitle();
-
-		$string .= $this->view->displayContentSelect('pass', $this->modifyPwd(), true);
-
-        $string .= $this->view->displayContentSelect('delete', $this->deleteAccount()) . $this->view->endDiv();
+        $string .= $this->view->displayContentSelect('pass', $this->modifyPwd(), true);
+        $string .= $this->view->displayContentSelect('delete', $this->deleteAccount());
+        $string .= $this->view->displayContentSelect('theme', $this->view->displayChangeTheme()) . $this->view->endDiv();
 
         return $string;
+    }
+
+    public function changeTheme(): void {
+        $theme = filter_input(INPUT_POST, 'theme');
+        if ($theme) {
+            $_SESSION['theme'] = $theme;
+            echo "<script>localStorage.setItem('selectedTheme', '$theme');</script>";
+        }
     }
 
 	/**

@@ -120,6 +120,31 @@ class UserView extends View
         </form>';
     }
 
+    public function displayChangeTheme(): string {
+        return '
+        <div id="themePreview" class="theme-preview">Sélectionnez un thème</div>
+        <div class="theme-selector-grid">
+            <button class="theme-button" onclick="changeTheme(\'light\')" style="background-color: blue; color: white;">Bleu AMU</button>
+            <button class="theme-button" onclick="changeTheme(\'purple\')" style="background-color: purple; color: white;">Violet AMU</button>
+            <button class="theme-button" onclick="changeTheme(\'green\')" style="background-color: green; color: white;">Vert AMU</button>
+            <button class="theme-button" onclick="changeTheme(\'orange\')" style="background-color: orange; color: white;">Orange AMU</button>
+        </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", (event) => {
+                const selectedTheme = localStorage.getItem("selectedTheme") || "light";
+                document.body.classList.add(selectedTheme);
+                document.getElementById("themePreview").className = "theme-preview " + selectedTheme;
+            });
+
+            function changeTheme(theme) {
+                document.body.className = "";
+                document.body.classList.add(theme);
+                localStorage.setItem("selectedTheme", theme);
+                document.getElementById("themePreview").className = "theme-preview " + theme;
+            }
+        </script>';
+    }
+
 
     /**
      * Generates an HTML string for the unsubscribe page.
