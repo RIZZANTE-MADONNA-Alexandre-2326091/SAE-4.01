@@ -4,6 +4,7 @@ namespace Controllers;
 
 use Models\Alert;
 use Models\CodeAde;
+use Models\Department;
 use Models\Information;
 use Models\User;
 use R34ICS;
@@ -56,7 +57,7 @@ class UserController extends Controller
 	        $modelInfo = new Information();
 	        $infos = $modelInfo->getAuthorListInformation($user->getId());
 	        foreach ($infos as $info) {
-		        $goodType = ['img', 'pdf', 'tab', 'event'];
+		        $goodType = ['img', 'pdf', 'event', 'LocCvideo', 'LocSvideo'];
 		        if (in_array($info->getType(), $goodType)) {
 			        $infoController = new InformationController();
 			        $infoController->deleteFile($info->getId());
@@ -72,6 +73,7 @@ class UserController extends Controller
 	 * @return string
 	 */
     public function deleteAccount(): string {
+    $current_user = wp_get_current_user();
     if (in_array('administrator', $current_user->roles)) {
         return '<p>La suppression de compte n’est pas autorisée pour les administrateurs.</p>';
     }
@@ -91,23 +93,12 @@ class UserController extends Controller
                 $user->createCode($code);
             }
 
-            $to = $current_user->user_email;
-            $subject = "Désinscription à la télé-connecté";
-            $message = '
-                <!DOCTYPE html>
-                <html lang="fr">
-                    <head>
-                        <title>Désinscription à la télé-connecté</title>
-                    </head>
-                    <body>
-                        <p>Bonjour, vous avez décidé de vous désinscrire sur le site de la Télé Connecté.</p>
-                        <p>Votre code de désinscription est : ' . $code . '.</p>
-                        <p>Pour vous désinscrire, rendez-vous sur le site :
-                           <a href="' . home_url() . '/mon-compte/">Tv Connectée</a>.
-                        </p>
-                    </body>
-                </html>';
-            $headers = array('Content-Type: text/html; charset=UTF-8');
+                //Build Mail
+                $to = $current_user->user_email;
+                $subject = "Désinscription à la télé-connecté";
+                $message = $this->view->displayUnsubscribe($code);
+
+                $headers = array('Content-Type: text/html; charset=UTF-8');
 
             wp_mail($to, $subject, $message, $headers);
             $this->view->displayMailSend();
@@ -136,17 +127,15 @@ class UserController extends Controller
      * @return string
      */
     public function chooseModif() {
-        $current_user = wp_get_current_user();
         $string = $this->view->displayStartMultiSelect();
 
 		$string .= $this->view->displayTitleSelect('pass', 'Modifier mon mot de passe', true);
 
-        $string .= $this->view->displayTitleSelect('delete', 'Supprimer mon compte') .
-            $this->view->displayEndOfTitle();
+        $string .= $this->view->displayTitleSelect('delete', 'Supprimer mon compte') . $this->view->displayEndOfTitle();
 
-        $string .= $this->view->displayContentSelect('pass', $this->modifyPwd(), true);
+		$string .= $this->view->displayContentSelect('pass', $this->modifyPwd(), true);
 
-        $string .= $this->view->displayContentSelect('delete', $this->deleteAccount()) . $this->view->displayEndDiv();
+        $string .= $this->view->displayContentSelect('delete', $this->deleteAccount()) . $this->view->endDiv();
 
         return $string;
     }
@@ -300,4 +289,10 @@ class UserController extends Controller
 
         return $this->view->displayModifyMyCodes($this->model->getCodes(), $years, $groups, $halfGroups);
     }
+
+	public function displayAllDepartement() {
+		$deptModel = new Department();
+		$dept = $deptModel->getAll();
+		return $this->view->displayAllDept($dept);
+	}
 }

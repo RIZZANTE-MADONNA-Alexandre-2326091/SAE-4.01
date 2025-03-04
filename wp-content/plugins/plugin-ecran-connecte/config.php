@@ -1,5 +1,10 @@
 <?php
 
+use Controllers\AlertRestController;
+use Controllers\CodeAdeRestController;
+use Controllers\InformationRestController;
+use Controllers\ProfileRestController;
+
 include_once 'vendor/R34ICS/R34ICS.php';
 include 'widgets/WidgetAlert.php';
 include 'widgets/WidgetWeather.php';
@@ -108,8 +113,10 @@ function installDatabaseEcran(): void
 			author BIGINT(20) UNSIGNED NOT NULL,
 			type VARCHAR (10) DEFAULT 'text' NOT NULL,
 			administration_id INT(10) DEFAULT NULL,
+    		dept_id INT(10) DEFAULT NULL,
 			PRIMARY KEY (id),
-			FOREIGN KEY (author) REFERENCES wp_users(ID) ON DELETE CASCADE
+			FOREIGN KEY (author) REFERENCES wp_users(ID) ON DELETE CASCADE,
+    		FOREIGN KEY (dept_id) REFERENCES ecran_departement(dept_id) ON DELETE CASCADE
 		) $charset_collate;";
 
     dbDelta($sql);
@@ -217,6 +224,19 @@ function installDatabaseEcran(): void
     	) $charset_collate;";
 
 	dbDelta($sql);
+
+    $table_name = 'ecran_television';
+
+    $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+            id INT(11) NOT NULL AUTO_INCREMENT,
+            id_user BIGINT(20) NOT NULL,
+            type_defilement CHAR(5) NOT NULL,
+            timeout INT(11) NOT NULL DEFAULT 10000,
+            PRIMARY KEY (id, id_user),
+            FOREIGN KEY (id_user) REFERENCES wp_users(ID) ON DELETE CASCADE
+            ) $charset_collate;";
+
+    dbDelta($sql);
 }
 
 add_action('plugins_loaded', 'installDatabaseEcran');
@@ -235,6 +255,17 @@ $result = add_role(
 		'delete_posts' => true,
 	)
 );
+
+$result = add_role(
+    'communicant',
+    __('Communicant'),
+    array(
+        'read' => true,  // true allows this capability
+        'edit_posts' => true,
+        'delete_posts' => false, // Use false to explicitly deny
+    )
+);
+
 
 $result = add_role(
     'secretaire',
@@ -266,4 +297,19 @@ $result = add_role(
     )
 );
 
+add_action(
+    'rest_api_init', function () {
+    $controller = new InformationRestController();
+    $controller->register_routes();
+
+    $controller = new CodeAdeRestController();
+    $controller->register_routes();
+
+    $controller = new AlertRestController();
+    $controller->register_routes();
+
+    $controller = new ProfileRestController();
+    $controller->register_routes();
+}
+);
 

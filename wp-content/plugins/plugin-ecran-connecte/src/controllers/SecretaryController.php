@@ -2,12 +2,9 @@
 
 namespace Controllers;
 
+use Models\Department;
 use Models\User;
 use Views\SecretaryView;
-
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 
 /**
  * Class SecretaryController
@@ -59,12 +56,19 @@ class SecretaryController extends UserController
     public function insert(): string {
         $action = filter_input(INPUT_POST, 'createSecre');
 
+	    $currentUser = wp_get_current_user();
+
+	    $deptModel = new Department();
+	    $isAdmin = in_array('administrator', $currentUser->roles);
+	    $currentDept = $isAdmin ? -1 : $deptModel->getUserInDept($currentUser->ID)->getId();
+
         if (isset($action)) {
 
             $login = filter_input(INPUT_POST, 'loginSecre');
             $password = filter_input(INPUT_POST, 'pwdSecre');
             $passwordConfirm = filter_input(INPUT_POST, 'pwdConfirmSecre');
             $email = filter_input(INPUT_POST, 'emailSecre');
+	        $deptId = $isAdmin ? filter_input(INPUT_POST, 'deptIdSecre') : $currentUser;
 
             if (is_string($login) && strlen($login) >= 4 && strlen($login) <= 25 &&
                 is_string($password) && strlen($password) >= 8 && strlen($password) <= 25 &&
@@ -74,6 +78,7 @@ class SecretaryController extends UserController
                 $this->model->setPassword($password);
                 $this->model->setEmail($email);
                 $this->model->setRole('secretaire');
+				$this->model->setDeptId($deptId);
 
                 if (!$this->checkDuplicateUser($this->model) && $this->model->insert()) {
                     $this->view->displayInsertValidate();
@@ -84,17 +89,28 @@ class SecretaryController extends UserController
                 $this->view->displayErrorCreation();
             }
         }
-        return $this->view->displayFormSecretary();
+
+		$departments = $deptModel->getAll();
+
+        return $this->view->displayFormSecretary($departments, $isAdmin, $currentDept);
     }
 
 	/**
 	 * Displays all secretaries by retrieving users with the role of 'secretaire' and rendering the appropriate view.
 	 *
-	 * @return string The result of the view's displayAllSecretary method.
+	 *
+     * @return string The result of the view's displayAllSecretary method.
 	 */
     public function displayAllSecretary(): string {
         $users = $this->model->getUsersByRole('secretaire');
-        return $this->view->displayAllSecretary($users);
+
+		$deptModel = new Department();
+		$userDeptList = array();
+		foreach ($users as $user) {
+			$userDeptList[] = $deptModel->getUserInDept($user->getId())->getName();
+		}
+
+        return $this->view->displayAllSecretary($users, $userDeptList);
     }
 
     /*** MANAGE USER ***/
@@ -109,8 +125,10 @@ class SecretaryController extends UserController
 	    $user_id = get_current_user_id();
 	    $user_info = get_userdata($user_id);
 		$adminDept = null;
+        $communiquant = null;
 		if(in_array('administrator', $user_info->roles)){
 			$adminDept = new AdminDeptController();
+            $communiquant = new CommunicatorController();
 		}
         $secretary = new SecretaryController();
         $technician = new TechnicianController();
@@ -119,19 +137,22 @@ class SecretaryController extends UserController
 		$form = $this->view->displayStartMultiSelect() .
 		           $this->view->displayTitleSelect('secretary', 'Secrétaires', true) .
 		           $this->view->displayTitleSelect('technician', 'Technicien') .
-		           $this->view->displayTitleSelect('television', 'Télévisions');
+		           $this->view->displayTitleSelect('television', 'Télévisions') ;
 
-	    if (!is_null($adminDept)) {
-			$form .= $this->view->displayTitleSelect('adminDept', 'Admin Département');;
+	    if (!is_null($adminDept) && !is_null($communiquant)) {
+            $form .= $this->view->displayTitleSelect('communicator', 'Communicants').
+			         $this->view->displayTitleSelect('adminDept', 'Admin Département');;
 	    }
 
 		$form .= $this->view->displayEndOfTitle() .
 		         $this->view->displayContentSelect('secretary', $secretary->insert(), true) .
 		         $this->view->displayContentSelect('technician', $technician->insert()) .
-		         $this->view->displayContentSelect('television', $television->insert());
+		         $this->view->displayContentSelect('television', $television->insert()) ;
+
 
 	    if (!is_null($adminDept)) {
-		    $form .= $this->view->displayContentSelect('adminDept', $adminDept->insert());
+		    $form .= $this->view->displayContentSelect('communicator', $communiquant->insert()) .
+		            $this->view->displayContentSelect('adminDept', $adminDept->insert());
 	    }
 
 		$form .= $this->view->displayEndDiv() .
@@ -150,38 +171,38 @@ class SecretaryController extends UserController
 	 * @return string The generated HTML form for displaying users based on their roles.
 	 */
     public function displayUsers(): string{
-	    $user_id = get_current_user_id();
-	    $user_info = get_userdata($user_id);
-	    $adminDept = null;
-	    if(in_array('administrator', $user_info->roles)){
-		    $adminDept = new AdminDeptController();
-	    }
-	    $secretary = new SecretaryController();
-	    $technician = new TechnicianController();
-	    $television = new TelevisionController();
+        $user_id = get_current_user_id();
+        $user_info = get_userdata($user_id);
+        $adminDept = null;
+        if(in_array('administrator', $user_info->roles)){
+            $adminDept = new AdminDeptController();
+        }
+        $secretary = new SecretaryController();
+        $technician = new TechnicianController();
+        $television = new TelevisionController();
 
-	    $form = $this->view->displayStartMultiSelect() .
-	            $this->view->displayTitleSelect('secretary', 'Secrétaires', true) .
-	            $this->view->displayTitleSelect('technician', 'Technicien') .
-	            $this->view->displayTitleSelect('television', 'Télévisions');
+        $form = $this->view->displayStartMultiSelect() .
+            $this->view->displayTitleSelect('secretary', 'Secrétaires', true) .
+            $this->view->displayTitleSelect('technician', 'Technicien') .
+            $this->view->displayTitleSelect('television', 'Télévisions');
 
-	    if (!is_null($adminDept)) {
-		    $form .= $this->view->displayTitleSelect('adminDept', 'Admin Département');;
-	    }
+        if (!is_null($adminDept)) {
+            $form .= $this->view->displayTitleSelect('adminDept', 'Admin Département');;
+        }
 
-	    $form .= $this->view->displayEndOfTitle() .
-	             $this->view->displayContentSelect('secretary', $secretary->displayAllSecretary(), true) .
-	             $this->view->displayContentSelect('technician', $technician->displayAllTechnician()) .
-	             $this->view->displayContentSelect('television', $television->displayAllTv());
+        $form .= $this->view->displayEndOfTitle() .
+            $this->view->displayContentSelect('secretary', $secretary->displayAllSecretary(), true) .
+            $this->view->displayContentSelect('technician', $technician->displayAllTechnician()) .
+            $this->view->displayContentSelect('television', $television->displayAllTv());
 
-	    if (!is_null($adminDept)) {
-		    $form .= $this->view->displayContentSelect('adminDept', $adminDept->displayAllAdminDept());
-	    }
+        if (!is_null($adminDept)) {
+            $form .= $this->view->displayContentSelect('adminDept', $adminDept->displayAllAdminDept());
+        }
 
-	    $form .= $this->view->displayEndDiv() .
-	             $this->view->contextCreateUser();
+        $form .= $this->view->displayEndDiv() .
+            $this->view->contextCreateUser();
 
-	    return $form;
+        return $form;
     }
 
 	/**
@@ -197,6 +218,7 @@ class SecretaryController extends UserController
 	 */
     public function modifyUser(): string {
         $id = $_GET['id'];
+
         if (is_numeric($id) && $this->model->get($id)) {
             $user = $this->model->get($id);
 
@@ -205,12 +227,9 @@ class SecretaryController extends UserController
             if (in_array("television", $wordpressUser->roles)) {
                 $controller = new TelevisionController();
                 return $controller->modify($user);
-            } else {
-                return $this->view->displayNoUser();
             }
-        } else {
-            return $this->view->displayNoUser();
         }
+        return $this->view->displayNoUser();
     }
 
 	/**

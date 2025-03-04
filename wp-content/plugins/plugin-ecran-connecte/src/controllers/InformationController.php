@@ -4,6 +4,7 @@ namespace Controllers;
 
 use Exception;
 use Models\Information;
+use Models\User;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Views\InformationView;
 
@@ -49,10 +50,10 @@ class InformationController extends Controller
     public function create(): string
     {
         $current_user = wp_get_current_user();
+        $author = new User();
+        $author = $author->get($current_user->ID);
 
         // All forms
-
-
         $actionText = filter_input(INPUT_POST, 'createText');
         $actionImg = filter_input(INPUT_POST, 'createImg');
         $actionPDF = filter_input(INPUT_POST, 'createPDF');
@@ -76,150 +77,148 @@ class InformationController extends Controller
 
         $information = $this->model;
 
-        // Set the base of all information
-        $information->setTitle($title);
-        $information->setAuthor($current_user->ID);
-        $information->setCreationDate($creationDate);
-        $information->setExpirationDate($endDate);
-        $information->setAdminId(null);
-
-
-        if (isset($actionText))
-        {                      // If the information is a text
-            $information->setContent($content);
-            $information->setType("text");
-
-            // Try to insert the information
-            if ($information->insert())
-            {
-                $this->view->displayCreateValidate();
-            }
-            else
-            {
-                $this->view->displayErrorInsertionInfo();
-            }
-        }
-        if (isset($actionImg))
-        {                     // If the information is an image
-            $type = "img";
-            $information->setType($type);
-            $filename = $_FILES['contentFile']['name'];
-            $fileTmpName = $_FILES['contentFile']['tmp_name'];
-            $explodeName = explode('.', $filename);
-            $goodExtension = ['jpg', 'jpeg', 'gif', 'png', 'svg'];
-            if (in_array(end($explodeName), $goodExtension))
-            {
-                $this->registerFile($filename, $fileTmpName, $information);
-            }
-            else
-            {
-                $this->view->buildModal('Image non valide', '<p>Ce fichier est une image non valide, veuillez choisir une autre image</p>');
-            }
-        }
-        if (isset($actionPDF))
+        if ((!empty($content) || !is_null($_FILES['contentFile'])) && !empty($endDate))
         {
-            $type = "pdf";
-            $information->setType($type);
-            $filename = $_FILES['contentFile']['name'];
-            $explodeName = explode('.', $filename);
-            if (end($explodeName) == 'pdf')
-            {
+            // Set the base of all information
+            $information->setTitle($title);
+            $information->setAuthor($author);
+            $information->setCreationDate($creationDate);
+            $information->setExpirationDate($endDate);
+            $information->setAdminId(null);
+
+            if (isset($actionText))
+            {                      // If the information is a text
+                $information->setContent($content);
+                $information->setType("text");
+
+                // Try to insert the information
+                if ($information->insert())
+                {
+                    $this->view->displayCreateValidate();
+                }
+                else
+                {
+                    $this->view->displayErrorInsertionInfo();
+                }
+            }
+            if (isset($actionImg))
+            {                     // If the information is an image
+                $type = "img";
+                $information->setType($type);
+                $filename = $_FILES['contentFile']['name'];
                 $fileTmpName = $_FILES['contentFile']['tmp_name'];
-                $this->registerFile($filename, $fileTmpName, $information);
-            }
-            else
-            {
-                $this->view->buildModal('PDF non valide', '<p>Ce fichier est un tableau non PDF, veuillez choisir un autre PDF</p>');
-            }
-        }
-        if (isset($actionEvent))
-        {                       // If the information is an event
-            $type = 'event';
-            $information->setType($type);
-            $countFiles = count($_FILES['contentFile']['name']);
-            for ($i = 0; $i < $countFiles; $i++)
-            {
-                $this->model->setId(null);
-                $filename = $_FILES['contentFile']['name'][$i];
-                $fileTmpName = $_FILES['contentFile']['tmp_name'][$i];
                 $explodeName = explode('.', $filename);
-                $goodExtension = ['jpg', 'jpeg', 'gif', 'png', 'svg', 'pdf'];
+                $goodExtension = ['jpg', 'jpeg', 'gif', 'png', 'svg'];
+
                 if (in_array(end($explodeName), $goodExtension))
                 {
                     $this->registerFile($filename, $fileTmpName, $information);
                 }
+                else
+                {
+                    $this->view->buildModal('Image non valide', '<p>Ce fichier est une image non valide, veuillez choisir une autre image</p>');
+                }
             }
-        }
-        if(isset($actionVideoYT))
-        {
-            // If the information is a Youtube video
-            $type = 'YTvideo';
-            if (str_contains($content, 'https://www.youtube.com/shorts/'))
-            {
-                $information->setType($type . 'sh');
-            }
-            else if (str_contains($content, 'https://www.youtube.com/watch?v='))
-            {
-                $information->setType($type . 'w');
-            }
-            else
-            {
-                $this->view->displayErrorInsertionInfo();
-            }
-            $information->setContent($content);
+            if (isset($actionPDF))
+            {                       // If the information is an PDF file
+                $type = "pdf";
+                $information->setType($type);
+                $filename = $_FILES['contentFile']['name'];
+                $explodeName = explode('.', $filename);
 
-            // Try to insert the information
-            if ($information->insert())
-            {
-                $this->view->displayCreateValidate();
+                if (end($explodeName) == 'pdf')
+                {
+                    $this->registerFile($filename, $fileTmpName, $information);
+                }
             }
-            else
-            {
-                $this->view->displayErrorInsertionInfo();
-            }
-        }
-        if (isset($actionVideoCLocal) || isset($actionVideoSLocal))
-        {
-            $type = '';
-            if (isset($actionVideoCLocal))
-            {
-                $type = 'LocCvideo';
-            } else if (isset($actionVideoSLocal))
-            {
-                $type = 'LocSvideo';
-            }
-            $information->setType($type);
-            $filename = $_FILES['contentFile']['name'];
-            $fileTmpName = $_FILES['contentFile']['tmp_name'];
-            $explodeName = explode('.', $filename);
-            $goodExtension = ['mp4'];
-            if (in_array(end($explodeName), $goodExtension))
-            {
-                $this->registerFile($filename, $fileTmpName, $information);
-            } else if ($_FILES['contentFile']['size'] > 1073741824)
-            {
-                $this->view->displayVideoExceedsMaxSize();
-            }
-            else
-            {
-                $this->view->displayNotConformVideo();
-            }
-        }
+            if (isset($actionEvent))
+            {                       // If the information is an event
+                $type = 'event';
+                $information->setType($type);
+                $countFiles = count($_FILES['contentFile']['name']);
 
-        if (isset($actionRSS))
-        {
-            $information->setContent($content);
-            $information->setType("rss");
-            if ($information->insert())
-            {
-                $this->view->displayCreateValidate();
+                for ($i = 0; $i < $countFiles; $i++)
+                {
+                    $this->model->setId(null);
+                    $filename = $_FILES['contentFile']['name'][$i];
+                    $fileTmpName = $_FILES['contentFile']['tmp_name'][$i];
+                    $explodeName = explode('.', $filename);
+                    $goodExtension = ['jpg', 'jpeg', 'gif', 'png', 'svg', 'pdf'];
+                    if (in_array(end($explodeName), $goodExtension))
+                    {
+                        $this->registerFile($filename, $fileTmpName, $information);
+                    }
+                }
             }
-            else
+            if (isset($actionVideoYT))
+            {                         // If the information is a Youtube video
+                $type = 'YTvideo';
+                if (str_contains($content, 'https://www.youtube.com/shorts/'))
+                {
+                    $information->setType($type . 'sh');
+                }
+                else if (str_contains($content, 'https://www.youtube.com/watch?v='))
+                {
+                    $information->setType($type . 'w');
+                }
+                else
+                {
+                    $this->view->displayErrorInsertionInfo();
+                }
+                $information->setContent($content);
+
+                // Try to insert the information
+                if ($information->insert())
+                {
+                    $this->view->displayCreateValidate();
+                }
+                else
+                {
+                    $this->view->displayErrorInsertionInfo();
+                }
+            }
+            if (isset($actionVideoCLocal) || isset($actionVideoSLocal))
             {
-                $this->view->displayErrorInsertionInfo();
+                $type = '';
+                if (isset($actionVideoCLocal))
+                {
+                    $type = 'LocCvideo';
+                } else if (isset($actionVideoSLocal))
+                {
+                    $type = 'LocSvideo';
+                }
+                $information->setType($type);
+                $filename = $_FILES['contentFile']['name'];
+                $fileTmpName = $_FILES['contentFile']['tmp_name'];
+                $explodeName = explode('.', $filename);
+                $goodExtension = ['mp4'];
+                if (in_array(end($explodeName), $goodExtension))
+                {
+                    $this->registerFile($filename, $fileTmpName, $information);
+                }
+                else if ($_FILES['contentFile']['size'] > 1073741824)
+                {
+                    $this->view->displayVideoExceedsMaxSize();
+                }
+                else
+                {
+                    $this->view->displayNotConformVideo();
+                }
+            }
+            if (isset($actionRSS))
+            {
+                $information->setContent($content);
+                $information->setType("rss");
+                if ($information->insert())
+                {
+                    $this->view->displayCreateValidate();
+                }
+                else
+                {
+                    $this->view->displayErrorInsertionInfo();
+                }
             }
         }
-
         // Return a selector with all forms
         return
             $this->view->displayStartMultiSelect() .
@@ -240,7 +239,7 @@ class InformationController extends Controller
             $this->view->displayContentSelect('LocalCVideo', $this->view->displayFormVideoCLocal()) .
             $this->view->displayContentSelect('LocalSVideo', $this->view->displayFormVideoSLocal()) .
             $this->view->displayContentSelect('rss', $this->view->displayFormRSS()) .
-            $this->view->displayEndDiv() .
+            $this->view->endDiv() .
             $this->view->contextCreateInformation();
     }
 
@@ -265,10 +264,12 @@ class InformationController extends Controller
         }
 
         $current_user = wp_get_current_user();
+        $user = new User();
+        $user = $user->get($current_user->ID);
         $information = $this->model->get($id);
 
-        if (!(in_array('administrator', $current_user->roles) || in_array('secretaire', $current_user->roles)
-            || $information->getAuthor()->getId() == $current_user->ID))
+        if (!(('administrator' === $user->getRole()) || ('secretaire' === $user->getRole())
+            || $information->getAuthor()->getId() == $user->getID()))
         {
             return $this->view->noInformation();
         }
@@ -288,6 +289,11 @@ class InformationController extends Controller
             $information->setTitle($title);
             $information->setExpirationDate($endDate);
 
+            if ($content === '' || $endDate === '')
+            {
+                return $this->view->displayNullInformation();
+            }
+
             if ($information->getType() == 'text')
             {
                 // Set new information
@@ -296,7 +302,7 @@ class InformationController extends Controller
             //Verify the format of the video we want to modify
             else if ($information->getType() == 'YTvideosh')
             {
-                if (str_contains($content, 'shorts'))
+                if (str_contains($content, 'https://www.youtube.com/shorts/'))
                 {
                     $information->setContent($content);
                 }
@@ -307,7 +313,7 @@ class InformationController extends Controller
             }
             else if ($information->getType() == 'YTvideow')
             {
-                if (str_contains($content, 'watch'))
+                if (str_contains($content, 'https://www.youtube.com/watch?v='))
                 {
                     $information->setContent($content);
                 }
@@ -378,20 +384,6 @@ class InformationController extends Controller
                             $this->view->buildModal('Vidéo non valide', '<p>Ce fichier est une vidéo non valide, veuillez choisir une autre vidéo</p>');
                         }
                     }
-                    else if ($information->getType() == 'tab')
-                    {
-                        $explodeName = explode('.', $filename);
-                        $goodExtension = ['xls', 'xlsx', 'ods'];
-                        if (in_array(end($explodeName), $goodExtension))
-                        {
-                            $this->deleteFile($information->getId());
-                            $this->registerFile($filename, $_FILES["contentFile"]['tmp_name'], $information);
-                        }
-                        else
-                        {
-                            $this->view->buildModal('Tableau non valide', '<p>Ce fichier est un tableau non valide, veuillez choisir un autre tableau</p>');
-                        }
-                    }
                 }
             }
 
@@ -415,17 +407,17 @@ class InformationController extends Controller
     }
 
 
-	/**
-	 * Handles the registration and upload of a file, associates it with an entity,
-	 * and updates the entity with the file content information.
-	 *
-	 * @param string $filename The original name of the file being uploaded.
-	 * @param string $tmpName The temporary file path where the uploaded file is stored.
-	 * @param object $entity The entity object to which the file content is associated.
-	 *
-	 * @return void
-	 */
-    public function registerFile( string $filename, string $tmpName, object $entity): void
+    /**
+     * Handles the registration and upload of a file, associates it with an entity,
+     * and updates the entity with the file content information.
+     *
+     * @param string $filename The original name of the file being uploaded.
+     * @param string $tmpName The temporary file path where the uploaded file is stored.
+     * @param Information $entity The entity object to which the file content is associated.
+     *
+     * @return void
+     */
+    public function registerFile(string $filename, string $tmpName, Information $entity): void
     {
         $id = 'temporary';
         $extension_upload = strtolower(substr(strrchr($filename, '.'), 1));
@@ -435,7 +427,8 @@ class InformationController extends Controller
         if ($result = move_uploaded_file($tmpName, $name))
         {
             $entity->setContent('temporary content');
-            if ($entity->getId() == null)
+            $idEntity = $entity->getId();
+            if (!isset($idEntity))
             {
                 $id = $entity->insert();
             }
@@ -471,13 +464,13 @@ class InformationController extends Controller
         }
     }
 
-	/**
-	 * Deletes a file from the server based on the provided ID.
-	 *
-	 * @param int $id The unique identifier of the file to be deleted.
-	 *
-	 * @return void
-	 */
+    /**
+     * Deletes a file from the server based on the provided ID.
+     *
+     * @param int $id The unique identifier of the file to be deleted.
+     *
+     * @return void
+     */
     public function deleteFile(int $id): void
     {
         $this->model = $this->model->get($id);
@@ -506,13 +499,15 @@ class InformationController extends Controller
             $pageNumber = $maxPage;
         }
         $current_user = wp_get_current_user();
+        $user = new User();
+        $user->get($current_user->ID);
         if (in_array('administrator', $current_user->roles) || in_array('secretaire', $current_user->roles))
         {
             $informationList = $this->model->getList($begin, $number);
         }
         else
         {
-            $informationList = $this->model->getAuthorListInformation($current_user->ID, $begin, $number);
+            $informationList = $this->model->getAuthorListInformation($user, $begin, $number);
         }
 
         $name = 'Info';
@@ -520,6 +515,7 @@ class InformationController extends Controller
         $dataList = [];
         $row = $begin;
         $imgExtension = ['jpg', 'jpeg', 'gif', 'png', 'svg'];
+        $videoExtension = 'mp4';
         foreach ($informationList as $information)
         {
             ++$row;
@@ -562,10 +558,10 @@ class InformationController extends Controller
                 }
                 else if ($information->getType() === 'YTvideosh')
                 {
-                    $link = substr_replace($information->getContent(),'embed/',24,6);
+                    $link = substr_replace($information->getContent(),'embed',24,6);
                     $link = substr_replace($link, '-nocookie', 19, 0);
                     $content = $information->getContent() . '<br><iframe class="previsualisationVideoShort" src="' . $link .
-                        '?playlist=' . substr($link,30) . '&mute=1"
+                        '?playlist=' . substr($link,39) . '&mute=1"
 				        title="YouTube video player" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
 				        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';
                 }
@@ -574,9 +570,9 @@ class InformationController extends Controller
                     $link = substr_replace($information->getContent(),'embed/',24,8);
                     $link = substr_replace($link, '-nocookie', 19, 0);
                     $content = $information->getContent() . '<br><iframe class="previsualisationVideoClassique" src="' . $link .
-                        '?playlist=' . substr($link,30) . '&mute=1"
+                        '?playlist=' . substr($link,39) . '&mute=1"
 				        title="YouTube video pr" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
-				        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';;
+				        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';
                 }
             }
             else
@@ -600,10 +596,6 @@ class InformationController extends Controller
             else if ($information->getType() === 'text')
             {
                 $type = 'Texte';
-            }
-            else if ($information->getType() === 'tab')
-            {
-                $type = 'Table Excel';
             }
             else if ($information->getType() === 'YTvideosh')
             {
@@ -635,7 +627,7 @@ class InformationController extends Controller
                     if (in_array('administrator', $current_user->roles) || in_array('secretaire', $current_user->roles) || $entity->getAuthor()->getId() == $current_user->ID)
                     {
                         $type = $entity->getType();
-                        $types = ['img', 'pdf', 'tab', 'event', 'LocCvideo', 'LocSvideo', 'YTvideosh', 'YTvideow'];
+                        $types = ['img', 'pdf', 'event', 'LocCvideo', 'LocSvideo', 'YTvideosh', 'YTvideow'];
                         if (in_array($type, $types))
                         {
                             $this->deleteFile($id);
@@ -655,14 +647,14 @@ class InformationController extends Controller
     }
 
 
-	/**
-	 * Check if the end date of an information has passed and performs deletion if necessary.
-	 *
-	 * @param int|string $id The unique identifier of the information.
-	 * @param string $endDate The expiration date of the information in 'Y-m-d' format.
-	 *
-	 * @return void
-	 */
+    /**
+     * Check if the end date of an information has passed and performs deletion if necessary.
+     *
+     * @param int $id The unique identifier of the information.
+     * @param string $endDate The expiration date of the information in 'Y-m-d' format.
+     *
+     * @return void
+     */
     public function endDateCheckInfo($id, $endDate): void
     {
         if ($endDate <= date("Y-m-d"))
@@ -673,31 +665,29 @@ class InformationController extends Controller
         }
     }
 
-	/**
-	 * Handles the display of information slides by retrieving a list of information,
-	 * processing each item based on its type and expiration date, and displaying
-	 * the components in a slideshow format.
-	 *
-	 * @return void
-	 */
+    /**
+     * Handles the display of information slides by retrieving a list of information,
+     * processing each item based on its type and expiration date, and displaying
+     * the components in a slideshow format.
+     *
+     * @return void
+     */
     public function informationMain(): void
     {
         $informations = $this->model->getList();
+        $currentUser = wp_get_current_user();
+        $user = new User();
+        $user = $user->get($currentUser->ID);
         $this->view->displayStartSlideshow();
         foreach ($informations as $information)
         {
             $endDate = date('Y-m-d', strtotime($information->getExpirationDate()));
             if (!$this->endDateCheckInfo($information->getId(), $endDate))
             {
-                if ($information->getType() == 'tab')
+                if ('television' === $user->getRole())
                 {
-                    $list = $this->readSpreadSheet(TV_UPLOAD_PATH . $information->getContent());
-                    $content = "";
-                    foreach ($list as $table)
-                    {
-                        $content .= $table;
-                    }
-                    $information->setContent($content);
+                    $typeDefilement = $user->getTypeDefilement();
+                    $timeout = $user->getTimeout();
                 }
 
                 $adminSite = true;
@@ -705,10 +695,10 @@ class InformationController extends Controller
                 {
                     $adminSite = false;
                 }
-                $this->view->displaySlide($information->getTitle(), $information->getContent(), $information->getType(), $adminSite);
+                $this->view->displaySlide($information->getTitle(), $information->getContent(), $information->getType(), $typeDefilement, $timeout, $adminSite);
             }
         }
-        $this->view->displayEndDiv();
+        $this->view->endDiv();
     }
 
 	/**
@@ -765,13 +755,13 @@ class InformationController extends Controller
         }
     }
 
-	/**
-	 * Handles the display of event slides by retrieving a list of event information,
-	 * iterating through each event, and rendering content based on its type.
-	 * Supports displaying images or embedding PDFs dynamically in the slideshow.
-	 *
-	 * @return string
-	 */
+    /**
+     * Handles the display of event slides by retrieving a list of event information,
+     * iterating through each event, and rendering content based on its type.
+     * Supports displaying images or embedding PDFs dynamically in the slideshow.
+     *
+     * @return string
+     */
     public function displayEvent(): string
     {
         $events = $this->model->getListInformationEvent();
@@ -792,65 +782,6 @@ class InformationController extends Controller
                 echo '<img src="' . TV_UPLOAD_PATH . $event->getContent() . '" alt="' . $event->getTitle() . '">';
             }
         }
-        return $this->view->displayEndDiv();
-    }
-
-	/**
-	 * Reads the content of a spreadsheet file and processes it into a formatted HTML table structure.
-	 * The content is divided into multiple tables, each containing a maximum of 10 rows.
-	 *
-	 * @param string $content The relative path to the spreadsheet file.
-	 *
-	 * @return array An array of HTML strings, where each string represents a table with 10 rows (or fewer).
-	 */
-    public function readSpreadSheet(string $content): array
-    {
-        $file = $_SERVER['DOCUMENT_ROOT'] . $content;
-
-	    $array     = explode( ".", $file );
-	    $extension = ucfirst(strtolower(end( $array )));
-        $reader    = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($extension);
-        $reader->setReadDataOnly(true);
-        $spreadsheet = $reader->load($file);
-
-        $worksheet = $spreadsheet->getActiveSheet();
-        $highestRow = $worksheet->getHighestRow();
-
-        $contentList = array();
-        $content = "";
-        $mod = 0;
-        for ($i = 0; $i < $highestRow; ++$i)
-        {
-            $mod = $i % 10;
-            if ($mod == 0)
-            {
-                $content .= '<table class ="table table-bordered tablesize">';
-            }
-            foreach ($worksheet->getRowIterator($i + 1, 1) as $row)
-            {
-                $content .= '<tr scope="row">';
-                $cellIterator = $row->getCellIterator();
-                $cellIterator->setIterateOnlyExistingCells(false);
-                foreach ($cellIterator as $cell)
-                {
-                    $content .= '<td class="text-center">' .
-                        $cell->getValue() .
-                        '</td>';
-                }
-                $content .= '</tr>';
-            }
-            if ($mod == 9)
-            {
-                $content .= '</table>';
-                array_push($contentList, $content);
-                $content = "";
-            }
-        }
-        if ($mod != 9 && $i > 0)
-        {
-            $content .= '</table>';
-            array_push($contentList, $content);
-        }
-        return $contentList;
+        return $this->view->endDiv();
     }
 }

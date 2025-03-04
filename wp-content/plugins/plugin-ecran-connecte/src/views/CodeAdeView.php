@@ -3,6 +3,7 @@
 namespace Views;
 
 use Models\CodeAde;
+use Models\Department;
 
 /**
  * Class CodeAdeView
@@ -19,7 +20,9 @@ class CodeAdeView extends View
 	 *
 	 * @return string The HTML form as a string.
 	 */
-    public function createForm(): string {
+    public function createForm(array $departments, bool $isAdmin = false, int $currentDept = null): string {
+        $disabled = $isAdmin ? '' : 'disabled';
+
         return '
         <form method="post">
             <div class="form-group">
@@ -43,6 +46,16 @@ class CodeAdeView extends View
                     <input class="form-check-input" type="radio" name="type" id="halfGroup" value="halfGroup">
                     <label class="form-check-label" for="halfGroup">Demi-groupe</label>
                 </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="type" id="room" value="room">
+                    <label class="form-check-label" for="room">Salle</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="department">Département</label>
+                <select name="dept" class="form-control" ' . $disabled . '>
+                		'. $this->displayAllDept($departments, $currentDept) .'
+                	</select>
             </div>
           <button type="submit" class="btn button_ecran" name="submit">Ajouter</button>
         </form>';
@@ -58,6 +71,7 @@ class CodeAdeView extends View
 	 * @return string The HTML form as a string for modifying the ADE code.
 	 */
     public function displayModifyCode(string $title, string $type, int $code): string {
+
         $page = get_page_by_title_V2('Gestion des codes ADE');
         $linkManageCode = get_permalink($page->ID);
 
@@ -107,6 +121,10 @@ class CodeAdeView extends View
                 'value' => 'halfGroup',
                 'title' => 'Demi-Groupe',
             ),
+            array(
+                'value' => 'room',
+                'title' => 'Salle'
+            )
         );
 
         // Build option list
@@ -137,12 +155,14 @@ class CodeAdeView extends View
 
         $title = 'Codes Ade';
         $name = 'Code';
-        $header = ['Titre', 'Code', 'Type', 'Modifier'];
+        $header = ['Titre', 'Code', 'Type', 'Département', 'Modifier'];
 
         $codesAde = [$years, $groups, $halfGroups];
 
         $row = array();
         $count = 0;
+
+        $deptModel = new Department();
 
         foreach ($codesAde as $codeAde) {
             foreach ($codeAde as $code) {
@@ -152,9 +172,11 @@ class CodeAdeView extends View
                     $code->setType('Groupe');
                 } else if ($code->getType() === 'halfGroup') {
                     $code->setType('Demi-groupe');
+                } else if ($code->getType() === 'room') {
+                    $code->setType('Salle');
                 }
                 ++$count;
-                $row[] = [$count, $this->buildCheckbox($name, $code->getId()), $code->getTitle(), $code->getCode(), $code->getType(), $this->buildLinkForModify($linkManageCodeAde . '?id=' . $code->getId())];
+                $row[] = [$count, $this->buildCheckbox($name, $code->getId()), $code->getTitle(), $code->getCode(), $code->getType(), $deptModel->get($code->getDeptId())->getName() , $this->buildLinkForModify($linkManageCodeAde . '?id=' . $code->getId())];
             }
         }
 
@@ -211,11 +233,11 @@ class CodeAdeView extends View
 	/**
 	 * Displays an error message indicating no content is available and provides a link to return.
 	 *
-	 * @return void
+	 * @return string
 	 */
-    public function errorNobody(): void {
+    public function errorNobody(): string {
         $page = get_page_by_title_V2('Gestion des codes ADE');
         $linkManageCode = get_permalink($page->ID);
-        echo '<p>Il n\'y a rien par ici</p><a href="' . $linkManageCode . '">Retour</a>';
+        return '<p>Il n\'y a rien par ici</p><a href="' . $linkManageCode . '">Retour</a>';
     }
 }

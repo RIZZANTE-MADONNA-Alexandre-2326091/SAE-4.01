@@ -24,8 +24,10 @@ class TelevisionView extends UserView
 	 *
 	 * @return string The HTML string of the television account creation form.
 	 */
-    public function displayFormTelevision(array $years,array $groups, array $halfGroups): string {
-        $form = '
+    public function displayFormTelevision(array $years, array $groups, array $halfGroups, array $departments, $isAdmin = null, $currentDept = null): string {
+        $disabled = $isAdmin ? '' : 'disabled';
+
+        return '
         <h2> Compte télévision</h2>
         <p class="lead">Pour créer des télévisions, remplissez ce formulaire avec les valeurs demandées.</p>
         <p class="lead">Vous pouvez mettre autant d\'emploi du temps que vous souhaitez, cliquez sur "Ajouter des emplois du temps</p>
@@ -41,6 +43,20 @@ class TelevisionView extends UserView
             	<input type="password" class="form-control" id="pwdConfTv" name="pwdConfirmTv" placeholder="Confirmer le Mot de passe" minlength="8" maxlength="25" required="" onkeyup=checkPwd("Tv")>
             	<small id="passwordHelpBlock" class="form-text text-muted">Votre mot de passe doit contenir entre 8 et 25 caractère</small>
             </div>
+            <!--Formulaire type de défilement des vidéos-->
+            <div class="form-group">
+                <h3>Choisissez le mode d\'affichage des vidéos classiques</h3>
+                <label for="defilement">Défilement entre les emplois du temps</label>
+                <input type="radio" name="defilement" value="defil" required="required"/>
+                <br>
+                <label for="defilement">Sur-impréssion par-dessus les emplois du temps</label>
+                <input type="radio" name="defilement" value="suret" required="required"/>
+            </div>
+            <!--Formulaire temps de défilement des vidéos-->
+            <div class="form-group">
+                <label for="temps">Temps de défilement des informations (par défaut 10s)</label>
+                <input type="number" name="temps" placeholder="Temps en secondes (par défaut 10s)" value="10">
+            </div>
             <div class="form-group">
             	<label>Premier emploi du temps</label>' .
             $this->buildSelectCode($years, $groups, $halfGroups) . '
@@ -48,8 +64,6 @@ class TelevisionView extends UserView
             <input type="button" class="btn button_ecran" id="addSchedule" onclick="addButtonTv()" value="Ajouter des emplois du temps">
             <button type="submit" class="btn button_ecran" id="validTv" name="createTv">Créer</button>
         </form>';
-
-        return $form;
     }
 
 	/**
@@ -59,22 +73,50 @@ class TelevisionView extends UserView
 	 * about the user login, number of schedules, and modification options.
 	 *
 	 * @param array $users An array of user objects, where each object contains user details such as ID, login, and codes.
+     * @param array $userData
 	 *
 	 * @return string A formatted string representation of televisions and their associated user information.
 	 */
-    public function displayAllTv(array $users): string {
+    public function displayAllTv(array $users, array $userData, $userDeptList): string
+    {
         $page = get_page_by_title_V2('Modifier un utilisateur');
         $linkManageUser = get_permalink($page->ID);
 
         $title = 'Televisions';
         $name = 'Tele';
-        $header = ['Login', 'Nombre d\'emplois du temps ', 'Modifier'];
+        $header = ['Login', 'Nombre d\'emplois du temps', 'Départements', 'Temps de défilement', 'Type de défilement', 'Modifier'];
 
         $row = array();
         $count = 0;
-        foreach ($users as $user) {
+        //On affiche les valeurs de certains attributs pour les télévisions
+        foreach ($users as $user)
+        {
+            $typeDefilement = '';
+            $timeout = 0;
+            foreach ($userData as $data)
+            {
+                if ($data[0] === $user->getId())
+                {
+                    $typeDefilement = $data[1];
+                    if ($typeDefilement === 'suret')
+                    {
+                        $typeDefilement = 'Par-dessus les emplois du temps';
+                    }
+                    else if ($typeDefilement === 'defil')
+                    {
+                        $typeDefilement = 'Défilement dans les emplois du temps';
+                    }
+                    $timeout = $data[2];
+                    $timeout = strval($timeout / 1000);
+                }
+            }
+            $row[] = [$count+1,
+                $this->buildCheckbox($name, $user->getId()),
+                $user->getLogin(), sizeof($user->getCodes()),
+                $userDeptList[$count], $timeout . ' secondes', $typeDefilement,
+                $this->buildLinkForModify($linkManageUser . '?id=' . $user->getId())];
+
             ++$count;
-            $row[] = [$count, $this->buildCheckbox($name, $user->getId()), $user->getLogin(), sizeof($user->getCodes()), $this->buildLinkForModify($linkManageUser . '?id=' . $user->getId())];
         }
 
         return $this->displayAll($name, $title, $header, $row, 'tele');
@@ -97,6 +139,20 @@ class TelevisionView extends UserView
         <a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des utilisateurs'))) . '">< Retour</a>
         <h2>' . $user->getLogin() . '</h2>
          <form method="post" id="registerTvForm">
+            <!--Formulaire type de défilement des vidéos-->
+            <div class="form-group">
+                <p class="lead">Choisissez le mode d\'affichage des vidéos classiques</p>
+                <label for="defilement">Défilement entre les emplois du temps</label>
+                <input type="radio" name="defilement" value="defil" required="required"/>
+                <br>
+                <label for="defilement">Sur-impréssion par-dessus les emplois du temps</label>
+                <input type="radio" name="defilement" value="suret" required="required"/>
+            </div>
+            <!--Formulaire temps de défilement des vidéos-->
+            <div class="form-group">
+                <label for="temps">Temps de défilement des informations (par défaut 10s)</label>
+                <input type="number" name="temps" placeholder="Temps en secondes (par défaut 10s)" value="10">
+            </div>
             <label id="selectId1"> Emploi du temps</label>';
 
         foreach ($user->getCodes() as $code) {
@@ -198,7 +254,8 @@ class TelevisionView extends UserView
 	 *
 	 * @return string The HTML string representing the opening of a slideshow container.
 	 */
-    public function displayStartSlide(): string {
+    public function displayStartSlide(): string
+    {
         return '<div id="slideshow-container" class="slideshow-container">';
     }
 
@@ -210,7 +267,13 @@ class TelevisionView extends UserView
 	 *
 	 * @return string A string containing the HTML structure for the middle slide.
 	 */
-    public function displayMidSlide(): string {
+    public function displayMidSlide(): string
+    {
         return '<div class="mySlides">';
+    }
+
+    public function displayTimeoutNegativeError(): void
+    {
+        $this->buildModal('Erreur valeur temps de défilement', '<p class="alert alert-danger">Le nombre que vous avez saisi pour le temps de défilement des informations est nul ou négatif.</p>');
     }
 }

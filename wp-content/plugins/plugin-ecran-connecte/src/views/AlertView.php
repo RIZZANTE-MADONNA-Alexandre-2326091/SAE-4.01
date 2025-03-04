@@ -15,6 +15,10 @@ use Models\CodeAde;
 class AlertView extends View
 {
 
+    public function __construct() {
+        error_log("AlertView instantiated");
+    }
+
 	/**
 	 * Generates an HTML form for alert creation, including content input,
 	 * expiration date, and select options for years, groups, and half-groups.
@@ -81,9 +85,12 @@ class AlertView extends View
 	 *
 	 * @return string The HTML string representing the alert modification form.
 	 */
-    public function modifyForm(Alert $alert,array $years,array $groups,array $halfGroups): string {
+
+    public function modifyForm(Alert $alert, array $years, array $groups, array $halfGroups): string {
+        error_log("Rendering modify form for alert ID: " . $alert->getId());
         $dateMin = date('Y-m-d', strtotime("+1 day"));
         $codes = $alert->getCodes();
+        $firstCode = !empty($codes) ? $codes[0] : null;
 
         $form = '
         <a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des alertes'))) . '">< Retour</a>
@@ -97,8 +104,8 @@ class AlertView extends View
                 <input type="date" class="form-control" id="expirationDate" name="expirationDate" min="' . $dateMin . '" value = "' . $alert->getExpirationDate() . '" required>
             </div>
             <div class="form-group">
-                <label for="selectId1">Année, groupe, demi-groupes concernés</label>' .
-            $this->buildSelectCode($years, $groups, $halfGroups, $codes[0], 1, $alert->getForEveryone()) . '
+            <label for="selectId1">Année, groupe, demi-groupes concernés</label>' .
+            $this->buildSelectCode($years, $groups, $halfGroups, $firstCode, 1, $alert->getForEveryone()) . '
             </div>';
 
         if (!$alert->getForEveryone()) {
