@@ -51,7 +51,7 @@ class TabletView extends UserView
             return '<p class="text-danger">Aucune salle disponible.</p>';
         }
 
-        $select = '<select name="selectTablet[]" class="form-control" required>';
+        $select = '<select name="selectTablet" class="form-control" required>';
         foreach ($rooms as $room) {
             if (method_exists($room, 'getCode') && method_exists($room, 'getTitle')) {
                 $select .= '<option value="' . htmlspecialchars($room->getCode()) . '">' . htmlspecialchars($room->getTitle()) . '</option>';
@@ -63,21 +63,24 @@ class TabletView extends UserView
     }
 
 
-    // Views/TabletView.php
-    public function displayRoomSchedule(array $rooms): string
-    {
-        $output = '<h2>Emplois du temps des salles</h2>';
+    public function displayRoomSchedule(array $rooms): string {
+        $output = '<h2>Room Schedules</h2>';
 
+        $currentWeek = isset($_GET['week']) ? (int)$_GET['week'] : 0;
+
+        $startDate = date('Y-m-d', strtotime("monday this week +$currentWeek week"));
+        $endDate = date('Y-m-d', strtotime("friday this week +$currentWeek week"));
         foreach ($rooms as $room) {
-            $icsUrl = "https://exemple.com/ade/export?code=" . $room->getCode();
+            $icsUrl = "https://ade-web-consult.univ-amu.fr/jsp/custom/modules/plannings/anonymous_cal.jsp?projectId=8&resources=" . $room->getCode() . "&calType=ical&firstDate=" . $startDate . "&lastDate=" . $endDate;
             $output .= '
         <div class="room-schedule">
             <h3>' . htmlspecialchars($room->getTitle()) . '</h3>
-            ' . do_shortcode('[ics_calendar url="' . $icsUrl . '"]') . '
+            ' . do_shortcode('[ics_calendar url="' . $icsUrl . '" view="week"]') . '
         </div>';
         }
 
         return $output;
     }
+
 
 }

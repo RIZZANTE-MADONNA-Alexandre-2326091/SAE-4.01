@@ -433,7 +433,7 @@ function schedule_render_callback()
             return $controller->displayMySchedule();
         } else if(in_array("tablette", $current_user->roles)){
             $controller = new TabletController();
-            return $controller->displayRoomSchedule();
+            return $controller->displayUserRoomSchedule();
         } else{
             $view = new UserView();
             return $view->displayHome();

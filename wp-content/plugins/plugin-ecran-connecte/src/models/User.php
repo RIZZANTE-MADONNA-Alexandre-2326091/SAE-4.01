@@ -636,17 +636,31 @@ class User extends Model implements Entity, JsonSerializable
         $this->timeout = $timeout;
     }
 
-    public function getRooms(): array
-    {
+    public function getRooms(User $user): array {
         $request = $this->getDatabase()->prepare('
-        SELECT c.id, c.type, c.title, c.code 
+        SELECT *
         FROM ecran_code_ade c
         JOIN ecran_code_user cu ON c.id = cu.code_ade_id
         WHERE cu.user_id = :userId AND c.type = "room"
     ');
-        $request->bindValue(':userId', $this->getId(), PDO::PARAM_INT);
+        $request->bindValue(':userId', $user->getId(), PDO::PARAM_INT);
         $request->execute();
 
         return (new CodeAde())->setEntityList($request->fetchAll());
     }
+
+
+    public function getOccupiedRooms(): array
+    {
+        $request = $this->getDatabase()->prepare('
+        SELECT DISTINCT code_ade_id
+        FROM ecran_code_user
+        WHERE code_ade_id IN (SELECT id FROM ecran_code_ade WHERE type = "room")
+    ');
+        $request->execute();
+        $result = $request->fetchAll(PDO::FETCH_COLUMN);
+        var_dump($result);
+        return $result;
+    }
+
 }

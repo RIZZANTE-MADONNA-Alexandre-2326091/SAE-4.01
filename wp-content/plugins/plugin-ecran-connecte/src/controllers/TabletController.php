@@ -11,13 +11,15 @@ class TabletController extends UserController
     private $model;
     private $view;
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->model = new User();
         $this->view = new TabletView();
     }
 
-    public function insert() {
+    public function insert()
+    {
         $action = filter_input(INPUT_POST, 'createTablet');
 
         $codeAde = new CodeAde();
@@ -32,24 +34,15 @@ class TabletController extends UserController
             $password = filter_input(INPUT_POST, 'pwdTablet');
             $passwordConfirm = filter_input(INPUT_POST, 'pwdConfirmTablet');
             $deptId = $isAdmin ? filter_input(INPUT_POST, 'deptTablet') : $currentDept;
-            $codes = filter_input(INPUT_POST, 'selectTablet', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
+            $selectedRoomCode = filter_input(INPUT_POST, 'selectTablet');
 
             if (is_string($login) && strlen($login) >= 4 && strlen($login) <= 25 &&
                 is_string($password) && strlen($password) >= 8 && strlen($password) <= 25 &&
                 $password === $passwordConfirm) {
 
-                $codesAde = [];
-                if (is_array($codes)) {  // Vérifier que $codes est bien un tableau
-                    foreach ($codes as $code) {
-                        if (is_numeric($code) && $code > 0) {
-                            $codeAdeInstance = $codeAde->getByCode($code);
-                            if (!$codeAdeInstance || is_null($codeAdeInstance->getId())) {
-                                return 'error'; // Code invalide
-                            } else {
-                                $codesAde[] = $codeAdeInstance;
-                            }
-                        }
-                    }
+                $room = $codeAde->getByCode($selectedRoomCode);
+                if (!$room || is_null($room->getId())) {
+                    return 'error'; // Invalid room code
                 }
 
                 $this->model->setLogin($login);
@@ -57,7 +50,7 @@ class TabletController extends UserController
                 $this->model->setEmail($login . '@' . $login . '.fr');
                 $this->model->setRole('tablette');
                 $this->model->setDeptId($deptId);
-                $this->model->setCodes($codesAde);
+                $this->model->setCodes([$room]);
 
                 if (!$this->checkDuplicateUser($this->model) && $this->model->insert()) {
                     $this->view->displayInsertValidate();
@@ -69,16 +62,18 @@ class TabletController extends UserController
             }
         }
 
-        $rooms = $codeAde->getAllFromType('room') ?? [];
-        if (!is_array($rooms)) {
-            $rooms = [];
-        }
+        $allRooms = $codeAde->getAllFromType('room') ?? [];
+        $occupiedRooms = $this->model->getOccupiedRooms();
+        $availableRooms = array_filter($allRooms, function($room) use ($occupiedRooms) {
+            return !in_array($room->getId(), $occupiedRooms);
+        });
 
-        return $this->view->displayFormTablet($deptModel->getAll(), $isAdmin, $currentDept, $rooms);
+        return $this->view->displayFormTablet($deptModel->getAll(), $isAdmin, $currentDept, $availableRooms);
     }
 
 
-    public function displayAllTablets() {
+    public function displayAllTablets()
+    {
         $users = $this->model->getUsersByRole('tablet');
 
         $deptModel = new Department();
@@ -90,14 +85,15 @@ class TabletController extends UserController
         return $this->view->displayAllTablets($users, $userDeptList);
 
 
-
     }
 
-    public function displayRoomSchedule(): string {
-        $codeAde = new CodeAde();
-        $rooms = $codeAde->getAllFromType('room'); // Récupérer les emplois du temps de type "room"
+    public function displayUserRoomSchedule(): string {
+        $current_user = wp_get_current_user();
+        $user = $this->model->get($current_user->ID);
+        $rooms = $this->model->getRooms($user);
 
         return $this->view->displayRoomSchedule($rooms);
     }
+
 
 }
