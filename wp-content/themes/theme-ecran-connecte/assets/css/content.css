@@ -93,7 +93,7 @@ body.orange .welcome-text {
 }
 
 .img-fluid {
-    filter: brightness(0) saturate(100%) invert(33%) sepia(31%) saturate(6915%) hue-rotate(212deg) brightness(89%) contrast(94%);
+    filter: brightness(0) saturate(100%);
 }
 
 .container {
