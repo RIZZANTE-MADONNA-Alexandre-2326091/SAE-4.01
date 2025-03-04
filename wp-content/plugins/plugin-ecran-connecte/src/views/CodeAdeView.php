@@ -149,7 +149,7 @@ class CodeAdeView extends View
 	 *
 	 * @return string The rendered HTML output displaying all the ADE codes.
 	 */
-    public function displayAllCode(array $years,array $groups,array $halfGroups): string {
+    public function displayAllCode(array $years,array $groups,array $halfGroups, array $room): string {
         $page = get_page_by_title_V2('Modifier un code ADE');
         $linkManageCodeAde = get_permalink($page->ID);
 
@@ -157,7 +157,7 @@ class CodeAdeView extends View
         $name = 'Code';
         $header = ['Titre', 'Code', 'Type', 'Département', 'Modifier'];
 
-        $codesAde = [$years, $groups, $halfGroups];
+        $codesAde = [$years, $groups, $halfGroups, $room];
 
         $row = array();
         $count = 0;

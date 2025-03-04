@@ -184,28 +184,40 @@ if (function_exists('register_sidebar')) {
 }
 
 function get_all_codes() {
+    $deptId = isset($_POST['deptId']) ? intval($_POST['deptId']) : 0;
+	$information = isset($_POST['information']) ? intval($_POST['information']) : false;
     $model = new CodeAde();
 
     $years = $model->getAllFromType('year');
+
     $groups = $model->getAllFromType('group');
     $halfGroups = $model->getAllFromType('halfGroup');
 
-    echo '<option value="0">Aucun</option>
-      <option value="all">Tous</option>
-      <optgroup label="Année">';
+	if($information){
+		echo '<option value="0">Aucun</option>
+      <option value="all">Tous</option>';
+	}
+    
+    echo '<optgroup label="Année">';
     foreach ($years as $year) {
-        echo '<option value="' . $year->getCode() . '">' . $year->getTitle() . '</option >';
+        if($deptId == 0 || $year->getDeptId() == $deptId)
+            echo '<option value="' . $year->getCode() . '">' . $year->getTitle() . '</option >';
     }
-    echo '</optgroup>
+	if($information){
+		echo '</optgroup>
      <optgroup label="Groupe">';
-    foreach ($groups as $group) {
-        echo '<option value="' . $group->getCode() . '">' . $group->getTitle() . '</option>';
-    }
-    echo '</optgroup>
+		foreach ($groups as $group) {
+			if($deptId == 0 || $group->getDeptId() == $deptId)
+				echo '<option value="' . $group->getCode() . '">' . $group->getTitle() . '</option>';
+		}
+		echo '</optgroup>
       <optgroup label="Demi groupe">';
-    foreach ($halfGroups as $halfGroup) {
-        echo '<option value="' . $halfGroup->getCode() . '">' . $halfGroup->getTitle() . '</option>';
-    }
+		foreach ($halfGroups as $halfGroup) {
+			if($deptId == 0 || $halfGroup->getDeptId() == $deptId)
+				echo '<option value="' . $halfGroup->getCode() . '">' . $halfGroup->getTitle() . '</option>';
+		}
+	}
+
     echo '</optgroup>';
 }
 add_action('wp_ajax_get_all_codes', 'get_all_codes');

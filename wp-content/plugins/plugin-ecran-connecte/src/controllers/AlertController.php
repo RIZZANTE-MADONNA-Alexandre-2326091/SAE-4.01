@@ -4,6 +4,7 @@ namespace Controllers;
 
 use Models\Alert;
 use Models\CodeAde;
+use Models\Department;
 use Models\User;
 use Views\AlertView;
 
@@ -49,8 +50,16 @@ class AlertController extends Controller
     public function insert(): string {
         $codeAde = new CodeAde();
         $action = filter_input(INPUT_POST, 'submit');
+
+        $currentUser = wp_get_current_user();
+        $deptId = 0;
+        if(in_array('adminDept', $currentUser->roles)|| in_array('secretaire', $currentUser->roles)) {
+            $deptModel = new Department();
+            $deptId = $deptModel->getUserInDept($currentUser->ID)->getId();
+        }
+
         if (isset($action)) {
-            $codes = $_POST['selectAlert'];
+            $codes = $_POST['select'];
             $content = filter_input(INPUT_POST, 'content');
             $endDate = filter_input(INPUT_POST, 'expirationDate');
 
@@ -74,12 +83,11 @@ class AlertController extends Controller
             }
 
             if (is_string($content) && strlen($content) >= 4 && strlen($content) <= 280 && $this->isRealDate($endDate) && $creationDateString < $endDateString) {
-                $current_user = wp_get_current_user();
-                $author = new User();
-                $author->get($current_user->ID);
+
+                $author = $currentUser->ID;
 
                 // Set the alert
-                $this->model->setAuthor($author);
+                $this->model->setAuthorId($author);
                 $this->model->setContent($content);
                 $this->model->setCreationDate($creationDate);
                 $this->model->setExpirationDate($endDate);
@@ -100,7 +108,7 @@ class AlertController extends Controller
         $groups = $codeAde->getAllFromType('group');
         $halfGroups = $codeAde->getAllFromType('halfGroup');
 
-        return $this->view->creationForm($years, $groups, $halfGroups);
+        return $this->view->creationForm($years, $groups, $halfGroups, $deptId);
     }
 
     /**
@@ -121,7 +129,7 @@ class AlertController extends Controller
      */
     public function modify(): string {
         $id = $_GET['id'];
-        $current_user = wp_get_current_user();
+	    $currentUser = wp_get_current_user();
         error_log("Modify method called with ID: $id");
 
         if (!is_numeric($id) || !$this->model->get($id)) {
@@ -130,17 +138,24 @@ class AlertController extends Controller
         }
         $alert = $this->model->get($id);
 
-        if (!in_array('administrator', $current_user->roles) && !in_array('secretaire', $current_user->roles) && $alert->getAuthor()->getId() != $current_user->ID) {
+        if (!in_array('administrator', $currentUser->roles) && !in_array('communicant', $currentUser->roles) && !in_array('secretaire', $currentUser->roles)
+            && $alert->getAuthor()->getId() != $currentUser->ID) {
             error_log("User does not have permission to modify this alert.");
             return $this->view->alertNotAllowed();
         }
 
-        if ($alert->getAdminId()) {
-            error_log("Alert modification not allowed for admin alerts.");
-            return $this->view->alertNotAllowed();
-        }
+//        if ($alert->getAdminId()) {
+//            error_log("Alert modification not allowed for admin alerts.");
+//            return $this->view->alertNotAllowed();
+//        }
 
         $codeAde = new CodeAde();
+
+	    $deptId = 0;
+	    if(in_array('adminDept', $currentUser->roles)|| in_array('secretaire', $currentUser->roles)) {
+		    $deptModel = new Department();
+		    $deptId = $deptModel->getUserInDept($currentUser->ID)->getId();
+	    }
 
         $submit = filter_input(INPUT_POST, 'submit');
         if (isset($submit)) {
@@ -198,7 +213,7 @@ class AlertController extends Controller
         $halfGroups = $codeAde->getAllFromType('halfGroup');
 
         error_log("Rendering modify form for alert ID: $id");
-        return $this->view->modifyForm($alert, $years, $groups, $halfGroups);
+        return ' ' . $this->view->modifyForm($alert, $years, $groups, $halfGroups, $deptId);
     }
 
 
@@ -225,11 +240,12 @@ class AlertController extends Controller
             $pageNumber = $maxPage;
         }
         $current_user = wp_get_current_user();
-        if (current_user_can('view_alerts')) {
+        if (in_array('administrator', $current_user->roles) || in_array('communicant', $current_user->roles)) {
             $alertList = $this->model->getList($begin, $number);
         } else {
             $alertList = $this->model->getAuthorListAlert($current_user->ID, $begin,  $number);
         }
+
         $name = 'Alert';
         $header = ['Contenu', 'Date de création', 'Date d\'expiration', 'Auteur', 'Modifier'];
         $dataList = [];

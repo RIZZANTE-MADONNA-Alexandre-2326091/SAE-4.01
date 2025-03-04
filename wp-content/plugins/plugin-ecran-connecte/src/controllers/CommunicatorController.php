@@ -53,42 +53,39 @@ class CommunicatorController extends UserController
      */
     function insert() : string
     {
-        $action = filter_input(INPUT_POST, 'createCommunicator');
+	    $action = filter_input(INPUT_POST, 'createComm');
+	    if (isset($action)) {
 
-        if (isset($action)) {
-            $login = filter_input(INPUT_POST, 'loginCommunicator');
-            $password = filter_input(INPUT_POST, 'pwdCommunicator');
-            $passwordConfirm = filter_input(INPUT_POST, 'pwdConfirmCommunicator');
-            $email = filter_input(INPUT_POST, 'emailCommunicator');
+		    $login = filter_input(INPUT_POST, 'loginComm');
+		    $password = filter_input(INPUT_POST, 'pwdComm');
+		    $passwordConfirm = filter_input(INPUT_POST, 'pwdConfirmComm');
+		    $email = filter_input(INPUT_POST, 'emailComm');
 
-            if (is_string($login) && strlen($login) >= 4 && strlen($login) <= 25 &&
-                is_string($password) && strlen($password) >= 8 && strlen($password) <= 25 &&
-                $password === $passwordConfirm && is_email($email)) {
+		    if (is_string($login) && strlen($login) >= 4 && strlen($login) <= 25 &&
+		        is_string($password) && strlen($password) >= 8 && strlen($password) <= 25 &&
+		        $password === $passwordConfirm && is_email($email)) {
 
-                $this->model->setLogin($login);
-                $this->model->setPassword($password);
-                $this->model->setEmail($email);
-                $this->model->setRole('communicant');
+			    $this->model->setLogin($login);
+			    $this->model->setPassword($password);
+			    $this->model->setEmail($email);
+			    $this->model->setRole('communicant');
+				$this->model->setDeptId(0);
 
-                if (!$this->checkDuplicateUser($this->model) && $this->model->insert()) {
-                    $this->view->displayInsertValidate();
-                } else {
-                    $this->view->displayErrorInsertion();
-                }
-            } else {
-                $this->view->displayErrorCreation();
-            }
-        }
-        return $this->view->displayFormCommunicator();
+			    if (!$this->checkDuplicateUser($this->model) && $this->model->insert()) {
+				    $this->view->displayInsertValidate();
+			    } else {
+				    $this->view->displayErrorInsertion();
+			    }
+		    } else {
+			    $this->view->displayErrorCreation();
+		    }
+	    }
+	    return $this->view->displayFormCommunicator();
     }
 
-    function modify()
-    {
-        //Todo
-    }
+    function displayAllCommunicator(): string {
+	    $users = $this->model->getUsersByRole('communicant');
 
-    function displayAllCommunicator()
-    {
-        //Todo
+	    return $this->view->displayAllCommunicator($users);
     }
 }
