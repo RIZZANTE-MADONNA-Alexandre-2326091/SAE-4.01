@@ -653,7 +653,6 @@ class User extends Model implements Entity, JsonSerializable
     ');
         $request->execute();
         $result = $request->fetchAll(PDO::FETCH_COLUMN);
-        var_dump($result);
         return $result;
     }
 

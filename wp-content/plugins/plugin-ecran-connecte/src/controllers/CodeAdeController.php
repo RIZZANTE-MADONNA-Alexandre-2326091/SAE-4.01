@@ -104,8 +104,6 @@ class CodeAdeController extends Controller
         if (is_numeric($id) && !$this->model->get($id))
             return $this->view->errorNobody();
 
-        var_dump('test');
-
         $result = $codeAde = $this->model->get($id);
 
         $submit = filter_input(INPUT_POST, 'submit');
