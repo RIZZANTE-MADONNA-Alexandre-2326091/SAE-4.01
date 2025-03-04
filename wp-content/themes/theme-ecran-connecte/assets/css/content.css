@@ -3,14 +3,14 @@
     --color-light-bg: #cdeafc;
     --color-text: black;
 
-    --color-green-primary: #008000;
-    --color-green-bg: #ccffcc;
+    --color-green-primary: #009B75;
+    --color-green-bg: #BAFADA;
 
-    --color-purple-primary: #800080;
-    --color-purple-bg: #f2ccff;
+    --color-purple-primary: #742899;
+    --color-purple-bg: #DDCCFF;
 
-    --color-orange-primary: #ffa500;
-    --color-orange-bg: #ffe6cc;
+    --color-orange-primary: #BC6C20;
+    --color-orange-bg: #F0DDCC;
 }
 
 body {
