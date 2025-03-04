@@ -1,53 +1,55 @@
-/* =============================================================================
-FONT
-========================================================================== */
+:root {
+    --color-light-primary: #1f63de;
+    --color-light-bg: #cdeafc;
+    --color-text: black;
 
-@font-face {
-    font-family: 'AMUMonumentGrotesk';
-    font-style: normal;
-    font-weight: 400;
-    src: local('AMUMonumentGrotesk-Regular'), url('../font/AMUMonumentGrotesk-Regular.woff') format('woff');
+    --color-green-primary: #009B75;
+    --color-green-bg: #BAFADA;
+
+    --color-purple-primary: #742899;
+    --color-purple-bg: #DDCCFF;
+
+    --color-orange-primary: #BC6C20;
+    --color-orange-bg: #F0DDCC;
 }
-
-@font-face {
-    font-family: 'AMUMonumentGrotesk';
-    font-style: italic;
-    font-weight: 400;
-    src: local('AMUMonumentGrotesk-RegularItalic'), url('../font/AMUMonumentGrotesk-RegularItalic.woff') format('woff');
-}
-
-@font-face {
-    font-family: 'AMUMonumentGrotesk';
-    font-style: normal;
-    font-weight: 500;
-    src: local('AMUMonumentGrotesk-Medium'), url('../font/AMUMonumentGrotesk-Medium.woff') format('woff');
-}
-
-@font-face {
-    font-family: 'AMUMonumentGrotesk';
-    font-style: italic;
-    font-weight: 500;
-    src: local('AMUMonumentGrotesk-MediumItalic'), url('../font/AMUMonumentGrotesk-MediumItalic.woff') format('woff');
-}
-
-@font-face {
-    font-family: 'AMUMonumentGrotesk';
-    font-style: normal;
-    font-weight: 700;
-    src: local('AMUMonumentGrotesk-Bold'), url('../font/AMUMonumentGrotesk-Bold.woff') format('woff');
-}
-
-@font-face {
-    font-family: 'AMUMonumentGrotesk';
-    font-style: italic;
-    font-weight: 700;
-    src: local('AMUMonumentGrotesk-BoldItalic'), url('../font/AMUMonumentGrotesk-BoldItalic.woff') format('woff');
-}
-
 
 body {
-    background-color: #cdeafc;
+    background-color: var(--color-light-bg);
     font-family: AMUMonumentGrotesk, sans-serif;
+    color: var(--color-text);
+}
+
+body.green {
+    background-color: var(--color-green-bg);
+    color: var(--color-text);
+}
+
+body.purple {
+    background-color: var(--color-purple-bg);
+    color: var(--color-text);
+}
+
+body.orange {
+    background-color: var(--color-orange-bg);
+    color: var(--color-text);
+}
+
+.theme-preview {
+    font-size: 24px;
+}
+
+.theme-selector-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+}
+
+.theme-button {
+    padding: 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: white;
 }
 
 .table-success, .table-success>td, .table-success>th {
@@ -55,12 +57,24 @@ body {
 }
 
 .welcome-text {
-    color: #1f63de;
+    color: var(--color-light-primary);
     font-size: 55px;
     font-weight: 500;
     margin-bottom: -1px;
     margin-top: 12px;
     letter-spacing: -0.05rem;
+}
+
+body.green .welcome-text {
+    color: var(--color-green-primary);
+}
+
+body.purple .welcome-text {
+    color: var(--color-purple-primary);
+}
+
+body.orange .welcome-text {
+    color: var(--color-orange-primary);
 }
 
 .courstext {
@@ -74,10 +88,22 @@ body {
 }
 
 .container {
-	max-width:65%;
-    background-color: #cdeafc;
+    max-width: 65%;
+    background-color: var(--color-light-bg);
     border-radius: 5px;
     margin-bottom: 10px;
+}
+
+body.green .container {
+    background-color: var(--color-green-bg);
+}
+
+body.purple .container {
+    background-color: var(--color-purple-bg);
+}
+
+body.orange .container {
+    background-color: var(--color-orange-bg);
 }
 
 .body_television_ecran {
@@ -103,7 +129,19 @@ body {
 .button, input {
     padding: 6px;
     border-radius: 18px;
-    border: #1f63de 3px solid;
+    border: var(--color-light-primary) 3px solid;
+}
+
+body.green .button, body.green input {
+    border: var(--color-green-primary) 3px solid;
+}
+
+body.purple .button, body.purple input {
+    border: var(--color-purple-primary) 3px solid;
+}
+
+body.orange .button, body.orange input {
+    border: var(--color-orange-primary) 3px solid;
 }
 
 .pagination {
@@ -111,7 +149,19 @@ body {
 }
 
 a, a:hover, a:active {
-    color: #1f63de;
+    color: var(--color-light-primary);
+}
+
+body.green a:hover, body.green a:active {
+    color: var(--color-green-primary);
+}
+
+body.purple a:hover, body.purple a:active {
+    color: var(--color-purple-primary);
+}
+
+body.orange a:hover, body.orange a:active {
+    color: var(--color-orange-primary);
 }
 
 a:hover {
@@ -119,22 +169,58 @@ a:hover {
 }
 
 .button_presentation_ecran {
-    background-color: #1f63de;
+    background-color: var(--color-light-primary);
     color: white;
     border-radius: 30px;
 }
 
+body.green .button_presentation_ecran {
+    background-color: var(--color-green-primary);
+}
+
+body.purple .button_presentation_ecran {
+    background-color: var(--color-purple-primary);
+}
+
+body.orange .button_presentation_ecran {
+    background-color: var(--color-orange-primary);
+}
+
 .dropdown-menu {
-    background-color: #1f63de;
+    background-color: var(--color-light-primary);
     border-radius: 12px;
+}
+
+body.green .dropdown-menu {
+    background-color: var(--color-green-primary);
+}
+
+body.purple .dropdown-menu {
+    background-color: var(--color-purple-primary);
+}
+
+body.orange .dropdown-menu {
+    background-color: var(--color-orange-primary);
 }
 
 .dropdown-item:hover {
     background-color: #7ba4fa;
 }
 
+body.green .dropdown-item:hover {
+    background-color: #66cc66;
+}
+
+body.purple .dropdown-item:hover {
+    background-color: #cc99ff;
+}
+
+body.orange .dropdown-item:hover {
+    background-color: #ffcc99;
+}
+
 td {
-	font-weight:bold;
+    font-weight: bold;
 }
 
 .bg-light {
@@ -142,7 +228,7 @@ td {
 }
 
 .class-title {
-    background-color: #1f63de;
+    background-color: var(--color-light-primary);
     color: white;
     padding: 10px 20px 10px 20px;
     display: inline-block;
@@ -151,15 +237,27 @@ td {
     font-weight: 500;
 }
 
+body.green .class-title {
+    background-color: var(--color-green-primary);
+}
+
+body.purple .class-title {
+    background-color: var(--color-purple-primary);
+}
+
+body.orange .class-title {
+    background-color: var(--color-orange-primary);
+}
+
 .titleInfo {
-    color: white!important;
+    color: white !important;
 }
 
 .text-info {
-    color: white!important;
+    color: white !important;
     font-size: 1.1rem;
 }
 
 .tabSchedule {
-	background-color: white!important;
+    background-color: white !important;
 }

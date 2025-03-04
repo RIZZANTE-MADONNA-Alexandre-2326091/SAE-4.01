@@ -2,11 +2,23 @@
 .nav_ecran {
     position: static;
     top: 0;
-    background-color: #1f63de;
+    background-color: var(--color-light-primary);
     margin-bottom: 10px;
     min-height: 5vh;
     width: 100%;
-	padding: 10px;
+    padding: 10px;
+}
+
+body.green .nav_ecran {
+    background-color: var(--color-green-primary);
+}
+
+body.purple .nav_ecran {
+    background-color: var(--color-purple-primary);
+}
+
+body.orange .nav_ecran {
+    background-color: var(--color-orange-primary);
 }
 
 .logo {

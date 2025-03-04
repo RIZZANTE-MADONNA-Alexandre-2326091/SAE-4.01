@@ -27,6 +27,25 @@ require ABSPATH . WPINC . '/option.php';
  * @return string|int|false Integer if `$format` is 'U' or 'G', string otherwise.
  *                          False on failure.
  */
+
+add_action('init', function() {
+    if (session_status() == PHP_SESSION_NONE) {
+        session_start();
+    }
+});
+
+add_action('wp_head', function() {
+    if (isset($_SESSION['theme'])) {
+        echo "<script>
+            document.addEventListener('DOMContentLoaded', (event) => {
+                const selectedTheme = '{$_SESSION['theme']}';
+                document.body.classList.add(selectedTheme);
+                localStorage.setItem('selectedTheme', selectedTheme);
+            });
+        </script>";
+    }
+});
+
 function mysql2date( $format, $date, $translate = true ) {
 	if ( empty( $date ) ) {
 		return false;

@@ -231,9 +231,10 @@ class Alert extends Model implements Entity, JsonSerializable
 	 *
 	 * @param int $id The ID of the user for whom to fetch alerts.
 	 *
-	 * @return Alert A list of alerts associated with the specified user.
+	 * @return array A list of alerts associated with the specified user.
 	 */
-    public function getForUser(int $id): Alert {
+    public function getForUser(int $id): array
+    {
         $request = $this->getDatabase()->prepare('SELECT ecran_alert.id, content, creation_date, expiration_date, author, administration_id
 															FROM ecran_alert
 															JOIN ecran_code_alert ON ecran_alert.id = ecran_code_alert.alert_id

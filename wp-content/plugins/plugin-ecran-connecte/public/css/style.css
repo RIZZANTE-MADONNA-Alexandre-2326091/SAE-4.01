@@ -24,9 +24,37 @@
 }
 
 .button_ecran {
-    background-color: #1f63de;
+    background-color: var(--color-light-primary);
     border-radius: 10px;
     margin-right: 1em;
+}
+
+.button_ecran:hover {
+    background-color: #1a4fb8; /* Darkened light primary */
+}
+
+body.green .button_ecran {
+    background-color: var(--color-green-primary);
+}
+
+body.green .button_ecran:hover {
+    background-color: #006400; /* Darkened green primary */
+}
+
+body.purple .button_ecran {
+    background-color: var(--color-purple-primary);
+}
+
+body.purple .button_ecran:hover {
+    background-color: #660066; /* Darkened purple primary */
+}
+
+body.orange .button_ecran {
+    background-color: var(--color-orange-primary);
+}
+
+body.orange .button_ecran:hover {
+    background-color: #cc8400; /* Darkened orange primary */
 }
 
 .addbtn {
@@ -35,14 +63,45 @@
     background-color: #00a32a;
 }
 
-
 .delete_button_ecran {
     background-color: #cb0000;
     border-radius: 10px;
 }
 
+.delete_button_ecran:hover {
+    background-color: #a30000; /* Darkened red */
+}
+
 .active_ecran .page-link {
-    background-color: #1f63de;
+    background-color: var(--color-light-primary);
+}
+
+.active_ecran .page-link:hover {
+    background-color: #1a4fb8; /* Darkened light primary */
+}
+
+body.green .active_ecran .page-link {
+    background-color: var(--color-green-primary);
+}
+
+body.green .active_ecran .page-link:hover {
+    background-color: #006400; /* Darkened green primary */
+}
+
+body.purple .active_ecran .page-link {
+    background-color: var(--color-purple-primary);
+}
+
+body.purple .active_ecran .page-link:hover {
+    background-color: #660066; /* Darkened purple primary */
+}
+
+body.orange .active_ecran .page-link {
+    background-color: var(--color-orange-primary);
+}
+
+body.orange .active_ecran .page-link:hover {
+    background-color: #cc8400; /* Darkened orange primary */
 }
 
 .dropdown-item {
@@ -58,8 +117,20 @@ div[id^="selctId"] {
 }
 
 thead {
-    background-color: #1f63de;
+    background-color: var(--color-light-primary);
     color: white;
+}
+
+body.green thead {
+    background-color: var(--color-green-primary);
+}
+
+body.purple thead {
+    background-color: var(--color-purple-primary);
+}
+
+body.orange thead {
+    background-color: var(--color-orange-primary);
 }
 
 .form-control {
@@ -82,13 +153,37 @@ thead {
 }
 
 .nav-tabs .nav-link:hover {
-    border-color: #1f63de;
+    border-color: #1a4fb8; /* Darkened light primary */
+}
+
+body.green .nav-tabs .nav-link:hover {
+    border-color: #006400; /* Darkened green primary */
+}
+
+body.purple .nav-tabs .nav-link:hover {
+    border-color: #660066; /* Darkened purple primary */
+}
+
+body.orange .nav-tabs .nav-link:hover {
+    border-color: #cc8400; /* Darkened orange primary */
 }
 
 .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
     color: white;
-    background-color: #1f63de;
+    background-color: var(--color-light-primary);
     border: none;
+}
+
+body.green .nav-tabs .nav-item.show .nav-link, body.green .nav-tabs .nav-link.active {
+    background-color: var(--color-green-primary);
+}
+
+body.purple .nav-tabs .nav-item.show .nav-link, body.purple .nav-tabs .nav-link.active {
+    background-color: var(--color-purple-primary);
+}
+
+body.orange .nav-tabs .nav-item.show .nav-link, body.orange .nav-tabs .nav-link.active {
+    background-color: var(--color-orange-primary);
 }
 
 .select_ecran {

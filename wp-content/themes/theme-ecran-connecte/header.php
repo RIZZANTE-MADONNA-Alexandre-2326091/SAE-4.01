@@ -16,6 +16,24 @@ if(in_array('television', $current_user->roles)) : ?>
 <?php else: ?>
 <body <?php body_class(); ?>>
 <?php endif; ?>
+<!-- Gestion des thèmes -->
+<script>
+    document.addEventListener("DOMContentLoaded", (event) => {
+        const selectedTheme = localStorage.getItem("selectedTheme") || "light";
+        document.body.classList.add(selectedTheme);
+        const themeSelector = document.getElementById("themeSelector");
+        if (themeSelector) {
+            themeSelector.value = selectedTheme;
+        }
+    });
+
+    function changeTheme(theme) {
+        document.body.className = "";
+        document.body.classList.add(theme);
+        localStorage.setItem("selectedTheme", theme);
+    }
+
+</script>
 
 <!-- HEADER -->
 <header>
