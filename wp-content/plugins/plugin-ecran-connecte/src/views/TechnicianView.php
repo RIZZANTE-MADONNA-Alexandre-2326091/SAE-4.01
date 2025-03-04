@@ -1,242 +1,161 @@
 <?php
 
-namespace Controllers;
+namespace Views;
 
 use Models\CodeAde;
 use Models\User;
-use Views\TechnicianView;
 
 /**
- * Controller responsible for handling technician-related functionality and operations.
- * Extends the UserController and implements the Schedule interface.
+ * Class TechnicianView
+ *
+ * Contain all view for technician (Forms, tables)
+ *
+ * @package Views
  */
-class TechnicianController extends UserController implements Schedule
+class TechnicianView extends UserView
 {
-    private User $model;
-    private TechnicianView $view;
-
-    public function __construct() {
-        parent::__construct();
-        $this->model = new User();
-        $this->view = new TechnicianView();
+    /**
+     * Displays the form for creating technician accounts with schedule selection.
+     *
+     * @param array $years An array of years to populate the dropdown for schedule selection.
+     * @param array $groups An array of groups used for schedule selection.
+     * @param array $halfGroups An array of half-groups used for schedule selection.
+     *
+     * @return string The rendered output of the technician account creation form.
+     */
+    public function displayFormTechnician(array $years, array $groups, array $halfGroups): string {
+        return '
+        <h2>Compte technicien</h2>
+        <p class="lead">Pour créer des techniciens, remplissez ce formulaire avec les valeurs demandées.</p>
+        <p class="lead">Vous pouvez associer des emplois du temps au technicien, cliquez sur "Ajouter des emplois du temps".</p>
+        <form method="post" id="registerTechForm">
+            <div class="form-group">
+                <label for="loginTech">Login</label>
+                <input type="text" class="form-control" name="loginTech" placeholder="Nom de compte" required="">
+                <small id="passwordHelpBlock" class="form-text text-muted">Votre login doit contenir entre 4 et 25 caractères.</small>
+            </div>
+            <div class="form-group">
+                <label for="pwdTech">Mot de passe</label>
+                <input type="password" class="form-control" id="pwdTech" name="pwdTech" placeholder="Mot de passe" minlength="8" maxlength="25" required="" onkeyup=checkPwd("Tech")>
+                <input type="password" class="form-control" id="pwdConfTech" name="pwdConfirmTech" placeholder="Confirmer le Mot de passe" minlength="8" maxlength="25" required="" onkeyup=checkPwd("Tech")>
+                <small id="passwordHelpBlock" class="form-text text-muted">Votre mot de passe doit contenir entre 8 et 25 caractères.</small>
+            </div>
+            <div class="form-group">
+                <label>Premier emploi du temps</label>' .
+            $this->buildSelectCode($years, $groups, $halfGroups) . '
+            </div>
+            <input type="button" class="btn button_ecran" id="addSchedule" onclick="addButtonTech()" value="Ajouter des emplois du temps">
+            <button type="submit" class="btn button_ecran" id="validTech" name="createTech">Créer</button>
+        </form>';
     }
 
     /**
-     * Handles the insertion of a new technician.
+     * Displays all technicians with their corresponding login information and number of schedules.
      *
-     * @return string The rendered view content.
+     * @param array $users An array of user objects, where each object represents a technician and contains relevant data such as ID, login, and codes.
+     *
+     * @return string The rendered output of the technicians' data in a formatted display.
      */
-    public function insert(): string {
-        $action = filter_input(INPUT_POST, 'createTech');
+    public function displayAllTechnicians(array $users): string {
+        $page = get_page_by_title_V2('Modifier un utilisateur');
+        $linkManageUser = get_permalink($page->ID);
 
-        if (isset($action)) {
-            $login = filter_input(INPUT_POST, 'loginTech');
-            $password = filter_input(INPUT_POST, 'pwdTech');
-            $passwordConfirm = filter_input(INPUT_POST, 'pwdConfirmTech');
-            $codes = $_POST['selectTech'] ?? []; // Récupère les codes ADE sélectionnés
+        $title = 'Techniciens';
+        $name = 'Tech';
+        $header = ['Login', 'Nombre d\'emplois du temps', 'Modifier'];
 
-            if ($this->validateInput($login, $password, $passwordConfirm, $codes)) {
-                $codesAde = $this->getValidCodes($codes);
-
-                if ($codesAde === null) {
-                    return $this->view->displayErrorCreation();
-                }
-
-                $this->model->setLogin($login);
-                $this->model->setEmail($login . '@' . $login . '.fr'); // Génère un email par défaut
-                $this->model->setPassword($password);
-                $this->model->setRole('technicien');
-                $this->model->setCodes($codesAde);
-
-                if (!$this->checkDuplicateUser($this->model) && $this->model->insert()) {
-                    return $this->view->displayInsertValidate();
-                } else {
-                    return $this->view->displayErrorLogin();
-                }
-            } else {
-                return $this->view->displayErrorCreation();
-            }
+        $row = array();
+        $count = 0;
+        foreach ($users as $user) {
+            ++$count;
+            $row[] = [$count, $this->buildCheckbox($name, $user->getId()), $user->getLogin(), sizeof($user->getCodes()), $this->buildLinkForModify($linkManageUser . '?id=' . $user->getId())];
         }
 
-        // Affiche le formulaire de création avec les codes ADE disponibles
-        $codeAde = new CodeAde();
-        $years = $codeAde->getAllFromType('year');
-        $groups = $codeAde->getAllFromType('group');
-        $halfGroups = $codeAde->getAllFromType('halfGroup');
-
-        return $this->view->displayFormTechnician($years, $groups, $halfGroups);
+        return $this->displayAll($name, $title, $header, $row, $name);
     }
 
     /**
-     * Validates input data for technician creation.
-     *
-     * @param string $login The technician's login.
-     * @param string $password The technician's password.
-     * @param string $passwordConfirm The password confirmation.
-     * @param array $codes The selected codes.
-     *
-     * @return bool True if the input is valid, false otherwise.
-     */
-    private function validateInput(string $login, string $password, string $passwordConfirm, array $codes): bool {
-        return strlen($login) >= 4 && strlen($login) <= 25 &&
-            strlen($password) >= 8 && strlen($password) <= 25 &&
-            $password === $passwordConfirm &&
-            !empty($codes);
-    }
-
-    /**
-     * Retrieves valid codes from the provided array.
-     *
-     * @param array $codes The selected codes.
-     *
-     * @return array|null An array of valid codes or null if any code is invalid.
-     */
-    private function getValidCodes(array $codes): ?array {
-        $codeAde = new CodeAde();
-        $codesAde = [];
-
-        foreach ($codes as $code) {
-            if (is_numeric($code) && $code > 0) {
-                $codeEntity = $codeAde->getByCode($code);
-                if (is_null($codeEntity->getId())) {
-                    return null;
-                }
-                $codesAde[] = $codeEntity;
-            }
-        }
-
-        return $codesAde;
-    }
-
-    /**
-     * Modifies an existing technician.
+     * Displays the form for modifying a technician account, including schedule selection.
      *
      * @param User $user The technician to modify.
+     * @param array $years An array of years to populate the dropdown for schedule selection.
+     * @param array $groups An array of groups used for schedule selection.
+     * @param array $halfGroups An array of half-groups used for schedule selection.
      *
-     * @return string The rendered view content.
+     * @return string The rendered output of the technician modification form.
      */
-    public function modify(User $user): string {
-        $action = filter_input(INPUT_POST, 'modifValidate');
+    public function modifyForm(User $user, array $years, array $groups, array $halfGroups): string {
+        $count = 0;
+        $string = '
+        <a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des utilisateurs'))) . '">< Retour</a>
+        <h2>' . $user->getLogin() . '</h2>
+        <form method="post" id="registerTechForm">
+            <label id="selectId1"> Emploi du temps</label>';
 
-        if (isset($action)) {
-            $codes = $_POST['selectTech'] ?? [];
-            $codesAde = $this->getValidCodes($codes);
-
-            if ($codesAde === null) {
-                return $this->view->displayErrorCreation();
-            }
-
-            $user->setCodes($codesAde);
-
-            if ($user->update()) {
-                $page = get_page_by_title_V2('Gestion des utilisateurs');
-                $linkManageUser = get_permalink($page->ID);
-                return $this->view->displayModificationValidate($linkManageUser);
-            }
-        }
-
-        // Affiche le formulaire de modification avec les codes ADE disponibles
-        $codeAde = new CodeAde();
-        $years = $codeAde->getAllFromType('year');
-        $groups = $codeAde->getAllFromType('group');
-        $halfGroups = $codeAde->getAllFromType('halfGroup');
-
-        return $this->view->modifyForm($user, $years, $groups, $halfGroups);
-    }
-
-    /**
-     * Displays all technicians.
-     *
-     * @return string The rendered view content.
-     */
-    public function displayAllTechnician(): string {
-        $users = $this->model->getUsersByRole('technicien');
-        return $this->view->displayAllTechnicians($users);
-    }
-
-    /**
-     * Displays the schedule for the current technician, sorted by floor and time.
-     *
-     * @return string The rendered schedule content.
-     **/
-    public function displayMySchedule(): string {
-        $current_user = wp_get_current_user();
-        $user = $this->model->get($current_user->ID);
-        $user = $this->model->getMycodes([$user])[0];
-
-        if (empty($user->getCodes())) {
-            return '<p>Aucun cours de prévu aujourd\'hui.</p>';
-        }
-
-        // Récupère tous les cours de la journée
-        $courses = [];
         foreach ($user->getCodes() as $code) {
-            $path = $this->getFilePath($code->getCode());
-            if (file_exists($path)) {
-                $schedule = $this->displaySchedule($code->getCode());
-                if ($schedule) {
-                    $parsedCourse = $this->parseCourseData($schedule);
-                    if ($parsedCourse) {
-                        $courses[] = $parsedCourse;
-                    }
-                }
+            $count = $count + 1;
+            if ($count == 1) {
+                $string .= $this->buildSelectCode($years, $groups, $halfGroups, $code, $count);
+            } else {
+                $string .= '
+                <div class="row">' .
+                    $this->buildSelectCode($years, $groups, $halfGroups, $code, $count) .
+                    '<input type="button" id="selectId' . $count . '" onclick="deleteRow(this.id)" class="btn button_ecran" value="Supprimer">
+                </div>';
             }
         }
 
-        // Trie les cours selon les consignes
-        usort($courses, function ($a, $b) {
-            // Priorité des étages : rez-de-chaussée > premier étage > deuxième étage
-            if ($a['floor'] === $b['floor']) {
-                // Si même étage, trie par heure
-                return $a['time'] <=> $b['time'];
-            }
-            return $a['floor'] <=> $b['floor'];
-        });
-
-        // Affiche les cours triés
-        $string = "";
-        if (get_theme_mod('ecran_connecte_schedule_scroll', 'vert') == 'vert') {
-            $string .= '<div class="ticker1"><div class="innerWrap tv-schedule">';
-            foreach ($courses as $course) {
-                $string .= '<div class="list">' . $course['content'] . '</div>';
-            }
-            $string .= '</div></div>';
-        } else {
-            $string .= $this->view->displayStartSlide();
-            foreach ($courses as $course) {
-                $string .= $this->view->displayMidSlide() . $course['content'] . $this->view->displayEndDiv();
-            }
-            $string .= $this->view->displayEndDiv();
+        if ($count == 0) {
+            $string .= $this->buildSelectCode($years, $groups, $halfGroups, null, $count);
         }
+
+        $page = get_page_by_title_V2('Gestion des utilisateurs');
+        $linkManageUser = get_permalink($page->ID);
+        $string .= '
+            <input type="button" class="btn button_ecran" id="addSchedule" onclick="addButtonTech()" value="Ajouter des emplois du temps">
+            <button name="modifValidate" class="btn button_ecran" type="submit" id="validTech">Valider</button>
+            <a href="' . $linkManageUser . '" id="linkReturn">Annuler</a>
+        </form>';
         return $string;
     }
 
     /**
-     * Parses course data to extract time, room, floor, and content.
+     * Builds an HTML select element with options for years, groups, and half-groups.
      *
-     * @param string $schedule The schedule data.
+     * @param array $years An array of objects representing years.
+     * @param array $groups An array of objects representing groups.
+     * @param array $halfGroups An array of objects representing half-groups.
+     * @param CodeAde|null $code An optional object representing a preselected code.
+     * @param int $count A unique identifier used to differentiate the generated select element.
      *
-     * @return array|null The parsed data or null if extraction fails.
+     * @return string The generated HTML string for the select element.
      */
-    private function parseCourseData(string $schedule): ?array {
-        // Extraction de l'heure (time)
-        preg_match('/<span class="time">([\d:]+)<\/span>/', $schedule, $timeMatch);
-        // Extraction du numéro de la salle (room)
-        preg_match('/<span class="room">(\d+)<\/span>/', $schedule, $roomMatch);
+    public function buildSelectCode(array $years, array $groups, array $halfGroups, CodeAde $code = null, int $count = 0): string {
+        $select = '<select class="form-control firstSelect" id="selectId' . $count . '" name="selectTech[]" required="">';
 
-        if (!empty($timeMatch[1]) && !empty($roomMatch[1])) {
-            $time  = strtotime($timeMatch[1]); // Convertit l'heure en timestamp
-            $room  = (int) $roomMatch[1]; // Numéro de salle
-            $floor = intval($room / 100); // Étages dérivés des centaines dans le numéro de salle (ex: 207 -> étage 2)
-
-            return [
-                'time'    => $time,         // Heure en format timestamp
-                'room'    => $room,         // Numéro de la salle
-                'floor'   => $floor,       // Étages calculés à partir de la salle
-                'content' => $schedule   // Garde le contenu brut pour réutilisation après tri
-            ];
+        if (!is_null($code)) {
+            $select .= '<option value="' . $code->getCode() . '">' . $code->getTitle() . '</option>';
         }
 
-        return null; // Retourne null si l'extraction échoue.
+        $select .= '<option value="0">Aucun</option>
+                    <optgroup label="Année">';
+
+        foreach ($years as $year) {
+            $select .= '<option value="' . $year->getCode() . '">' . $year->getTitle() . '</option>';
+        }
+        $select .= '</optgroup><optgroup label="Groupe">';
+
+        foreach ($groups as $group) {
+            $select .= '<option value="' . $group->getCode() . '">' . $group->getTitle() . '</option>';
+        }
+        $select .= '</optgroup><optgroup label="Demi groupe">';
+
+        foreach ($halfGroups as $halfGroup) {
+            $select .= '<option value="' . $halfGroup->getCode() . '">' . $halfGroup->getTitle() . '</option>';
+        }
+        $select .= '</optgroup>
+            </select>';
+
+        return $select;
     }
 }
