@@ -13,7 +13,4 @@ class ThemeView
         return $output;
     }
 
-    public function displayThemeChangeSuccess(): void {
-        echo '<p>Theme changed successfully!</p>';
-    }
 }
