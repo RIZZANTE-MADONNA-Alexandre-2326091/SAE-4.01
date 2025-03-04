@@ -3,33 +3,38 @@ let countRow = 0;
 /**
  * Create a new select to add a new group for the alert
  */
-function addButtonAlert(deptId) {
+function addButton(deptId, information) {
     console.log(countRow);
     countRow = countRow + 1;
     var presenceSupp = false;
 
-    console.log(deptId);
+    let formId = document.querySelector('form').id;
+    console.log(formId);
+
+    let buttonName = document.querySelector('button[type="submit"]').name;
+    console.log(buttonName);
 
     $.ajax({
         url: '/wp-admin/admin-ajax.php',
         type: 'POST',
         data: {
             action: 'get_all_codes',
-            deptId: deptId
+            deptId: deptId,
+            information: information
         }
     }).done(function (data) {
         let div = $('<div >', {
             class: 'row alertEntry',
             id: countRow
-        }).appendTo('#alert');
-        let select = $('<select >', {
-            name: 'selectAlert[]',
+        }).appendTo('#' + formId);
+        let select = $('<select>', {
+            name: 'select[]',
             class: 'form-control firstSelect'
         }).append(data).appendTo(div);
-        let button = $('<input >', {
+        let button = $('<input>', {
             type: 'button',
             id: countRow,
-            onclick: 'deleteRowAlert(this.id)',
+            onclick: 'deleteRow(this.id)',
             class: 'selectbtn',
             value: 'Retirer'
         }).appendTo(div);
@@ -45,22 +50,21 @@ function addButtonAlert(deptId) {
             presenceSupp = true;
         }
 
+        // Adding the buttons so that they are at the end of the form.
         let add = $('<input>', {
             type: 'button',
             id: 'plus',
-            onclick: 'addButtonAlert()',
+            onclick: 'addButton()',
             class: 'addbtn btn button_ecran',
             value: 'Ajouter'
-        }).appendTo('#alert');
-
+        }).appendTo('#' + formId);
         let valider = $('<button>', {
             type: 'submit',
             class: 'btn button_ecran',
             id: 'valider',
-            name: 'submit',
-            text: "Confirmer"
-        }).appendTo('#alert');
-
+            name: buttonName,
+            text: "Valider"
+        }).appendTo('#' + formId);
         if(presenceSupp){
             let supprimer = $('<button>', {
                 type: 'submit',
@@ -68,8 +72,8 @@ function addButtonAlert(deptId) {
                 id: 'supprimer',
                 name: 'delete',
                 onclick: 'return confirm(\' Voulez-vous supprimer cette alerte ?\');',
-                text: 'Supprimer l\'alerte'
-            }).appendTo('#alert');
+                text: 'Supprimer'
+            }).appendTo('#' + formId);
         }
     });
 }
@@ -79,7 +83,7 @@ function addButtonAlert(deptId) {
  *
  * @param id
  */
-function deleteRowAlert(id) {
+function deleteRow(id) {
     let dele = document.getElementById(id);
     dele.remove();
     let dele2 = document.getElementById(id);

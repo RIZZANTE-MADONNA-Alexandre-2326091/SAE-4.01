@@ -61,6 +61,16 @@ class Information extends Model implements Entity, JsonSerializable
      */
     private int $authorId;
 
+	/**
+	 * @var CodeAde[]
+	 */
+	private array $codes;
+
+	/**
+	 * @var int
+	 */
+	private int $deptId;
+
     /**
      * Insert an information in the database
      *
@@ -81,11 +91,27 @@ class Information extends Model implements Entity, JsonSerializable
 
         try {
             $request->execute();
-            return $database->lastInsertId();
+            $lastId = $database->lastInsertId();
         } catch (PDOException $e) {
             error_log('Insert Error: ' . $e->getMessage());
             return false;
         }
+
+		if($this->getDeptId() !== 0){
+			$request = $database->prepare("INSERT INTO ecran_information_department (info_id, dept_id) VALUES (:info_id, :dept_id)");
+
+			$request->bindValue(':info_id', $lastId, PDO::PARAM_INT);
+			$request->bindValue(':dept_id', $this->getDeptId(), PDO::PARAM_INT);
+		} elseif ($this->getCodes() !== null){
+			foreach ($this->getCodes() as $code){
+				$request = $database->prepare("INSERT INTO ecran_code_information (info_id, code_ade_id) VALUES (:info_id, :code_ade_id)");
+
+				$request->bindValue(':info_id', $lastId, PDO::PARAM_INT);
+				$request->bindValue(':code_ade_id', $code->getId(), PDO::PARAM_INT);
+			}
+		}
+
+		return $lastId;
     }
 
     /**
@@ -458,6 +484,28 @@ class Information extends Model implements Entity, JsonSerializable
     {
         $this->adminId = $adminId;
     }
+
+	/**
+	 * @return CodeAde[]
+	 */
+	public function getCodes(): array {
+		return $this->codes;
+	}
+
+	/**
+	 * @param CodeAde[] $codes
+	 */
+	public function setCodes( array $codes ): void {
+		$this->codes = $codes;
+	}
+
+	public function getDeptId(): int {
+		return $this->deptId;
+	}
+
+	public function setDeptId( int $deptId ): void {
+		$this->deptId = $deptId;
+	}
 
     public function jsonSerialize()
     {

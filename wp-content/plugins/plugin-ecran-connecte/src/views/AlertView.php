@@ -44,10 +44,10 @@ class AlertView extends View
 				<input type="date" class="form-control" id="expirationDate" name="expirationDate" min="' . $dateMin . '" required>
 			</div>
             <div class="form-group">
-                <label for="selectAlert">Année, groupe, demi-groupes concernés</label>
+                <label for="select">Année, groupe, demi-groupes concernés</label>
                 ' . $this->buildSelectCode($deptId, $years, $groups, $halfGroups) . '
             </div>
-            <input type="button" id="plus" onclick="addButtonAlert(' . $deptId . ')" class="addbtn btn button_ecran" value="Ajouter">
+            <input type="button" id="plus" onclick="addButton(' . $deptId . ', ' . true . ')" class="addbtn btn button_ecran" value="Ajouter">
             <button type="submit" id="valider" class="btn button_ecran" name="submit">Valider</button>
         </form>
         <a href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des alertes'))) . '">Voir les alertes</a>' . $this->contextCreateAlert();
@@ -115,16 +115,15 @@ class AlertView extends View
                 $form .= '
 				<div class="row alertEntry" id="selctId' . $count . '">' .
                     $this->buildSelectCode($deptId, $years, $groups, $halfGroups, $code, $count)
-                    . '<input type="button" id="selectId' . $count . '" onclick="deleteRowAlert(this.id)" class="selectbtn" value="Retirer">
+                    . '<input type="button" id="selectId' . $count . '" onclick="deleteRow(this.id)" class="selectbtn" value="Supprimer">
                   </div>';
                 $count = $count + 1;
             }
         }
 
-        $form .= '<input type="button" id="plus" class="addbtn btn button_ecran" onclick="addButtonAlert(' . $deptId . ')" value="Ajouter"> 
-
-                  <button type="submit" class="btn button_ecran" id="valider" name="submit">Confirmer</button>
-                  <button type="submit" class="btn delete_button_ecran" id="supprimer" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette alerte ?\');">Supprimer l\'alerte</button>
+	    $form .= '<input type="button" id="plus" onclick="addButton(' . $deptId . ', ' . true . ')" class="addbtn btn button_ecran" value="Ajouter">
+                  <button type="submit" class="btn button_ecran" id="valider" name="submit">Valider</button>
+                  <button type="submit" class="btn delete_button_ecran" id="supprimer" name="delete" onclick="return confirm(\' Voulez-vous supprimer cette alerte ?\');">Supprimer</button>
                 </form>' . $this->contextModify();
 
         return $form;
@@ -186,15 +185,15 @@ class AlertView extends View
         ';
     }
 
-    /**
-     * Builds and returns an HTML string for a select dropdown menu, populated with options for years, groups, and half groups.
-     *
-     * @param array $years An array of year objects, where each object is expected to have methods `getCode()` and `getTitle()` to fetch year code and title.
-     * @param array $groups An array of group objects, where each object is expected to have methods `getCode()` and `getTitle()` to fetch group
-     */
-    // PHP
-    public function buildSelectCode(int $deptId, array $years, array $groups, array $halfGroups, CodeAde|array $code = null, int $count = 0, int $forEveryone = 0): string {
-        $select = '<select class="form-control firstSelect" id="selectId' . $count . '" name="selectAlert[]" required="">';
+	/**
+	 * Builds and returns an HTML string for a select dropdown menu, populated with options for years, groups, and half groups.
+	 *
+	 * @param array $years An array of year objects, where each object is expected to have methods `getCode()` and `getTitle()` to fetch year code and title.
+	 * @param array $groups An array of group objects, where each object is expected to have methods `getCode()` and `getTitle()` to fetch group
+	 */
+	// PHP
+	public function buildSelectCode(int $deptId, array $years, array $groups, array $halfGroups, CodeAde|array $code = null, int $count = 0, int $forEveryone = 0): string {
+		$select = '<select class="form-control firstSelect" id="selectId' . $count . '" name="select[]" required="">';
 
         if ($forEveryone) {
             $select .= '<option value="all" selected>Tous</option>';

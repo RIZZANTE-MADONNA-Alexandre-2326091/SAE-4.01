@@ -3,6 +3,8 @@
 namespace Controllers;
 
 use Exception;
+use Models\CodeAde;
+use Models\Department;
 use Models\Information;
 use Models\User;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -49,9 +51,18 @@ class InformationController extends Controller
 	 */
     public function create(): string
     {
-        $current_user = wp_get_current_user();
+	    $codeAde = new CodeAde();
+
+	    $currentUser = wp_get_current_user();
+
+		$deptId = 0;
+	    if(in_array('adminDept', $currentUser->roles)|| in_array('secretaire', $currentUser->roles)) {
+		    $deptModel = new Department();
+		    $deptId = $deptModel->getUserInDept($currentUser->ID)->getId();
+	    }
+
         $author = new User();
-        $author = $author->get($current_user->ID);
+        $author = $author->get($currentUser->ID);
 
         // All forms
         $actionText = filter_input(INPUT_POST, 'createText');
@@ -68,6 +79,18 @@ class InformationController extends Controller
         $content = filter_input(INPUT_POST, 'content');
         $endDate = filter_input(INPUT_POST, 'expirationDate');
         $creationDate = date('Y-m-d');
+	    $codes = $_POST['select'];
+
+	    $codesAde = array();
+	    foreach ($codes as $code) {
+		    if ($code != 'all' && $code != 0) {
+			    if (is_null($codeAde->getByCode($code)->getId())) {
+				    $this->view->errorMessageInvalidForm();
+			    } else {
+				    $codesAde[] = $codeAde->getByCode($code);
+			    }
+		    }
+	    }
 
         // If the title is empty
         if ($title == '')
@@ -85,6 +108,8 @@ class InformationController extends Controller
             $information->setCreationDate($creationDate);
             $information->setExpirationDate($endDate);
             $information->setAdminId(null);
+			$information->setDeptId($deptId);
+			$information->setCodes($codesAde);
 
             if (isset($actionText))
             {                      // If the information is a text
@@ -219,6 +244,9 @@ class InformationController extends Controller
                 }
             }
         }
+
+	    $years = $codeAde->getAllFromType('year');
+
         // Return a selector with all forms
         return
             $this->view->displayStartMultiSelect() .
@@ -231,7 +259,7 @@ class InformationController extends Controller
             $this->view->displayTitleSelect('LocalSVideo', 'Vidéo short local') .
             $this->view->displayTitleSelect('rss', 'Flux RSS') .
             $this->view->displayEndOfTitle() .
-            $this->view->displayContentSelect('text', $this->view->displayFormText(), true) .
+            $this->view->displayContentSelect('text', $this->view->displayFormText($years, $deptId), true) .
             $this->view->displayContentSelect('image', $this->view->displayFormImg()) .
             $this->view->displayContentSelect('pdf', $this->view->displayFormPDF()) .
             $this->view->displayContentSelect('event', $this->view->displayFormEvent()) .
