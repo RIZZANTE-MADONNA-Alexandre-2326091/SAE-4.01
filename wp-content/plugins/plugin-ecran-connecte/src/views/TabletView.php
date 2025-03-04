@@ -64,18 +64,20 @@ class TabletView extends UserView
 
 
     public function displayRoomSchedule(array $rooms): string {
-        $output = '<h2>Room Schedules</h2>';
+        $output = '<h2>Emploi du temps</h2>';
 
-        $currentWeek = isset($_GET['week']) ? (int)$_GET['week'] : 0;
+        setlocale(LC_TIME, 'fr_FR.UTF-8');
+        $startDate = strftime('%A %d %B %Y', strtotime("monday this week"));
+        $endDate = strftime('%A %d %B %Y', strtotime("friday this week"));
 
-        $startDate = date('Y-m-d', strtotime("monday this week +$currentWeek week"));
-        $endDate = date('Y-m-d', strtotime("friday this week +$currentWeek week"));
         foreach ($rooms as $room) {
-            $icsUrl = "https://ade-web-consult.univ-amu.fr/jsp/custom/modules/plannings/anonymous_cal.jsp?projectId=8&resources=" . $room->getCode() . "&calType=ical&firstDate=" . $startDate . "&lastDate=" . $endDate;
+            $icsUrl = "https://ade-web-consult.univ-amu.fr/jsp/custom/modules/plannings/anonymous_cal.jsp?projectId=8&resources=" . $room->getCode() . "&calType=ical&firstDate=" . date('Y-m-d', strtotime("monday this week")) . "&lastDate=" . date('Y-m-d', strtotime("friday this week"));
+
             $output .= '
         <div class="room-schedule">
             <h3>' . htmlspecialchars($room->getTitle()) . '</h3>
-            ' . do_shortcode('[ics_calendar url="' . $icsUrl . '" view="week"]') . '
+            <p>Du ' . $startDate . ' au ' . $endDate . '</p>
+            ' . do_shortcode('[ics_calendar url="' . $icsUrl . '" view="week" time_min="08:00" time_max="20:00"]') . '
         </div>';
         }
 
