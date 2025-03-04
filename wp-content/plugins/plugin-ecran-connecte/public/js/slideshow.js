@@ -89,8 +89,8 @@ function separeVideosIntoASlide(slides) {
                     //Sinon, on ajoute dans la nouvelle liste des autres informations
                     else {
                         if (newSlides.indexOf(slides[i]) === -1 && !(
-                                slides[i].childNodes[1].className === 'localCvideo'
-                                || slides[i].childNodes[1].className === 'videow')) {
+                            slides[i].childNodes[1].className === 'localCvideo'
+                            || slides[i].childNodes[1].className === 'videow')) {
                             newSlides.push(slides[i]);
                         }
                     }
@@ -109,8 +109,8 @@ function separeVideosIntoASlide(slides) {
                     //Sinon, on ajoute dans la nouvelle liste des autres informations
                     else {
                         if (newSlides.indexOf(slides[i]) === -1 && !(
-                                slides[i].childNodes[1].className === 'localCvideo'
-                                || slides[i].childNodes[1].className === 'videow')) {
+                            slides[i].childNodes[1].className === 'localCvideo'
+                            || slides[i].childNodes[1].className === 'videow')) {
                             newSlides.push(slides[i]);
                         }
                     }
@@ -121,6 +121,26 @@ function separeVideosIntoASlide(slides) {
     slidesVideos = listeVideos;
     return newSlides;
 }
+
+function autoScrollRss() {
+    const container = document.querySelector('.rss-container');
+    const feed = document.querySelector('.rss-feed');
+    let scrollAmount = 0;
+    const scrollStep = 0.5;
+    const scrollInterval = 30;
+
+    function autoScroll() {
+        scrollAmount += scrollStep;
+        if (scrollAmount >= feed.scrollHeight - container.clientHeight) {
+            scrollAmount = 0;
+        }
+        feed.style.top = -scrollAmount + 'px';
+    }
+
+    setInterval(autoScroll, scrollInterval);
+}
+
+document.addEventListener('DOMContentLoaded', autoScrollRss);
 
 /**
  * Begin a slideshow if there is some informations where "classic" videos are show in the schedule slideshow
@@ -183,7 +203,7 @@ function displayOrHide(slides, slideIndex)
         if(slideIndex === slides.length) {
             if (slides.length === slidesVideos.length
                 && (slides[0].childNodes[1].className === "videow"
-                || slides[0].childNodes[1].className === "localCvideo")) {
+                    || slides[0].childNodes[1].className === "localCvideo")) {
                 // Fin du diaporama vidéos classiques
                 console.log("-Fin de l'affichage des vidéos.");
                 return displayOrHide(slidesShow, 0);

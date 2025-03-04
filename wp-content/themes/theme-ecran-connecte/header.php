@@ -32,7 +32,6 @@ if(in_array('television', $current_user->roles)) : ?>
         document.body.classList.add(theme);
         localStorage.setItem("selectedTheme", theme);
     }
-
 </script>
 
 <!-- HEADER -->

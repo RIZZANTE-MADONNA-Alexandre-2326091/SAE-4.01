@@ -235,6 +235,7 @@ class TelevisionController extends UserController implements Schedule
         return $this->view->displayAllTv($users, $userData, $userDeptList);
     }
 
+
 	/**
 	 * Displays the current user's schedule based on their codes and theme settings.
 	 * Generates and formats the schedule dynamically based on the number of codes

@@ -451,23 +451,22 @@ class User extends Model implements Entity, JsonSerializable
      */
     public function setEntity($data): User
     {
-        //$entity = new User();
         $this->setId($data['ID']);
-	    $this->setLogin($data['user_login']);
-	    $this->setPassword($data['user_pass']);
-	    $this->setEmail($data['user_email']);
-	    $this->setRole($wp_user->roles[0] ?? 'default_role');
-	    $this->setDeptId(($data['dept_id']) ?: 0);
+        $this->setLogin($data['user_login']);
+        $this->setPassword($data['user_pass']);
+        $this->setEmail($data['user_email']);
+        $this->setRole($data['role'] ?? 'default_role');
+        $this->setDeptId($data['dept_id'] ?? 0);
 
         $request = $this->getDatabase()->prepare('SELECT id, title, code, type, dept_id FROM ecran_code_ade
-                                                JOIN ecran_code_user ON ecran_code_ade.id = ecran_code_user.code_ade_id
-                                                WHERE ecran_code_user.user_id = :id');
+                                                  JOIN ecran_code_user ON ecran_code_ade.id = ecran_code_user.code_ade_id
+                                                  WHERE ecran_code_user.user_id = :id');
         $request->bindValue(':id', $data['ID']);
         $request->execute();
 
         $codeAde = new CodeAde();
         $codes = $codeAde->setEntityList($request->fetchAll());
-	    $this->setCodes($codes);
+        $this->setCodes($codes);
 
         return $this;
     }
@@ -481,7 +480,8 @@ class User extends Model implements Entity, JsonSerializable
         $listEntity = array();
         foreach ($dataList as $data)
         {
-            $listEntity[] = $this->setEntity($data);
+            $user = new User();
+            $listEntity[] = $user->setEntity($data);
         }
         return $listEntity;
     }

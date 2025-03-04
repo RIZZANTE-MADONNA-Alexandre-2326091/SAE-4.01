@@ -66,6 +66,10 @@ CSS de l'emploi du temps
     margin: auto;
 }
 
+.lien {
+    display: none;
+}
+
 .mySlides {
     display: block;
 }
@@ -78,6 +82,18 @@ CSS de l'emploi du temps
     .shedule_tech{
         width: 100%;
     }
+}
+
+.sidebar {
+    position: relative;
+}
+
+.multicolor-band {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 0.6rem
 }
 
 .firstSelect {

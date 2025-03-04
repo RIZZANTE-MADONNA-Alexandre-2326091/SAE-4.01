@@ -34,6 +34,10 @@ body.orange {
     color: var(--color-text);
 }
 
+#nav-tabContent {
+    margin-bottom: 12px;
+}
+
 .theme-preview {
     font-size: 24px;
 }
@@ -48,8 +52,13 @@ body.orange {
     padding: 20px;
     border: none;
     cursor: pointer;
+    border-radius: 12px;
     font-size: 16px;
     color: white;
+}
+
+.theme-button.selected {
+    border: 3px solid white;
 }
 
 .table-success, .table-success>td, .table-success>th {

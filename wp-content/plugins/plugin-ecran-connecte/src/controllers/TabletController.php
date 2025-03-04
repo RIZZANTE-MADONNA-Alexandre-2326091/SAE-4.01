@@ -72,20 +72,20 @@ class TabletController extends UserController
     }
 
 
-    public function displayAllTablets()
+    public function displayAllTablets(): string
     {
-        $users = $this->model->getUsersByRole('tablet');
+        $users = $this->model->getUsersByRole('tablette');
 
         $deptModel = new Department();
         $userDeptList = array();
-        foreach ($users as $user) {
+        foreach ($users as $user)
+        {
             $userDeptList[] = $deptModel->getUserInDept($user->getId())->getName();
         }
 
         return $this->view->displayAllTablets($users, $userDeptList);
-
-
     }
+
 
     public function displayUserRoomSchedule(): string {
         $current_user = wp_get_current_user();

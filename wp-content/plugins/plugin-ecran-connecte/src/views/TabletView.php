@@ -37,10 +37,11 @@ class TabletView extends UserView
     </form>';
     }
 
-    public function displayAllTablets($users, $userDeptList) {
+    public function displayAllTablets(array $users, array $userDeptList): string
+    {
         $output = '<h2>Liste des utilisateurs Tablet</h2><table class="table"><thead><tr><th>Login</th><th>Département</th></tr></thead><tbody>';
         foreach ($users as $index => $user) {
-            $output .= '<tr><td>' . $user->getLogin() . '</td><td>' . $userDeptList[$index] . '</td></tr>';
+            $output .= '<tr><td>' . htmlspecialchars($user->getLogin()) . '</td><td>' . htmlspecialchars($userDeptList[$index]) . '</td></tr>';
         }
         $output .= '</tbody></table>';
         return $output;

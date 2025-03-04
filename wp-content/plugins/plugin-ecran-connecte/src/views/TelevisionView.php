@@ -77,7 +77,7 @@ class TelevisionView extends UserView
 	 *
 	 * @return string A formatted string representation of televisions and their associated user information.
 	 */
-    public function displayAllTv(array $users, array $userData, $userDeptList): string
+    public function displayAllTv(array $users, array $userData, array $userDeptList): string
     {
         $page = get_page_by_title_V2('Modifier un utilisateur');
         $linkManageUser = get_permalink($page->ID);

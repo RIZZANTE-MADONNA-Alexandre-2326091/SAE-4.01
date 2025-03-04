@@ -41,25 +41,25 @@ class InformationController extends Controller
         $this->view = new InformationView();
     }
 
-	/**
-	 * Handles the creation of information based on user input, including setting metadata,
-	 * uploading files, and managing different content types (text, images, tables, PDFs, events).
-	 * It also displays the corresponding forms and validation UI components.
-	 *
-	 * @return string A rendered HTML selector for information creation forms, including type and content options.
-	 * @throws Exception If an error occurs during file registration or database insertion.
-	 */
+    /**
+     * Handles the creation of information based on user input, including setting metadata,
+     * uploading files, and managing different content types (text, images, tables, PDFs, events).
+     * It also displays the corresponding forms and validation UI components.
+     *
+     * @return string A rendered HTML selector for information creation forms, including type and content options.
+     * @throws Exception If an error occurs during file registration or database insertion.
+     */
     public function create(): string
     {
-	    $codeAde = new CodeAde();
+        $codeAde = new CodeAde();
 
-	    $currentUser = wp_get_current_user();
+        $currentUser = wp_get_current_user();
 
-		$deptId = 0;
-	    if(in_array('adminDept', $currentUser->roles)|| in_array('secretaire', $currentUser->roles)) {
-		    $deptModel = new Department();
-		    $deptId = $deptModel->getUserInDept($currentUser->ID)->getId();
-	    }
+        $deptId = 0;
+        if(in_array('adminDept', $currentUser->roles)|| in_array('secretaire', $currentUser->roles)) {
+            $deptModel = new Department();
+            $deptId = $deptModel->getUserInDept($currentUser->ID)->getId();
+        }
 
         $author = new User();
         $author = $author->get($currentUser->ID);
@@ -79,18 +79,18 @@ class InformationController extends Controller
         $content = filter_input(INPUT_POST, 'content');
         $endDate = filter_input(INPUT_POST, 'expirationDate');
         $creationDate = date('Y-m-d');
-	    $codes = $_POST['select'];
+        $codes = $_POST['select'];
 
-	    $codesAde = array();
-	    foreach ($codes as $code) {
-		    if ($code != 'all' && $code != 0) {
-			    if (is_null($codeAde->getByCode($code)->getId())) {
-				    $this->view->errorMessageInvalidForm();
-			    } else {
-				    $codesAde[] = $codeAde->getByCode($code);
-			    }
-		    }
-	    }
+        $codesAde = array();
+        foreach ($codes as $code) {
+            if ($code != 'all' && $code != 0) {
+                if (is_null($codeAde->getByCode($code)->getId())) {
+                    $this->view->errorMessageInvalidForm();
+                } else {
+                    $codesAde[] = $codeAde->getByCode($code);
+                }
+            }
+        }
 
         // If the title is empty
         if ($title == '')
@@ -108,8 +108,8 @@ class InformationController extends Controller
             $information->setCreationDate($creationDate);
             $information->setExpirationDate($endDate);
             $information->setAdminId(null);
-			$information->setDeptId($deptId);
-			$information->setCodes($codesAde);
+            $information->setDeptId($deptId);
+            $information->setCodes($codesAde);
 
             if (isset($actionText))
             {                      // If the information is a text
@@ -245,7 +245,7 @@ class InformationController extends Controller
             }
         }
 
-	    $years = $codeAde->getAllFromType('year');
+        $years = $codeAde->getAllFromType('year');
 
         // Return a selector with all forms
         return
@@ -271,17 +271,17 @@ class InformationController extends Controller
             $this->view->contextCreateInformation();
     }
 
-	/**
-	 * Modify an information entry.
-	 *
-	 * This method retrieves, validates, and updates an information entry based on user input. It ensures
-	 * the user has the appropriate permissions and verifies file uploads (if applicable) for specific
-	 * content types such as images, PDFs, or spreadsheets.
-	 *
-	 * @return string Returns various views including the modification form, validation messages,
-	 *               or an error message based on the action and its outcome.
-	 * @throws Exception Throws exceptions for invalid file operations or unexpected errors.
-	 */
+    /**
+     * Modify an information entry.
+     *
+     * This method retrieves, validates, and updates an information entry based on user input. It ensures
+     * the user has the appropriate permissions and verifies file uploads (if applicable) for specific
+     * content types such as images, PDFs, or spreadsheets.
+     *
+     * @return string Returns various views including the modification form, validation messages,
+     *               or an error message based on the action and its outcome.
+     * @throws Exception Throws exceptions for invalid file operations or unexpected errors.
+     */
     public function modify(): string
     {
         $id = $_GET['id'];
@@ -748,9 +748,9 @@ class InformationController extends Controller
         $currentUser = wp_get_current_user();
         $user = new User();
         $user = $user->get($currentUser->ID);
-	    $dataTv = $user->getTypeOfTelevision($user->getId());
-	    $typeDefilement = $dataTv[1];
-	    $timeout = $dataTv[2];
+        $dataTv = $user->getTypeOfTelevision($user->getId());
+        $typeDefilement = $dataTv[1];
+        $timeout = $dataTv[2];
         $this->view->displayStartSlideshow();
         foreach ($informations as $information)
         {
@@ -768,16 +768,16 @@ class InformationController extends Controller
         $this->view->endDiv();
     }
 
-	/**
-	 * Synchronizes and updates the local information database with the information
-	 * retrieved from the admin website. Existing information is compared and updated
-	 * based on title, content, and expiration date. If an information entry no longer
-	 * exists on the admin site, it is deleted from the local database. New information
-	 * from the admin website is added to the local database if it doesn't already exist.
-	 *
-	 * @return void
-	 */
-	public function registerNewInformation(): void
+    /**
+     * Synchronizes and updates the local information database with the information
+     * retrieved from the admin website. Existing information is compared and updated
+     * based on title, content, and expiration date. If an information entry no longer
+     * exists on the admin site, it is deleted from the local database. New information
+     * from the admin website is added to the local database if it doesn't already exist.
+     *
+     * @return void
+     */
+    public function registerNewInformation(): void
     {
         $informationList = $this->model->getFromAdminWebsite();
         $myInformationList = $this->model->getAdminWebsiteInformation();

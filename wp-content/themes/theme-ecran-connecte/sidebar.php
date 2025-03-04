@@ -4,11 +4,10 @@
         <a href="<?php echo wp_logout_url(); ?>" target="_blank">
             <img src="/wp-content/themes/theme-ecran-connecte/assets/media/Logo-Dpt-info-aix-jaune.png" alt="Logo" class="sidebar-logo">
         </a>
+        <img src="/wp-content/themes/theme-ecran-connecte/assets/media/barre-couleur.png" alt="Multicolor Band" class="multicolor-band">
         <?php if (! function_exists('dynamic_sidebar') || ! dynamic_sidebar('Colonne Droite')) :
             the_widget('WidgetInformation');
         endif; ?>
-        <img src="/wp-content/themes/theme-ecran-connecte/assets/media/barre-couleur.png" alt="Multicolor Band" class="multicolor-band">
-
     </aside>
 <?php endif; ?>
 
