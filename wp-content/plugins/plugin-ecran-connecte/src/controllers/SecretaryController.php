@@ -133,11 +133,13 @@ class SecretaryController extends UserController
         $secretary = new SecretaryController();
         $technician = new TechnicianController();
         $television = new TelevisionController();
+        $tablette = new TabletController();
 
-		$form = $this->view->displayStartMultiSelect() .
+        $form = $this->view->displayStartMultiSelect() .
 		           $this->view->displayTitleSelect('secretary', 'Secrétaires', true) .
 		           $this->view->displayTitleSelect('technician', 'Technicien') .
-		           $this->view->displayTitleSelect('television', 'Télévisions') ;
+		           $this->view->displayTitleSelect('television', 'Télévisions') .
+                   $this->view->displayTitleSelect('tablette', 'Tablettes');
 
 	    if (!is_null($adminDept)) {
             $form .= $this->view->displayTitleSelect('communicator', 'Communicants').
@@ -147,10 +149,12 @@ class SecretaryController extends UserController
 		$form .= $this->view->displayEndOfTitle() .
 		         $this->view->displayContentSelect('secretary', $secretary->insert(), true) .
 		         $this->view->displayContentSelect('technician', $technician->insert()) .
-		         $this->view->displayContentSelect('television', $television->insert()) ;
+		         $this->view->displayContentSelect('television', $television->insert()) .
+                 $this->view->displayContentSelect('tablette', $tablette->insert());
 
 
-	    if (!is_null($adminDept)) {
+
+        if (!is_null($adminDept)) {
 		    $form .= $this->view->displayContentSelect('communicator', $communicator->insert()) .
 		            $this->view->displayContentSelect('adminDept', $adminDept->insert());
 	    }
@@ -182,11 +186,14 @@ class SecretaryController extends UserController
         $secretary = new SecretaryController();
         $technician = new TechnicianController();
         $television = new TelevisionController();
+        $tablette = new TabletController();
 
         $form = $this->view->displayStartMultiSelect() .
             $this->view->displayTitleSelect('secretary', 'Secrétaires', true) .
             $this->view->displayTitleSelect('technician', 'Technicien') .
-            $this->view->displayTitleSelect('television', 'Télévisions');
+            $this->view->displayTitleSelect('television', 'Télévisions') .
+            $this->view->displayTitleSelect('tablette', 'Tablettes');
+
 
         if (!is_null($adminDept)) {
 	        $form .= $this->view->displayTitleSelect('communicator', 'Communicants').
@@ -196,7 +203,9 @@ class SecretaryController extends UserController
         $form .= $this->view->displayEndOfTitle() .
             $this->view->displayContentSelect('secretary', $secretary->displayAllSecretary(), true) .
             $this->view->displayContentSelect('technician', $technician->displayAllTechnician()) .
-            $this->view->displayContentSelect('television', $television->displayAllTv());
+            $this->view->displayContentSelect('television', $television->displayAllTv()) .
+            $this->view->displayContentSelect('tablette', $tablette->displayAllTablets());
+
 
         if (!is_null($adminDept)) {
             $form .= $this->view->displayContentSelect('communicator', $communicator->displayAllCommunicator()) .

@@ -91,6 +91,16 @@ class User extends Model implements Entity, JsonSerializable
 		    $request->execute();
 	    }
 
+        if (in_array($this->getRole(), ['television', 'tablette'])) {
+            foreach ($this->getCodes() as $code) {
+                $request = $this->getDatabase()->prepare('INSERT INTO ecran_code_user (user_id, code_ade_id) VALUES (:userId, :codeAdeId)');
+                $request->bindParam(':userId', $id, PDO::PARAM_INT);
+                $request->bindValue(':codeAdeId', $code->getId(), PDO::PARAM_INT);
+                $request->execute();
+            }
+        }
+
+
         // To review
         if ($this->getRole() == 'television')
         {
@@ -624,5 +634,19 @@ class User extends Model implements Entity, JsonSerializable
     public function setTimeout(int $timeout): void
     {
         $this->timeout = $timeout;
+    }
+
+    public function getRooms(): array
+    {
+        $request = $this->getDatabase()->prepare('
+        SELECT c.id, c.type, c.title, c.code 
+        FROM ecran_code_ade c
+        JOIN ecran_code_user cu ON c.id = cu.code_ade_id
+        WHERE cu.user_id = :userId AND c.type = "room"
+    ');
+        $request->bindValue(':userId', $this->getId(), PDO::PARAM_INT);
+        $request->execute();
+
+        return (new CodeAde())->setEntityList($request->fetchAll());
     }
 }

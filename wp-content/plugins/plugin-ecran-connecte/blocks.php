@@ -6,6 +6,7 @@ use Controllers\CommunicatorController;
 use Controllers\DepartmentController;
 use Controllers\InformationController;
 use Controllers\SecretaryController;
+use Controllers\TabletController;
 use Controllers\TechnicianController;
 use Controllers\TelevisionController;
 use Controllers\UserController;
@@ -430,6 +431,9 @@ function schedule_render_callback()
         } else if(in_array("communicant", $current_user->roles)){
             $controller = new CommunicatorController();
             return $controller->displayMySchedule();
+        } else if(in_array("tablette", $current_user->roles)){
+            $controller = new TabletController();
+            return $controller->displayRoomSchedule();
         } else{
             $view = new UserView();
             return $view->displayHome();

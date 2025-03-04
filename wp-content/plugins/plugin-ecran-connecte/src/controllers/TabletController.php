@@ -38,14 +38,16 @@ class TabletController extends UserController
                 is_string($password) && strlen($password) >= 8 && strlen($password) <= 25 &&
                 $password === $passwordConfirm) {
 
-                $codesAde = array();
-                foreach ($codes as $code) {
-                    if (is_numeric($code) && $code > 0) {
-                        $codeAdeInstance = $codeAde->getByCode($code);
-                        if (is_null($codeAdeInstance->getId())) {
-                            return 'error'; // Code invalide;
-                        } else {
-                            $codesAde[] = $codeAdeInstance;
+                $codesAde = [];
+                if (is_array($codes)) {  // Vérifier que $codes est bien un tableau
+                    foreach ($codes as $code) {
+                        if (is_numeric($code) && $code > 0) {
+                            $codeAdeInstance = $codeAde->getByCode($code);
+                            if (!$codeAdeInstance || is_null($codeAdeInstance->getId())) {
+                                return 'error'; // Code invalide
+                            } else {
+                                $codesAde[] = $codeAdeInstance;
+                            }
                         }
                     }
                 }
@@ -53,7 +55,7 @@ class TabletController extends UserController
                 $this->model->setLogin($login);
                 $this->model->setPassword($password);
                 $this->model->setEmail($login . '@' . $login . '.fr');
-                $this->model->setRole('tablet');
+                $this->model->setRole('tablette');
                 $this->model->setDeptId($deptId);
                 $this->model->setCodes($codesAde);
 
@@ -67,14 +69,14 @@ class TabletController extends UserController
             }
         }
 
-        $years = $codeAde->getAllFromType('year');
-        $groups = $codeAde->getAllFromType('group');
-        $halfGroups = $codeAde->getAllFromType('halfGroup');
+        $rooms = $codeAde->getAllFromType('room') ?? [];
+        if (!is_array($rooms)) {
+            $rooms = [];
+        }
 
-        $allDepts = $deptModel->getAll();
-
-        return $this->view->displayFormTablet($allDepts, $isAdmin, $currentDept, $years, $groups, $halfGroups);
+        return $this->view->displayFormTablet($deptModel->getAll(), $isAdmin, $currentDept, $rooms);
     }
+
 
     public function displayAllTablets() {
         $users = $this->model->getUsersByRole('tablet');
@@ -86,5 +88,16 @@ class TabletController extends UserController
         }
 
         return $this->view->displayAllTablets($users, $userDeptList);
+
+
+
     }
+
+    public function displayRoomSchedule(): string {
+        $codeAde = new CodeAde();
+        $rooms = $codeAde->getAllFromType('room'); // Récupérer les emplois du temps de type "room"
+
+        return $this->view->displayRoomSchedule($rooms);
+    }
+
 }
