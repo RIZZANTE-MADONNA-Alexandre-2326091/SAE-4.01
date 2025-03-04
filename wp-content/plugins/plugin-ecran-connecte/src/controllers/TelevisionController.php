@@ -97,12 +97,12 @@ class TelevisionController extends UserController implements Schedule
                 $this->model->setCodes($codesAde);
                 $this->model->setDeptId($deptId);
 
-                if ($typeDefilement === null)
+                if (empty($typeDefilement))
                 {
                     $typeDefilement = 'suret';
                 }
 
-                if ($tempsDefilement === null)
+                if (empty($tempsDefilement))
                 {
                     $tempsDefilement = 0;
                 }
@@ -262,7 +262,7 @@ class TelevisionController extends UserController implements Schedule
                             $string .= $this->view->displayEndDiv();
                             if ($user->getTypeDefilement() == 'defil')
                             {
-                            $informationVideo->displayVideo();
+                                $string .= $informationVideo->displayVideo();
                             }
                         }
                     }
@@ -277,6 +277,10 @@ class TelevisionController extends UserController implements Schedule
                             $string .= $this->view->displayMidSlide();
                             $string .= $this->displaySchedule($code->getCode());
                             $string .= $this->view->displayEndDiv();
+                            if ($user->getTypeDefilement() == 'defil')
+                            {
+                                $string .= $informationVideo->displayVideo();
+                            }
                         }
                     }
                 }

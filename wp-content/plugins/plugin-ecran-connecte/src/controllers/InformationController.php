@@ -654,16 +654,16 @@ class InformationController extends Controller
     /**
      * Display a slideshow of video if the type of slideshow is 'defil'
      *
-     * @return void
+     * @return string
      */
-    public function displayVideo(): void
+    public function displayVideo(): string
     {
         $currentUser = wp_get_current_user();
         $user = new User();
         $user->get($currentUser->ID);
 
         // Début du conteneur pour les vidéos
-        $this->view->displayStartSlideVideo();
+        $string = $this->view->displayStartSlideVideo();
 
         //On récupère depuis le model toutes les informations qui sont des vidéos "classiques".
         $informations = $this->model->getListClassicsVideos(array('videow','LocalCvideo'));
@@ -677,14 +677,15 @@ class InformationController extends Controller
             // Affiche uniquement les vidéos
             if ($information->getType() === 'videow' || $information->getType() === 'LocalCvideo')
             {
-                $this->view->displaySlideVideo(
+                $string .= $this->view->displaySlideVideo(
                     $information->getTitle(),
                     $information->getContent(),
                     $information->getType(),$user->getTypeDefilement(), $adminSite
                 );
             }
         }
-        echo '</div>';
+        $string .= '</div>';
+        return $string;
     }
 
 

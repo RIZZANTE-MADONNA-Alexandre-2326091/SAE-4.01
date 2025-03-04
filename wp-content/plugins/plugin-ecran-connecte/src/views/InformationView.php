@@ -553,10 +553,12 @@ class InformationView extends View
 
     /**
      * Display the start of the videos slideshow
+     *
+     * @return string
      * */
-    public function displayStartSlideVideo(): void
+    public function displayStartSlideVideo(): string
     {
-        echo '<div class="video-slideshow-container">';
+        return '<div class="video-slideshow-container">';
     }
 
     /**
@@ -567,34 +569,37 @@ class InformationView extends View
      * @param string $type
      * @param string $typeDefilement
      * @param bool $adminSite
+     *
+     * @return string
      */
-    public function displaySlideVideo(string $title, string $content, string $type, string $typeDefilement, bool $adminSite = false): void
+    public function displaySlideVideo(string $title, string $content, string $type, string $typeDefilement, bool $adminSite = false): string
     {
-        echo '<div class="myVideoSlides text-center" style="display: block;">';
+        $affichage = '<div class="myVideoSlides text-center" style="display: block;">';
 
         // If the title is empty
         if ($title != "Sans titre")
         {
-            echo '<h2 class="titleInfo">' . $title . '</h2>';
+            $affichage .= '<h2 class="titleInfo">' . $title . '</h2>';
         }
 
         $url = $adminSite ? URL_WEBSITE_VIEWER . TV_UPLOAD_PATH : TV_UPLOAD_PATH;
 
         if ($type === 'LocCvideo' && $typeDefilement === 'defil')
         {
-            echo '<video class="video_container" src="' . $url . $content . '
+            $affichage .= '<video class="video_container" src="' . $url . $content . '
               " autoplay loop muted type="video/mp4"></video>';
         }
         else if ($type === 'YTvideow' && $typeDefilement === 'defil')
         {
             $link = substr_replace($content,'embed/',24,8);
             $link = substr_replace($link, '-nocookie', 19, 0);
-            echo '<iframe class="video_container" src="' . $link . '?autoplay=1&loop=1&playlist=' . substr($link,30) . '&mute=1&controls=0&disablekb=1&enablejsapi=0"
+            $affichage .= '<iframe class="video_container" src="' . $link . '?autoplay=1&loop=1&playlist=' . substr($link,30) . '&mute=1&controls=0&disablekb=1&enablejsapi=0"
 				  title="YouTube slide player" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
 				  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';
         }
 
-        echo '</div>';
+        $affichage .= '</div>';
+        return $affichage;
     }
 
     public function contextDisplayAll(): string
