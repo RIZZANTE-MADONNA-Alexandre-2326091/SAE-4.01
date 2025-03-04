@@ -224,6 +224,20 @@ class Information extends Model implements Entity, JsonSerializable
     }
 
     /**
+     * Returns a list of information where the type are normal videos
+     * @return array
+     */
+    public function getListClassicsVideos(array $types): array
+    {
+        $request = $this->getDatabase()->prepare('SELECT * FROM ecran_information WHERE type = :type1 OR type = :type2');
+        $request->bindValue(':type1', $types[0], PDO::PARAM_STR);
+        $request->bindValue(':type1', $types[1], PDO::PARAM_STR);
+        $request->execute();
+
+        return $this->setEntityList($request->fetchAll(PDO::FETCH_ASSOC));
+    }
+
+    /**
      * Return the list of event present in database
      * @return array
      */

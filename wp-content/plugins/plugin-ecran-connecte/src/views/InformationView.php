@@ -509,7 +509,7 @@ class InformationView extends View
 				  title="YouTube short player" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
 				  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';*/
 		}
-		else if ($type == 'YTvideow')
+		else if ($type == 'YTvideow' && $typeDefilement == 'suret')
 		{
 			$link = substr_replace($content,'embed/',24,8);
             $link = substr_replace($link, '-nocookie', 19, 0);
@@ -520,7 +520,7 @@ class InformationView extends View
 				  title="YouTube video player" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
 				  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';*/
         }
-        else if ($type == 'LocCvideo')
+        else if ($type == 'LocCvideo' && $typeDefilement == 'suret')
         {
             echo '<video class="localCvideo" muted>
 				      <source src="' . TV_UPLOAD_PATH . $content . '" type="video/mp4">
@@ -559,6 +559,57 @@ class InformationView extends View
             echo $content;
         }
         echo '</div>';
+    }
+
+    /**
+     * Display the start of the videos slideshow
+     *
+     * @return string
+     * */
+    public function displayStartSlideVideo(): string
+    {
+        return '<div class="video-slideshow-container">';
+    }
+
+    /**
+     * Display the slideshow of video on the schedule
+     *
+     * @param string $title
+     * @param string $content
+     * @param string $type
+     * @param string $typeDefilement
+     * @param bool $adminSite
+     *
+     * @return string
+     */
+    public function displaySlideVideo(string $title, string $content, string $type, string $typeDefilement, bool $adminSite = false): string
+    {
+        $affichage = '<div class="myVideoSlides text-center" style="display: block;">';
+
+        // If the title is empty
+        if ($title != "Sans titre")
+        {
+            $affichage .= '<h2 class="titleInfo">' . $title . '</h2>';
+        }
+
+        $url = $adminSite ? URL_WEBSITE_VIEWER . TV_UPLOAD_PATH : TV_UPLOAD_PATH;
+
+        if ($type === 'LocCvideo' && $typeDefilement === 'defil')
+        {
+            $affichage .= '<video class="video_container" src="' . $url . $content . '
+              " autoplay loop muted type="video/mp4"></video>';
+        }
+        else if ($type === 'YTvideow' && $typeDefilement === 'defil')
+        {
+            $link = substr_replace($content,'embed/',24,8);
+            $link = substr_replace($link, '-nocookie', 19, 0);
+            $affichage .= '<iframe class="video_container" src="' . $link . '?autoplay=1&loop=1&playlist=' . substr($link,30) . '&mute=1&controls=0&disablekb=1&enablejsapi=0"
+				  title="YouTube slide player" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
+				  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"></iframe>';
+        }
+
+        $affichage .= '</div>';
+        return $affichage;
     }
 
     public function contextDisplayAll(): string

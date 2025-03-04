@@ -68,10 +68,13 @@ Les emplois du temps des différentes promotions sont disponibles pour toutes le
 Les informations sont visibles par tous les utilisateurs.
 Elles sont affichées dans un diaporama sur le côté de l'écran.
 
-Il y a plusieurs types d'informations possibles à poster (image, texte, PDF, tableau excel, événement, vidéo).
+Il y a plusieurs types d'informations possibles à poster (image, texte, PDF, évènement, vidéo, flux RSS).
 
-Les tableaux sont recommandés à n'avoir que trois colonnes maximum avec peu de contenu (A améliorer).  
 Les PDF sont affichés grâce à la librairie "PDF.js" qui permet de créer son propre lecteur de PDF. Voir "slideshow.js"
+
+Les vidéos peuvent être de deux formats : short et classique.<br>
+Les vidéos shorts sont les vidéos verticales et les vidéos classiques sont les vidéos horizontales.<br>
+Les vidéos peuvent être importées via un fichier MP4 ou un lien YouTube.
 
 Les événements sont des informations spéciales. Lorsqu'une information événement est posté, les télévisions n'affichent que les informations en plein écran.  
 Ces informations sont donc destinés pour les journées sans cours du style "journée porte ouverte".  

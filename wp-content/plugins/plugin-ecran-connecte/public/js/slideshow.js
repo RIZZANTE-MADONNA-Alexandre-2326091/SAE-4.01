@@ -51,17 +51,11 @@ let urlYoutube;
 
 if (typeDefilement === "suret") {
     infoSlideShowSuret();
-    scheduleSlideshowSuret();
+    scheduleSlideshow();
 }
 else if (typeDefilement === "defil") {
     infoSlideShowDefil();
-    scheduleSlideshowDefil();
-}
-else {
-    console.error("Erreur dans le type de défilement des vidéos");
-    slidesShow = document.getElementsByClassName("myInfoSlides");
-    console.log("-Début du diaporama");
-    displayOrHide(slidesShow, 0);
+    scheduleSlideshow();
 }
 
 /**
@@ -144,29 +138,17 @@ function infoSlideShowSuret() {
  */
 function infoSlideShowDefil() {
     //TODO
-    if (document.getElementsByClassName("myInfoSlides").length > 0) {
-        slidesShow = document.getElementsByClassName("myInfoSlides");
-        slidesShow = separeVideosIntoASlide(slidesShow);
-        console.log("-Début du diaporama");
-        displayOrHide(slidesShow, 0);
+    if (document.getElementsByClassName("myVideoSlides").length > 0) {
+        slidesShow = document.getElementsByClassName("myVideoSlides");
+        console.log("-Début du diaporama vidéo dans le défilement");
+        displayOrHideVideo(slidesShow, 0);
     }
 }
 
 /**
  * Begin a schedule if there is some informations
  */
-function scheduleSlideshowSuret()
-{
-    if(document.getElementsByClassName("mySlides").length > 0) {
-        console.log("-Début du diaporama");
-        displayOrHide(document.getElementsByClassName("mySlides"), 0);
-    }
-}
-
-/**
- * Begin a schedule if there is some informations
- */
-function scheduleSlideshowDefil()
+function scheduleSlideshow()
 {
     if(document.getElementsByClassName("mySlides").length > 0) {
         console.log("-Début du diaporama");
@@ -457,6 +439,65 @@ function displayOrHide(slides, slideIndex)
     if(slides.length !== 1 || totalPage !== 1) {
         console.log("Real timeout = " + timeout);
         setTimeout(function(){displayOrHide(slides, slideIndex)} , timeout);
+    }
+}
+
+/**
+ * Display the videos slideshow
+ */
+function displayOrHideVideo(slides, slideIndex) {
+    //Verify the number of slides
+    if (slides.length > 0) {
+        if (slides.length > 1) {
+            for (let i = 0; i < slides.length; ++i) {
+                slides[i].style.display = "none";
+            }
+        }
+
+        // Une fois que toutes les vidéos ont été passées, on cache la diapositive, laissant apparaître l'emploi du temps
+        if (slideIndex === slides.length) {
+            console.log("--Fin du diaporama - On cache les vidéos");
+            for (let i = 0; i < slides.length; ++i) {
+                slides[i].style.display = "none";
+            }
+
+            // On attend la valeur de la variable timeout secondes, avant de refaire apparaître le diaporama
+            setTimeout(function () {
+                console.log("--Reprise du diaporama après " + timeout/1000 + " secondes");
+                displayOrHideVideo(slides, 0); // Redémarre depuis la première slide
+            }, timeout);
+
+            return;
+        }
+
+        // On vérifie qu'il existe une dernière slide
+        if (slides[slideIndex] !== undefined) {
+            console.log("--Slide n°" + slideIndex);
+
+            // On vérifie qu'un enfant existe et que c'est bien une vidéo
+            if (slides[slideIndex].childNodes) {
+                for (let i = 0; i < slides[slideIndex].childNodes.length; ++i) {
+                    let child = slides[slideIndex].childNodes[i];
+                    // Si c'est une vidéo, on l'affiche
+                    if (child.className === 'video_container') {
+                        timeout = child.duration * 1000;
+                        slides[slideIndex].style.display = "block";
+                        slides[slideIndex].style.position = "relative";
+                        console.log("--Lecture de la vidéo");
+
+                    }
+                }
+                // On passe à la slide suivante
+                ++slideIndex;
+            }
+        }
+
+        if (slides.length !== 1 || totalPage !== 1) {
+            // On définit notre temps, ici 5 secondes
+            setTimeout(function () {
+                displayOrHideVideo(slides, slideIndex)
+            }, timeout);
+        }
     }
 }
 

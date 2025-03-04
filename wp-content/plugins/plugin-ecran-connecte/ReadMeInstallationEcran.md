@@ -48,9 +48,11 @@ Pour que les pages se mettent à jour automatiquement, il vous faut rajouter une
 
 Pour ce faire, allez dans la partie administrateur du site "nomdusite/wp-admin".  
 
-Dans la barre latérale, cliquez sur "Réglages", puis "Planifications Cron". 
+Dans la barre latérale, cliquez sur "Réglages", puis "Évènements Cron". 
 
 Allez ensuite dans l'onglet "Ajouter un évènement cron". 
+
+Dans la section "Type d'évènement", sélectionnez "Évènement cron standard"
 
 Dans la section "Nom du crochet", renseignez "downloadFileICS" (sans les guillemets). 
 
@@ -82,7 +84,7 @@ Récupérer la valeur à ressources=.... (Dans notre lien d'exemple, il s'agit d
 
 Dans votre site WordPress, allez dans la partie "Code ADE" et remplissez le formulaire.  
 
-## Custimisation
+## Customisation
 
 Vous pouvez customiser ce site comme vous le souhaitez.
 
