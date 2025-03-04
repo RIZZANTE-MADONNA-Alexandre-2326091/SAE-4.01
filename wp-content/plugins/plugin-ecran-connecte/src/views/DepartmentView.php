@@ -109,11 +109,13 @@ class DepartmentView extends View
 	/**
 	 * Generates and returns an HTML table displaying all departments with options to modify them.
 	 *
-	 * @param array $departments An array of department objects, each containing details such as ID and name.
 	 *
-	 * @return string The HTML string representing the table of departments.
+	 * @param array $departments
+	 * @param int|null $currentDept *
+	 *
+* @return string The HTML string representing the table of departments.
 	 */
-   public function displayAllDept(array $departments): string {
+   public function displayAllDept( array $departments, int $currentDept = null): string {
 	   $page = get_page_by_title_V2('Modifier un département');
 	   $linkManageDept = get_permalink($page->ID);
 

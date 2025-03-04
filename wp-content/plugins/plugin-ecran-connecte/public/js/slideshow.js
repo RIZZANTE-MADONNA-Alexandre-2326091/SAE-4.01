@@ -49,6 +49,7 @@ let slidesVideos;
  * */
 let urlYoutube;
 
+console.log(typeDefilement);
 if (typeDefilement === "suret") {
     infoSlideShowSuret();
     scheduleSlideshow();
@@ -312,7 +313,7 @@ function displayOrHide(slides, slideIndex)
                             // Si la vidéo correspond à celle affichée, on associe un id pour l'API
                             if (videoYouTube === slides[slideIndex].childNodes[i]) {
                                 videoYouTube.id = "videoID";
-                                urlYoutube = slides[slideIndex].childNodes[i].firstChild;
+                                urlYoutube = document.getElementById("lien").innerHTML;
                                 console.log(urlYoutube);
 
                                 let lienClassiqueRealise = false;

@@ -20,7 +20,6 @@ class R34ICS extends Controller
 
     var $ical_path = '/vendors/ics-parser/src/ICal/ICal.php';
     var $event_path = '/vendors/ics-parser/src/ICal/Event.php';
-    var $carbon_path = '/vendors/ics-parser/vendor/nesbot/carbon/src/Carbon/Carbon.php';
     var $parser_loaded = false;
     var $limit_days = 365;
 
@@ -351,8 +350,7 @@ class R34ICS extends Controller
     {
         include_once($this->ical_path);
         include_once($this->event_path);
-        include_once($this->carbon_path);
-        return true;
+		return true;
     }
 
 }

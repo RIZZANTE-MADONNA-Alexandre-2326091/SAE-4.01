@@ -181,17 +181,21 @@ class CodeAde extends Model implements Entity, JsonSerializable
 	 *
 	 * @param string $code The code to search for in the database.
 	 *
-	 * @return CodeAde The entity retrieved from the database, or null if no match is found.
+	 * @return array The entity retrieved from the database, or null if no match is found.
 	 */
-    public function getByCode(string $code): CodeAde {
-        $request = $this->getDatabase()->prepare('SELECT id, title, code, type, dept_id FROM ecran_code_ade WHERE code = :code LIMIT 1');
+	public function getByCode(string $code): ?CodeAde {
+		$request = $this->getDatabase()->prepare('SELECT id, title, code, type, dept_id FROM ecran_code_ade WHERE code = :code LIMIT 1');
 
-        $request->bindParam(':code', $code, PDO::PARAM_STR);
+		$request->bindParam(':code', $code, PDO::PARAM_STR);
 
-        $request->execute();
+		$request->execute();
 
-        return $this->setEntity($request->fetch(PDO::FETCH_ASSOC));
-    }
+		$result = $request->fetch(PDO::FETCH_ASSOC);
+		if ($result) {
+			return $this->setEntity($result);
+		}
+		return null;
+	}
 
 	/**
 	 * Retrieves a list of entries associated with the given alert ID.
@@ -224,7 +228,7 @@ class CodeAde extends Model implements Entity, JsonSerializable
         $entity->setTitle($data['title']);
         $entity->setCode($data['code']);
         $entity->setType($data['type']);
-        $entity->setDeptId($data['dept_id']);
+        $entity->setDeptId($data['dept_id'] ?? 0);
 
         return $entity;
     }
