@@ -607,10 +607,10 @@ class User extends Model implements Entity, JsonSerializable
     /**
      * @return string
      */
-    public function getTypeDefilement(): string
-    {
-        return $this->typeDefilement;
-    }
+	public function getTypeDefilement(): string
+	{
+		return $this->typeDefilement ?? '';
+	}
 
     /**
      * @param string $typeDefilement
