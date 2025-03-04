@@ -748,18 +748,15 @@ class InformationController extends Controller
         $currentUser = wp_get_current_user();
         $user = new User();
         $user = $user->get($currentUser->ID);
+	    $dataTv = $user->getTypeOfTelevision($user->getId());
+	    $typeDefilement = $dataTv[1];
+	    $timeout = $dataTv[2];
         $this->view->displayStartSlideshow();
         foreach ($informations as $information)
         {
             $endDate = date('Y-m-d', strtotime($information->getExpirationDate()));
             if (!$this->endDateCheckInfo($information->getId(), $endDate))
             {
-                if ('television' === $user->getRole())
-                {
-                    $typeDefilement = $user->getTypeDefilement();
-                    $timeout = $user->getTimeout();
-                }
-
                 $adminSite = true;
                 if (is_null($information->getAdminId()))
                 {
