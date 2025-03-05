@@ -62,7 +62,8 @@ else {
 	else {
 
 		// Actions before rendering calendar wrapper (can include additional template output)
-		do_action('r34ics_display_calendar_before_wrapper', $view, $args, $ics_data);
+        $view = 'list';
+        do_action('r34ics_display_calendar_before_wrapper', $view, $args, $ics_data);
 
 		// Color code key
 		if (empty($args['legendposition']) || $args['legendposition'] == 'above') {
@@ -216,7 +217,7 @@ else {
 												?>
 
 											</dl>
-										</div>
+										</article>
 										<?php
 										// Pagination?
 										if (!empty($pagination)) { $p_i++; }
@@ -369,7 +370,7 @@ else {
 				}
 			}
 			?>
-		</article>
+		</dl>
 
 		<?php
 		$calendar_output = ob_get_clean();

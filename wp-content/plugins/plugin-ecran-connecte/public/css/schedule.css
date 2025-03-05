@@ -98,4 +98,5 @@ CSS de l'emploi du temps
 
 .firstSelect {
     max-width: 70%;
+    display: inline;
 }

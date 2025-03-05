@@ -77,52 +77,37 @@ class TelevisionView extends UserView
 	 *
 	 * @return string A formatted string representation of televisions and their associated user information.
 	 */
-    public function displayAllTv(array $users, array $userData, array $userDeptList): string
-    {
-        $page = get_page_by_title_V2('Modifier un utilisateur');
-        $linkManageUser = get_permalink($page->ID);
+    public function displayAllTv(array $users, array $userDeptList): string {
+        $title = 'Télévisions';
+        $name = 'TV';
+        $header = ['Login', 'Nombre d\'emplois du temps', 'Département', 'Temps de défilement', 'Type de défilement', 'Modifier'];
 
-        $title = 'Televisions';
-        $name = 'Tele';
-        $header = ['Login', 'Nombre d\'emplois du temps', 'Départements', 'Temps de défilement', 'Type de défilement', 'Modifier'];
+        $rows = [];
+        foreach ($users as $index => $user) {
+            $tvData = $user->getTypeOfTelevision($user->getId());
+            $timeout = isset($tvData['timeout']) ? ($tvData['timeout'] / 1000) . 's' : '10s';
+            $scrollType = isset($tvData['type_defilement']) ?
+                ($tvData['type_defilement'] === 'suret' ? 'Surimpression' : 'Défilement') :
+                'Non défini';
 
-        $row = array();
-        $count = 0;
-        //On affiche les valeurs de certains attributs pour les télévisions
-        foreach ($users as $user)
-        {
-            $typeDefilement = '';
-            $timeout = 0;
-            foreach ($userData as $data)
-            {
-                if ($data[0] === $user->getId())
-                {
-                    $typeDefilement = $data[1];
-                    if ($typeDefilement === 'suret')
-                    {
-                        $typeDefilement = 'Par-dessus les emplois du temps';
-                    }
-                    else if ($typeDefilement === 'defil')
-                    {
-                        $typeDefilement = 'Défilement dans les emplois du temps';
-                    }
-                    $timeout = $data[2];
-                    $timeout = strval($timeout / 1000);
-                }
-            }
-            $row[] = [$count+1,
+            $rows[] = [
+                $index + 1,
                 $this->buildCheckbox($name, $user->getId()),
-                $user->getLogin(), sizeof($user->getCodes()),
-                $userDeptList[$count], $timeout . ' secondes', $typeDefilement,
-                $this->buildLinkForModify($linkManageUser . '?id=' . $user->getId())];
-
-            ++$count;
+                htmlspecialchars($user->getLogin()),
+                count($user->getCodes()),
+                htmlspecialchars($userDeptList[$index] ?? 'Non assigné'),
+                htmlspecialchars($timeout),
+                htmlspecialchars($scrollType),
+                '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Modifier un utilisateur')->ID) . '?id=' . $user->getId()) . '" class="btn button_ecran">Modifier</a>'
+            ];
         }
 
-        return $this->displayAll($name, $title, $header, $row, 'tele');
+        return $this->displayAll($name, $title, $header, $rows, $name);
     }
 
-	/**
+
+
+    /**
 	 * Generates and returns the HTML form for modifying a user's schedule data.
 	 *
 	 * This method creates a dynamic form based on the user's existing schedule codes, with options
@@ -135,49 +120,46 @@ class TelevisionView extends UserView
 	 */
     public function modifyForm(User $user, array $years, array $groups, array $halfGroups): string {
         $count = 0;
+        $tvSettings = $user->getTypeOfTelevision($user->getId());
+
         $string = '
-        <a class="returnbutton" href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des utilisateurs'))) . '">< Retour</a>
-        <h2>' . $user->getLogin() . '</h2>
-         <form method="post" id="registerTvForm">
-            <!--Formulaire type de défilement des vidéos-->
-            <div class="form-group">
-                <p class="lead">Choisissez le mode d\'affichage des vidéos classiques</p>
-                <label for="defilement">Défilement entre les emplois du temps</label>
-                <input type="radio" name="defilement" value="defil" required="required"/>
-                <br>
-                <label for="defilement">Sur-impréssion par-dessus les emplois du temps</label>
-                <input type="radio" name="defilement" value="suret" required="required"/>
-            </div>
-            <!--Formulaire temps de défilement des vidéos-->
-            <div class="form-group">
-                <label for="temps">Temps de défilement des informations (par défaut 10s)</label>
-                <input type="number" name="temps" placeholder="Temps en secondes (par défaut 10s)" value="10">
-            </div>
-            <label id="selectId1"> Emploi du temps</label>';
+    <a class="returnbutton" href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des utilisateurs'))) . '">< Retour</a>
+    <h2>' . $user->getLogin() . '</h2>
+     <form method="post" id="registerTvForm">
+        <!--Formulaire type de défilement des vidéos-->
+        <div class="form-group">
+            <p class="lead">Choisissez le mode d\'affichage des vidéos classiques</p>
+            <label for="defilement">Défilement entre les emplois du temps</label>
+            <input type="radio" name="defilement" value="defil" required="required" ' . ($tvSettings['type_defilement'] === 'defil' ? 'checked' : '') . '/>
+            <br>
+            <label for="defilement">Sur-impréssion par-dessus les emplois du temps</label>
+            <input type="radio" name="defilement" value="suret" required="required" ' . ($tvSettings['type_defilement'] === 'suret' ? 'checked' : '') . '/>
+        </div>
+        <!--Formulaire temps de défilement des vidéos-->
+        <div class="form-group">
+            <label for="temps">Temps de défilement des informations (par défaut 10s)</label>
+            <input type="number" name="temps" placeholder="Temps en secondes (par défaut 10s)" value="' . htmlspecialchars($tvSettings['timeout'] / 1000) . '">
+        </div>
+        <label id="selectId1"> Emploi du temps</label>';
 
         foreach ($user->getCodes() as $code) {
-            $count = $count + 1;
-            if ($count == 1) {
-                $string .= $this->buildSelectCode($years, $groups, $halfGroups, $code, $count);
-            } else {
-                $string .= '
-					<div class="row">' .
-                    $this->buildSelectCode($years, $groups, $halfGroups, $code, $count) .
-                    '<input type="button" id="selectId' . $count . '" onclick="deleteRow(this.id)" class="btn button_ecran" value="Supprimer">
-					</div>';
-            }
+            $count++;
+            $string .= '
+        <div class="scheduleRow">' .
+                $this->buildSelectCode($years, $groups, $halfGroups, $code, $count) .
+                '<input type="button" id="selectId' . $count . '" onclick="deleteRow(this.id)" class="btn button_ecran" value="Supprimer">
+        </div>';
         }
 
         if ($count == 0) {
-            $string .= $this->buildSelectCode($years, $groups, $halfGroups, null, $count);
         }
 
         $page = get_page_by_title_V2('Gestion des utilisateurs');
         $linkManageUser = get_permalink($page->ID);
         $string .= '
-            <input type="button" class="btn button_ecran" id="addSchedule" onclick="addButtonTv()" value="Ajouter des emplois du temps">
-            <button name="modifValidate" class="btn button_ecran" type="submit" id="validTv">Valider</button>
-        </form>';
+        <input type="button" class="btn button_ecran" id="addSchedule" onclick="addButtonTv()" value="Ajouter des emplois du temps">
+        <button name="modifValidate" class="btn button_ecran" type="submit" id="validTv">Valider</button>
+    </form>';
         return $string;
     }
 
@@ -197,7 +179,7 @@ class TelevisionView extends UserView
 	 * @return string The generated HTML string for the select element, including all options and optgroup elements.
 	 */
     public function buildSelectCode(array $years, array $groups, array $halfGroups, CodeAde $code = null, int $count = 0): string {
-        $select = '<select class="form-control firstSelect" id="selectId' . $count . '" name="selectTv[]" required="">';
+        $select = '<select class="form-control scheduleSel firstSelect" id="selectId' . $count . '" name="selectTv[]" required="">';
 
         if (!is_null($code)) {
             $select .= '<option value="' . $code->getCode() . '">' . $code->getTitle() . '</option>';

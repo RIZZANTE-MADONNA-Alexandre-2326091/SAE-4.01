@@ -48,6 +48,10 @@ body.orange {
     gap: 10px;
 }
 
+.room-schedule {
+    margin-top: 120px;
+}
+
 .theme-button {
     padding: 20px;
     border: none;
@@ -118,6 +122,11 @@ body.orange .container {
 .body_television_ecran {
     overflow: hidden;
 }
+
+.scheduleRow {
+    margin-bottom: 20px;
+}
+
 
 .row {
     margin: 0px;

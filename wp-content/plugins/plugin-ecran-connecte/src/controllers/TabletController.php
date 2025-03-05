@@ -71,6 +71,52 @@ class TabletController extends UserController
         return $this->view->displayFormTablet($deptModel->getAll(), $isAdmin, $currentDept, $availableRooms);
     }
 
+    public function modify(User $user): string {
+        $page = get_page_by_title_V2('Gestion des utilisateurs');
+        $linkManageUser = get_permalink($page->ID);
+
+        $codeAde = new CodeAde();
+        $deptModel = new Department();
+
+        $action = filter_input(INPUT_POST, 'modifyTablet');
+
+        if (isset($action)) {
+            $selectedRoomCode = filter_input(INPUT_POST, 'selectTablet');
+            $deptId = filter_input(INPUT_POST, 'deptTablet', FILTER_VALIDATE_INT);
+
+            if ($selectedRoomCode && $deptId !== false) {
+                $room = $codeAde->getByCode($selectedRoomCode);
+
+                if ($room && !is_null($room->getId())) {
+                    $user->setCodes([$room]);
+                    $user->setDeptId($deptId);
+
+                    if ($user->update()) {
+                        $this->view->displayModificationValidate($linkManageUser);
+                    } else {
+                        $this->view->displayErrorModification();
+                    }
+                } else {
+                    $this->view->displayErrorInvalidRoom();
+                }
+            } else {
+                $this->view->displayErrorInvalidData();
+            }
+        }
+
+        // Récupérer les salles disponibles
+        $allRooms = $codeAde->getAllFromType('room') ?? [];
+        $occupiedRooms = $this->model->getOccupiedRooms();
+        $availableRooms = array_filter($allRooms, function($room) use ($occupiedRooms) {
+            return !in_array($room->getId(), $occupiedRooms);
+        });
+
+        // Récupérer les départements
+        $departments = $deptModel->getAll();
+
+        return $this->view->modifyForm($user, $availableRooms, $departments, in_array('administrator', wp_get_current_user()->roles), $user->getDeptId());
+    }
+
 
     public function displayAllTablets(): string
     {
