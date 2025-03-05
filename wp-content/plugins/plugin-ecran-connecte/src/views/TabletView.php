@@ -2,10 +2,12 @@
 namespace Views;
 
 use Models\CodeAde;
+use Models\User;
 
 class TabletView extends UserView
 {
-    public function displayFormTablet(array $departments, $isAdmin = null, $currentDept = null, array $rooms) {
+    public function displayFormTablet(array $departments, $isAdmin = null, $currentDept = null, array $rooms): string
+    {
         $disabled = $isAdmin ? '' : 'disabled';
 
         return '
@@ -122,5 +124,6 @@ class TabletView extends UserView
         $select .= '</select>';
         return $select;
     }
+
 
 }

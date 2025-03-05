@@ -71,7 +71,17 @@ class TabletController extends UserController
         return $this->view->displayFormTablet($deptModel->getAll(), $isAdmin, $currentDept, $availableRooms);
     }
 
-    public function modify(User $user): string {
+    public function modify(): string {
+        $userId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+        if (!$userId) {
+            return 'Veuillez choisir un utilisateur';
+        }
+
+        $user = $this->model->get($userId);
+        if (!$user) {
+            return 'Utilisateur non trouvé';
+        }
+
         $page = get_page_by_title_V2('Gestion des utilisateurs');
         $linkManageUser = get_permalink($page->ID);
 

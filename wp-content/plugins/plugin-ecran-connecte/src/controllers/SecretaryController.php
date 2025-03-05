@@ -234,11 +234,16 @@ class SecretaryController extends UserController
 
         if (is_numeric($id) && $this->model->get($id)) {
             $user = $this->model->get($id);
-
             $wordpressUser = get_user_by('id', $id);
 
             if (in_array("television", $wordpressUser->roles)) {
                 $controller = new TelevisionController();
+                return $controller->modify($user);
+            } elseif (in_array("tablette", $wordpressUser->roles)) {
+                $controller = new TabletController();
+                return $controller->modify($user);
+            } elseif (in_array("technicien", $wordpressUser->roles)) {
+                $controller = new TechnicianController();
                 return $controller->modify($user);
             }
         }
