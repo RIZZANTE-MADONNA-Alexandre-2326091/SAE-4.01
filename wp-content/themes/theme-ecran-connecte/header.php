@@ -32,13 +32,12 @@ if(in_array('television', $current_user->roles)) : ?>
         document.body.classList.add(theme);
         localStorage.setItem("selectedTheme", theme);
     }
-
 </script>
 
 <!-- HEADER -->
 <header>
     <!-- NAV -->
-    <?php if(!in_array('television', $current_user->roles)) : ?>
+    <?php if(!in_array('television', $current_user->roles) && !in_array('tablette', $current_user->roles)) : ?>
         <nav class="navbar navbar-expand-lg navbar-dark nav_ecran">
             <a class="navbar-brand" href="<?php echo get_home_url(); ?>">
                 <?php if (get_header_image()) : ?>

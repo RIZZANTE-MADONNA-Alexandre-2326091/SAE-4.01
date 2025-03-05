@@ -175,16 +175,24 @@ class Department extends Model implements Entity, JsonSerializable
 	 *
 	 * @return Department Returns an array of departments, where each department contains its ID and name.
 	 */
-    public function getUserInDept(int $userId): Department
+    public function getUserInDept(int $userId): ?Department
     {
-        $request = $this->getDatabase()->prepare("SELECT ed.dept_id, ed.name FROM ecran_department ed
-                                              JOIN ecran_dept_user edu ON edu.dept_id = ed.dept_id
-                                              WHERE edu.user_id = :userId");
+        $request = $this->getDatabase()->prepare("
+        SELECT ed.dept_id, ed.name 
+        FROM ecran_department ed
+        LEFT JOIN ecran_dept_user edu ON edu.dept_id = ed.dept_id
+        WHERE edu.user_id = :userId
+    ");
 
         $request->bindValue(':userId', $userId, PDO::PARAM_INT);
         $request->execute();
 
         $data = $request->fetch(PDO::FETCH_ASSOC);
+
+        // Gérer le cas où il n'y a pas de département
+        if (empty($data['dept_id'])) {
+            return null;
+        }
 
         return $this->setEntity($data);
     }

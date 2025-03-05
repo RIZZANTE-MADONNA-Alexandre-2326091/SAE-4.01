@@ -41,6 +41,27 @@ will be retained permanently, so they can be used to create custom color palette
 	100% { transform: rotate(360deg); }
 }
 
+.ics-calendar {
+	font-size: 1.5em; /* Increase the base font size */
+}
+
+.ics-calendar-month-grid th,
+.ics-calendar-month-grid td {
+	padding: 16px; /* Increase padding for table cells */
+}
+
+.ics-calendar-month-grid th {
+	font-size: 1.2em; /* Increase font size for table headers */
+}
+
+.ics-calendar-month-grid .day {
+	font-size: 1.2em; /* Increase font size for day numbers */
+}
+
+.ics-calendar-month-grid ul.events li {
+	font-size: 1.1em; /* Increase font size for event list items */
+	padding: 8px 16px; /* Increase padding for event list items */
+}
 
 /* CSS classes */
 
@@ -157,8 +178,7 @@ will be retained permanently, so they can be used to create custom color palette
 		}
 		.ics-calendar .events .time .end_time {
 			display: inline-block;
-			font-size: 90%;
-			font-weight: normal;
+
 		}
 		.ics-calendar .events .time .show_on_hover {
 			visibility: hidden;
@@ -293,15 +313,7 @@ will be retained permanently, so they can be used to create custom color palette
 	.ics-calendar-description { }
 	
 	.ics-calendar-select {
-		color: var(--r34ics--color--black); /* Resolves issues in some browsers when site has default text color set to white */
-		float: right;
-		font-size: 80%;
-		margin: 0.5em 0 0.5em 0.5em;
-		max-width: 200px;
-		min-width: 200px;
-		position: relative;
-		width: 200px;
-		z-index: 2;
+		display: none;
 	}
 	
 	.ics-calendar-arrow-nav {
@@ -490,7 +502,7 @@ will be retained permanently, so they can be used to create custom color palette
 			.ics-calendar-month-grid th {
 				background: var(--r34ics--color--gainsboro);
 				color: var(--r34ics--color--black);
-				padding: 0.5em 0.8em 0.2em 0.8em !important;
+				padding: 1em !important;
 				text-align: center;
 				text-transform: uppercase;
 			}
@@ -557,9 +569,9 @@ will be retained permanently, so they can be used to create custom color palette
 				margin: 0;
 				padding: 0;
 			}
-			
+
 				.ics-calendar-month-grid ul.events li {
-					border-bottom: 1px solid var(--r34ics--color--gainsboro);
+					border-bottom: 1px solid #495159;
 					list-style: none !important;
 					margin: 0;
 					padding: 0.4em 0.8em;
@@ -851,9 +863,7 @@ button:not(.components-button):not([role=presentation]).r34ics_event_ics_downloa
 	body:not(#tinymce) .ics-calendar:not(.nomobile) .phone_only.inline_block:not(.hidden) { display: inline-block !important; }
 
 	.ics-calendar-select {
-		float: none;
-		margin: 0 0 1em 0;
-		width: 100%;
+		display: none;
 	}
 	
 	.ics-calendar:not(.nomobile) .ics-calendar-month-grid { margin-bottom: 1.5em; }
@@ -939,6 +949,31 @@ button:not(.components-button):not([role=presentation]).r34ics_event_ics_downloa
 	.ics-calendar-color-key { max-width: 100%; }
 
 }
+
+.ics-calendar-month-grid {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+.ics-calendar-month-grid th,
+.ics-calendar-month-grid td {
+	border: 1px solid #ddd;
+	padding: 8px;
+	text-align: center;
+}
+
+.ics-calendar-month-grid th {
+	background-color: #f4f4f4;
+}
+
+.ics-calendar-month-grid .week-number {
+	background-color: #eaeaea;
+}
+
+.ics-calendar-month-grid .off {
+	background-color: #f9f9f9;
+}
+
 
 
 /* Print */

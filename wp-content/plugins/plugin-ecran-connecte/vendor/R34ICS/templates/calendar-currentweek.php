@@ -31,15 +31,7 @@ $ics_calendar_classes = array(
 		?>
 		<p class="ics-calendar-description"><?php echo $ics_data['description']; ?></p>
 		<?php
-	}
-	
-	// Display calendar
-	?>
-	<select class="ics-calendar-select" style="display: none;">
-		<option value="previous-week"><?php _e('Last week', 'R34ICS'); ?></option>
-		<option value="current-week" selected="selected"><?php _e('This week', 'R34ICS'); ?></option>
-		<option value="next-week"><?php _e('Next week', 'R34ICS'); ?></option>
-	</select>
+	} ?>
 	
 	<div class="ics-calendar-currentweek-wrapper" style="display: none;">
 		<table class="ics-calendar-month-grid">

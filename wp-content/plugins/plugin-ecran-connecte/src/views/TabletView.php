@@ -37,34 +37,28 @@ class TabletView extends UserView
     </form>';
     }
 
-    public function displayAllTablets($users, $userDeptList) {
-        $output = '<h2>Liste des utilisateurs Tablet</h2><table class="table"><thead><tr><th>Login</th><th>Département</th></tr></thead><tbody>';
+    public function displayAllTablets(array $users, array $userDeptList): string {
+        $title = 'Tablettes';
+        $name = 'Tablet';
+        $header = ['Login', 'Département', 'Modifier'];
+
+        $rows = [];
         foreach ($users as $index => $user) {
-            $output .= '<tr><td>' . $user->getLogin() . '</td><td>' . $userDeptList[$index] . '</td></tr>';
-        }
-        $output .= '</tbody></table>';
-        return $output;
-    }
-
-    public function buildSelectCode(array $rooms, CodeAde $code = null, int $count = 0): string {
-        if (empty($rooms)) {
-            return '<p class="text-danger">Aucune salle disponible.</p>';
+            $rows[] = [
+                $index + 1,
+                $this->buildCheckbox($name, $user->getId()),
+                htmlspecialchars($user->getLogin()),
+                htmlspecialchars($userDeptList[$index] ?? 'Non assigné'),
+                '<a href="' . esc_url(get_permalink(get_page_by_title_V2('Modifier un utilisateur')->ID) . '?id=' . $user->getId()) . '" class="btn button_ecran">Modifier</a>'
+            ];
         }
 
-        $select = '<select name="selectTablet" class="form-control" required>';
-        foreach ($rooms as $room) {
-            if (method_exists($room, 'getCode') && method_exists($room, 'getTitle')) {
-                $select .= '<option value="' . htmlspecialchars($room->getCode()) . '">' . htmlspecialchars($room->getTitle()) . '</option>';
-            }
-        }
-        $select .= '</select>';
-
-        return $select;
+        return $this->displayAll($name, $title, $header, $rows, $name);
     }
 
 
     public function displayRoomSchedule(array $rooms): string {
-        $output = '<h2>Emploi du temps</h2>';
+        $output = '<a class="welcome-text" href="/wp-login.php?action=logout">Emploi du temps</a>';
 
         setlocale(LC_TIME, 'fr_FR.UTF-8');
         $startDate = strftime('%A %d %B %Y', strtotime("monday this week"));
@@ -84,5 +78,49 @@ class TabletView extends UserView
         return $output;
     }
 
+    public function modifyForm(User $user, array $rooms, array $departments, $isAdmin = null, $currentDept = null): string {
+        $disabled = $isAdmin ? '' : 'disabled';
+
+        // Récupérer la salle actuelle
+        $currentRoom = $user->getCodes()[0] ?? null;
+
+        return '
+    <a class="returnbutton" href="' . esc_url(get_permalink(get_page_by_title_V2('Gestion des utilisateurs'))) . '">< Retour</a>
+    <h2>Modifier la tablette ' . htmlspecialchars($user->getLogin()) . '</h2>
+    <form method="post" class="cadre">
+        <div class="form-group">
+            <label for="loginTablet">Login</label>
+            <input class="form-control" type="text" value="' . htmlspecialchars($user->getLogin()) . '" disabled>
+        </div>
+        <div class="form-group">
+            <label for="deptTablet">Département</label>
+            <select name="deptTablet" class="form-control" ' . $disabled . '>
+                ' . $this->displayAllDept($departments, $currentDept) . '
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Salle : </label>' .
+            $this->buildSelectCode($rooms, $currentRoom) . '
+        </div>
+        <button type="submit" class="btn button_ecran" name="modifyTablet">Enregistrer</button>
+    </form>';
+    }
+
+    private function buildSelectCode(array $rooms, ?CodeAde $currentRoom = null): string {
+        $select = '<select class="form-control" name="selectTablet" required>';
+
+        if ($currentRoom) {
+            $select .= '<option value="' . $currentRoom->getCode() . '" selected>' . $currentRoom->getTitle() . '</option>';
+        }
+
+        $select .= '<option value="0">Aucune</option>';
+
+        foreach ($rooms as $room) {
+            $select .= '<option value="' . $room->getCode() . '">' . htmlspecialchars($room->getTitle()) . '</option>';
+        }
+
+        $select .= '</select>';
+        return $select;
+    }
 
 }

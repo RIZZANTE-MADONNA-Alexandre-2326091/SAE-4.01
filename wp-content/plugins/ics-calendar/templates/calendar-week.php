@@ -59,16 +59,6 @@ if ($args['toggle'] === 'lightbox') {
 		echo wp_kses(($R34ICS2->color_key_html($args, $ics_data) ?: ''), r34ics_color_key_allowed());
 	}
 
-	// Display calendar
-	if (empty($fixed_dates)) {
-		?>
-		<select class="ics-calendar-select" style="display: none;" autocomplete="off">
-			<option value="previous-week"><?php esc_html_e('Last week', 'ics-calendar'); ?></option>
-			<option value="current-week" selected="selected"><?php esc_html_e('This week', 'ics-calendar'); ?></option>
-			<option value="next-week"><?php esc_html_e('Next week', 'ics-calendar'); ?></option>
-		</select>
-		<?php
-	}
 
 	// Toggle show/hide past events on mobile
 	if ($args['startdate'] != $today) {
@@ -236,7 +226,7 @@ if ($args['toggle'] === 'lightbox') {
 															if (!empty($event['end']) && $event['end'] != $event['start']) {
 																if (empty($args['showendtimes'])) {
 																	?>
-																	<span class="end_time show_on_hover">&#8211; <?php echo wp_kses_post($event['end'] ?: ''); ?></span>
+																	<span class="end_time">&#8211; <?php echo wp_kses_post($event['end'] ?: ''); ?></span>
 																	<?php
 																}
 																else {
@@ -285,7 +275,7 @@ if ($args['toggle'] === 'lightbox') {
 				?>
 			</tr></tbody>
 		</table>
-		
+
 		<?php
 		// Message for mobile breakpoint when there are no events returned
 		if (empty($ics_data['events']) || r34ics_is_empty_array($ics_data['events'])) {

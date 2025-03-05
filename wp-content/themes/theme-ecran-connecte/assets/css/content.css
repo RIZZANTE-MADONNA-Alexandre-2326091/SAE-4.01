@@ -34,6 +34,10 @@ body.orange {
     color: var(--color-text);
 }
 
+#nav-tabContent {
+    margin-bottom: 12px;
+}
+
 .theme-preview {
     font-size: 24px;
 }
@@ -44,12 +48,21 @@ body.orange {
     gap: 10px;
 }
 
+.room-schedule {
+    margin-top: 120px;
+}
+
 .theme-button {
     padding: 20px;
     border: none;
     cursor: pointer;
+    border-radius: 12px;
     font-size: 16px;
     color: white;
+}
+
+.theme-button.selected {
+    border: 3px solid white;
 }
 
 .table-success, .table-success>td, .table-success>th {
@@ -84,7 +97,7 @@ body.orange .welcome-text {
 }
 
 .img-fluid {
-    filter: brightness(0) saturate(100%) invert(33%) sepia(31%) saturate(6915%) hue-rotate(212deg) brightness(89%) contrast(94%);
+    filter: brightness(0) saturate(100%);
 }
 
 .container {
@@ -109,6 +122,11 @@ body.orange .container {
 .body_television_ecran {
     overflow: hidden;
 }
+
+.scheduleRow {
+    margin-bottom: 20px;
+}
+
 
 .row {
     margin: 0px;

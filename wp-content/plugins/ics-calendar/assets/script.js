@@ -264,9 +264,6 @@ function r34ics_init(elem) {
 		// Initial state
 		jQuery('.ics-calendar.layout-week .ics-calendar-month-grid:not(.fixed_dates) tbody tr').addClass('remove');
 		jQuery('.ics-calendar.layout-week .ics-calendar-month-grid.fixed_dates tbody tr').addClass('current-week');
-		jQuery('.ics-calendar.layout-week .ics-calendar-month-grid:not(.fixed_dates) tbody td.today').parent().addClass('current-week').removeClass('remove');
-		jQuery('.ics-calendar.layout-week .ics-calendar-month-grid:not(.fixed_dates) tbody td.today').parent().prev().addClass('previous-week').removeClass('remove');
-		jQuery('.ics-calendar.layout-week .ics-calendar-month-grid:not(.fixed_dates) tbody td.today').parent().next().addClass('next-week').removeClass('remove');
 		jQuery('.ics-calendar.layout-week .ics-calendar-month-grid:not(.fixed_dates) tbody tr.remove').remove();
 		r34ics_week_reset();
 		jQuery('.ics-calendar.layout-week .ics-calendar-select').show();
@@ -655,6 +652,34 @@ jQuery(window).on('resize', function() {
 	r34ics_week_reset();
 
 });
+
+jQuery(document).ready(function() {
+	// Calculate the height of each hour block
+	var hourHeight = jQuery('.ics-calendar-month-grid th').outerHeight();
+
+	// Position each event block based on its start and end time
+	jQuery('.ics-calendar-month-grid .events li').each(function() {
+		var event = jQuery(this);
+		var startTime = event.data('start-time');
+		var endTime = event.data('end-time');
+
+		if (startTime && endTime) {
+			var startHour = parseInt(startTime.split(':')[0]);
+			var endHour = parseInt(endTime.split(':')[0]);
+			var startMinute = parseInt(startTime.split(':')[1]);
+			var endMinute = parseInt(endTime.split(':')[1]);
+
+			var startOffset = (startHour - 8) * hourHeight + (startMinute / 60) * hourHeight;
+			var endOffset = (endHour - 8) * hourHeight + (endMinute / 60) * hourHeight;
+
+			event.css({
+				top: startOffset,
+				height: endOffset - startOffset
+			});
+		}
+	});
+});
+
 
 
 jQuery(document).on('r34ics_init_end', function() {

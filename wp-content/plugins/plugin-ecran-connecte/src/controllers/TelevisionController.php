@@ -147,71 +147,63 @@ class TelevisionController extends UserController implements Schedule
     /**
      * Modify user data and handle the modification process
      *
-     * @param user $user The user object that will be modified
+     * @param User $user The user object that will be modified
      *
      * @return string The HTML content for the modification form or an error message
      * @throws Exception
      */
-    public function modify(user $user): string {
+    public function modify(User $user): string {
         $page = get_page_by_title_V2('Gestion des utilisateurs');
-        $linkManageUser = get_permalink($page->ID);
+        $returnUrl = get_permalink($page->ID);
 
-        $codeAde = new CodeAde();
+        try {
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                // Récupération des données
+                $codes = $_POST['selectTv'] ?? [];
+                $scrollType = $_POST['defilement'] ?? 'suret';
+                $timeout = (int)($_POST['temps'] ?? 10) * 1000;
 
-        $action = filter_input(INPUT_POST, 'modifValidate');
-
-        if (isset($action))
-        {
-            $codes = filter_input(INPUT_POST, 'selectTv', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
-            $typeDefilement = $_POST['defilement'];
-            $tempsDefilement = filter_input(INPUT_POST, 'temps');
-
-            $codesAde = array();
-            foreach ($codes as $code)
-            {
-                if (is_null($codeAde->getByCode($code)->getId()))
-                {
-                    return 'error';
+                // Validation des données
+                if ($timeout <= 0) {
+                    throw new Exception("Durée invalide");
                 }
-                else
-                {
-                    $codesAde[] = $codeAde->getByCode($code);
+
+                // Conversion des codes en objets CodeAde
+                $codeAde = new CodeAde();
+                $codesObjects = [];
+                foreach ($codes as $code) {
+                    if ($code !== '0') {
+                        $codeObj = $codeAde->getByCode($code);
+                        if ($codeObj) {
+                            $codesObjects[] = $codeObj;
+                        }
+                    }
                 }
-            }
 
-            if ($typeDefilement === null)
-            {
-                $typeDefilement = 'suret';
-            }
-            if ($tempsDefilement === null)
-            {
-                $tempsDefilement = 0;
-            }
-            $tempsDefilement = (int)$tempsDefilement;
+                // Mise à jour de l'utilisateur
+                $user->setCodes($codesObjects);
+                $user->setTypeDefilement($scrollType);
+                $user->setTimeout($timeout);
 
-            $user->setTypeDefilement($typeDefilement);
-
-            if ($tempsDefilement <= 0)
-            {
-                $this->view->displayTimeoutNegativeError();
-            }
-            else
-            {
-                $user->setTimeout($tempsDefilement * 1000);
-
-                $user->setCodes($codesAde);
-                if ($user->update())
-                {
-                    $this->view->displayModificationValidate($linkManageUser);
+                if ($user->update()) {
+                    wp_redirect(add_query_arg('success', '1', $returnUrl));
+                    exit;
                 }
             }
+
+            // Récupération des données pour le formulaire
+            $codeAde = new CodeAde();
+            return $this->view->modifyForm(
+                $user,
+                $codeAde->getAllFromType('year'),
+                $codeAde->getAllFromType('group'),
+                $codeAde->getAllFromType('halfGroup')
+            );
+
+        } catch (Exception $e) {
+            error_log("Erreur modification TV: " . $e->getMessage());
+            return '<div class="alert alert-danger">Erreur: ' . $e->getMessage() . '</div>';
         }
-
-        $years = $codeAde->getAllFromType('year');
-        $groups = $codeAde->getAllFromType('group');
-        $halfGroups = $codeAde->getAllFromType('halfGroup');
-
-        return $this->view->modifyForm($user, $years, $groups, $halfGroups);
     }
 
 	/**
@@ -219,21 +211,20 @@ class TelevisionController extends UserController implements Schedule
 	 *
 	 * @return string The rendered view displaying all television users.
 	 */
-    public function displayAllTv(): string
-    {
+    public function displayAllTv(): string {
         $users = $this->model->getUsersByRole('television');
 
-	    $deptModel = new Department();
-	    $userDeptList = array();
-        $userData = array();
-	    foreach ($users as $user)
-        {
-            $userData[] = $user->getTypeOfTelevision($user->getId());
-		    $userDeptList[] = $deptModel->getUserInDept($user->getId())->getName();
-	    }
+        $deptModel = new Department();
+        $userDeptList = [];
 
-        return $this->view->displayAllTv($users, $userData, $userDeptList);
+        foreach ($users as $user) {
+            $dept = $deptModel->getUserInDept($user->getId());
+            $userDeptList[] = $dept ? $dept->getName() : 'Non assigné';
+        }
+
+        return $this->view->displayAllTv($users, $userDeptList);
     }
+
 
 	/**
 	 * Displays the current user's schedule based on their codes and theme settings.

@@ -100,15 +100,14 @@ class CodeAdeController extends Controller
 	 *               - Success or error views based on the input validation and update results.
 	 */
     public function modify(): string {
-        $id = $_GET['id'];
-        if (is_numeric($id) && !$this->model->get($id))
+        $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+        if (!$id || !$this->model->get($id)) {
             return $this->view->errorNobody();
+        }
 
-        var_dump('test');
-
-        $result = $codeAde = $this->model->get($id);
-
+        $codeAde = $this->model->get($id);
         $submit = filter_input(INPUT_POST, 'submit');
+
         if (isset($submit)) {
             $validType = ['year', 'group', 'halfGroup'];
 
@@ -117,7 +116,6 @@ class CodeAdeController extends Controller
             $type = filter_input(INPUT_POST, 'type');
 
             if (is_string($title) && strlen($title) > 4 && strlen($title) < 30 &&
-                is_numeric($code) && is_string($code) && strlen($code) < 20 &&
                 in_array($type, $validType)) {
 
                 $codeAde->setTitle($title);
@@ -125,7 +123,7 @@ class CodeAdeController extends Controller
                 $codeAde->setType($type);
 
                 if (!$this->checkDuplicateCode($codeAde) && $codeAde->update()) {
-                    if ($result->getCode() != $code) {
+                    if ($codeAde->getCode() != $code) {
                         $this->addFile($code);
                     }
                     $this->view->successModification();

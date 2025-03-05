@@ -13,19 +13,26 @@
 .rss-feed {
     list-style-type: none;
     padding: 0;
+    text-align: left;
+    line-height: 20px;
+}
+
+.rss-item {
+    background-color: #d4eeff;
+    border-radius: 15px;
 }
 
 .rss-feed li {
     margin-bottom: 15px;
     border-bottom: 1px solid #ddd;
-    padding-bottom: 10px;
+    padding: 15px;
     margin-left: 0;
 }
 
 .rss-feed a {
-    font-size: 18px;
+    font-size: 24px;
     font-weight: bold;
-    color: #FFFFFF;
+    color: black;
     text-decoration: none;
 }
 
@@ -34,15 +41,9 @@
 }
 
 .rss-description {
-    color: #000c69;
     margin-top: 5px;
     margin-bottom: 10px;
     font-size: 14px;
-    background-color: white;
-    border-radius: 05px;
-    text-align: left;
-    outline: 2px solid #1c2eb5;
-    padding: 5px;
 }
 
 /*
