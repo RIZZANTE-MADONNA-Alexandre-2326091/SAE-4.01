@@ -142,7 +142,6 @@ class TabletController extends UserController
         return $this->view->displayAllTablets($users, $userDeptList);
     }
 
-
     public function displayUserRoomSchedule(): string {
         $current_user = wp_get_current_user();
         $user = $this->model->get($current_user->ID);

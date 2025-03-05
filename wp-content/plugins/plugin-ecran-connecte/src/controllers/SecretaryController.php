@@ -250,6 +250,7 @@ class SecretaryController extends UserController
         return $this->view->displayNoUser();
     }
 
+
 	/**
 	 * Deletes users based on their roles and selected checkboxes.
 	 *

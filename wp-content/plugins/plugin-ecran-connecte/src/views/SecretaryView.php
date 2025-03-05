@@ -129,6 +129,7 @@ class SecretaryView extends UserView
         return $this->displayAll($name, $title, $header, $row, $name);
     }
 
+
 	/**
 	 * Displays an alert message indicating that no user has been selected.
 	 *
